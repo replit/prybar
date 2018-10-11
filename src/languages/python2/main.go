@@ -40,7 +40,7 @@ const char* pry_eval(const char *code, int start) {
 		PyErr_Print();
 		return NULL;
 	}
-	char *str = PyString_AS_STRING(s);
+	char *str = PyBytes_AS_STRING(s);
 	Py_DECREF(v);
 	Py_DECREF(s);
 	return str;
@@ -95,6 +95,12 @@ func (p Python) EvalFile(file string, args []string) {
 	argv := C.CString(file + "\x00" + strings.Join(args, "\x00"))
 	defer C.free(unsafe.Pointer(argv))
 	C.pry_eval_file(handle, cfile, C.int(len(args) + 1), argv)
+}
+
+func (p Python) REPLLikeEval(code string) {
+	ccode := C.CString(code)
+	defer C.free(unsafe.Pointer(ccode))
+	C.pry_eval(ccode, C.Py_single_input)
 }
 
 func (p Python) REPL() {

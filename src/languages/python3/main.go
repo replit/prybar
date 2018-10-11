@@ -1,7 +1,7 @@
 package main
 
 /*
-#cgo pkg-config: python3
+#cgo pkg-config: python2
 #include <Python.h>
 
 void pry_eval_file(FILE* f, const char* file, int argn, const char *argv) {
@@ -14,6 +14,36 @@ void pry_eval_file(FILE* f, const char* file, int argn, const char *argv) {
 	xargv[argn] = NULL;
 	PySys_SetArgvEx(argn, xargv, 1);
 	PyRun_AnyFile(f, file);
+}
+
+const char* pry_eval(const char *code, int start) {
+
+	PyObject *m, *d, *s, *v;
+	PyCodeObject *c;
+	m = PyImport_AddModule("__main__");
+
+	if (m == NULL) return NULL;
+
+	d = PyModule_GetDict(m);
+	c = Py_CompileString(code, "(eval)", start);
+	if (c == NULL) {
+		PyErr_Print();
+		return NULL;
+	}
+	v = PyEval_EvalCode(c, d, d);
+	if (v == NULL) {
+		PyErr_Print();
+		return NULL;
+	}
+	s = PyObject_Str(v);
+	if (s == NULL) {
+		PyErr_Print();
+		return NULL;
+	}
+	char *str = PyBytes_AS_STRING(s);
+	Py_DECREF(v);
+	Py_DECREF(s);
+	return str;
 }
 
 */
@@ -40,14 +70,20 @@ func (p Python) Version() string {
 func (p Python) Eval(code string) {
 	ccode := C.CString(code)
 	defer C.free(unsafe.Pointer(ccode))
-	C.PyRun_SimpleStringFlags(ccode, nil) 
+	C.GoString(C.pry_eval(ccode, C.Py_file_input))
+}
+
+func (p Python) EvalExpression(code string) string {
+	ccode := C.CString(code)
+	defer C.free(unsafe.Pointer(ccode))
+	return C.GoString(C.pry_eval(ccode, C.Py_eval_input))
 }
 
 func (p Python) EvalFile(file string, args []string) {
 	handle := C.stdin
 	cfile := C.CString(file)
 	defer C.free(unsafe.Pointer(cfile))
-
+	
 	if file != "-" {
 		cmode := C.CString("r")
 		
@@ -61,6 +97,12 @@ func (p Python) EvalFile(file string, args []string) {
 	C.pry_eval_file(handle, cfile, C.int(len(args) + 1), argv)
 }
 
+func (p Python) REPLLikeEval(code string) {
+	ccode := C.CString(code)
+	defer C.free(unsafe.Pointer(ccode))
+	C.pry_eval(ccode, C.Py_single_input)
+}
+
 func (p Python) REPL() {
 	fn := C.CString("<stdin>")
 	defer C.free(unsafe.Pointer(fn))
@@ -68,7 +110,7 @@ func (p Python) REPL() {
 }
 
 func (p Python) Close() {    
-    C.Py_Finalize()
+	C.Py_Finalize()
 }
 
 // exported

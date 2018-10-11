@@ -14,13 +14,13 @@ void pry_open() {
 	binding = rb_binding_new();
 }
 
-const char* prybar_ruby_version() {
+const char* pry_ruby_version() {
 	return ruby_description;
 }
 
 
 
-char * prybar_eval(const char* code) {
+char * pry_eval(const char* code) {
 	
 	int state;
 	VALUE result;
@@ -57,7 +57,7 @@ func (p Ruby) Open() {
 }
 
 func (p Ruby) Version() string {
-	return C.GoString(C.prybar_ruby_version())
+	return C.GoString(C.pry_ruby_version())
 }
 
 func (p Ruby) Eval(code string) {
@@ -67,7 +67,7 @@ func (p Ruby) Eval(code string) {
 func (p Ruby) EvalExpression(code string) string {
 	ccode := C.CString(code)
 	defer C.free(unsafe.Pointer(ccode))
-	res := C.prybar_eval(ccode)
+	res := C.pry_eval(ccode)
 	return C.GoString(res);
 }
 

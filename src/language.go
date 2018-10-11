@@ -18,6 +18,11 @@ type PluginEval interface {
 	Eval(code string)
 }
 
+type PluginEvalExpression interface {
+	PluginBase
+	EvalExpression(code string) string
+}
+
 type PluginEvalFile interface {
 	PluginBase
 	EvalFile(file string, args []string)
@@ -26,6 +31,11 @@ type PluginEvalFile interface {
 type PluginREPL interface {
 	PluginBase
 	REPL()
+}
+
+type PluginREPLLikeEval interface {
+	PluginBase
+	REPLLikeEval(code string)
 }
 
 type Langauge struct {
@@ -73,10 +83,48 @@ func (lang Langauge) Eval(code string) {
 	lang.ptr.(PluginEval).Eval(code)
 }
 
+func (lang Langauge) EvalAndTryToPrint(code string) {
+	ee, ok := lang.ptr.(PluginEvalExpression)
+	if ok {
+		fmt.Println(ee.EvalExpression(code))
+	} else {
+		lang.ptr.(PluginEval).Eval(code)
+	}
+}
+
+func (lang Langauge) REPLLikeEval(code string) {
+	rle, ok := lang.ptr.(PluginREPLLikeEval)
+	if ok {
+		rle.REPLLikeEval(code)
+		return
+	}
+
+	ee, ok := lang.ptr.(PluginEvalExpression)
+	if ok {
+		fmt.Println(ee.EvalExpression(code))
+	} else {
+		lang.ptr.(PluginEval).Eval(code)
+	}
+}
+
 func (lang Langauge) EvalFile(file string, args []string) {
 	lang.ptr.(PluginEvalFile).EvalFile(file, args)
 }
 
 func (lang Langauge) REPL() {
-	lang.ptr.(PluginREPL).REPL()
+	repl, ok := lang.ptr.(PluginREPL)
+	if ok { 
+		repl.REPL()
+	} else {
+		lang.InternalREPL()
+	}
+}
+
+func (lang Langauge) InternalREPL() {
+	for {
+		line, err := Linenoise(ps1)
+		if err != nil { break }
+		lang.REPLLikeEval(line)
+		LinenoiseHistoryAdd(line)
+	}
 }
