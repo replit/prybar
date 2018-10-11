@@ -4,7 +4,7 @@
 ** See Copyright Notice in lua.h
 */
 
-
+#include "pry.h"
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -146,7 +146,7 @@ static int report (lua_State *L, int status) {
 
 
 /* the next function is called unprotected, so it must avoid errors */
-static void finalreport (lua_State *L, int status) {
+void finalreport (lua_State *L, int status) {
   if (status != LUA_OK) {
     const char *msg = (lua_type(L, -1) == LUA_TSTRING) ? lua_tostring(L, -1)
                                                        : NULL;
@@ -323,7 +323,7 @@ void dotty (lua_State *L) {
 }
 
 
-static int handle_script (lua_State *L, char **argv, int n) {
+int handle_script (lua_State *L, char **argv, int n) {
   int status;
   const char *fname;
   int narg = getargs(L, argv, n);  /* collect arguments */
@@ -435,7 +435,7 @@ static int handle_luainit (lua_State *L) {
 }
 
 
-static int pmain (lua_State *L) {
+int pmain (lua_State *L) {
   int argc = (int)lua_tointeger(L, 1);
   char **argv = (char **)lua_touserdata(L, 2);
   int script;

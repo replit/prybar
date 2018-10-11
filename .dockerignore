@@ -1,5 +1,6 @@
-Dockerfile
-plugins/
 prybar
+plugins
+Dockerfile
+extract.sh
 deps.lst
 prybar.tar.gz

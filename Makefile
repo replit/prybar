@@ -1,9 +1,17 @@
+.PHONY: clean default
 
-prybar: main.go plugins/python2.so plugins/python3.so plugins/ruby.so plugins/lua.so
-	go build -o prybar
+default: prybar
 
-plugins/%.so: languages/%/*.go
-	cd languages/$* && CGO_LDFLAGS_ALLOW=".*" go build -buildmode=plugin -o ../../$@
+deps.lst: mk-deps.sh
+	./mk-deps.sh > deps.lst
+
+-include deps.lst
+
+prybar: src/*.go $(plugins)
+	cd src && go build -o ../prybar
+
+plugins/%.so: src/languages/%/*.* 
+	cd src/languages/$* && CGO_LDFLAGS_ALLOW=".*" go build -buildmode=plugin -o ../../../$@
 
 clean:
 	@rm prybar

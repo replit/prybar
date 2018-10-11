@@ -2,18 +2,10 @@ package main
 
 import (
 	"fmt"
-	"os"
-	"plugin"
 	"flag"
 )
 
-type Language interface {
-	Open()
-	Close()
-	Eval(string)
-	Version() string
-	REPL()
-}
+
 
 
 func main() {
@@ -29,35 +21,24 @@ func main() {
 	flag.BoolVar(&quiet, "q", false, "quiet")
 	flag.Parse()
 
+	args := flag.Args()
 
-	plug, err := plugin.Open("./plugins/" + language + ".so")
-
-	symGreeter, err := plug.Lookup("Instance")
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
-
-	var lang Language
-	lang, ok := symGreeter.(Language)
-	if !ok {
-		fmt.Println("unexpected type from module symbol")
-		os.Exit(1)
-	}
+	
 
 	// 4. use the module
-	lang.Open()
+	lang := GetLanguage(language)
 	if !quiet {
 		fmt.Println(lang.Version())
 	}
 	if code != "" {
 		lang.Eval(code)
+	} else if len(args) > 0 {
+		lang.EvalFile(args[0], args[1:])
 	}
 	if interactive {
 		lang.REPL()
 	}
-	lang.Close()
+
 	
 }
 
-var instance Language
