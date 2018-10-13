@@ -1,14 +1,14 @@
 package main
 
 /*
-#cgo pkg-config: python2
+#cgo pkg-config: python3
 #include <Python.h>
 
 void pry_eval_file(FILE* f, const char* file, int argn, const char *argv) {
-	const char* xargv[argn+1];
+	const wchar_t* xargv[argn+1];
 	const char* ptr = argv;
 	for (int i = 0; i < argn; ++i) {
-		xargv[i] = ptr;
+		xargv[i] = Py_DecodeLocale(ptr, NULL);
 		ptr += strlen(ptr) + 1;
 	}
 	xargv[argn] = NULL;

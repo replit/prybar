@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"flag"
+	"os"
+	"strings"
 )
 
 var ps1, ps2 string
@@ -14,8 +16,12 @@ func main() {
 	var quiet bool
 	var exp string
 	
+	defaultLangague := os.Args[0]
+	if defaultLangague == "prybar" || strings.ContainsAny(defaultLangague,"./") {
+		defaultLangague = "python2"
+	}
 
-	flag.StringVar(&language, "l", "python2", "langauge")
+	flag.StringVar(&language, "l", defaultLangague, "langauge")
 	flag.StringVar(&code, "c", "", "code to run")
 	flag.StringVar(&exp, "e", "", "expression to print")
 
@@ -29,6 +35,12 @@ func main() {
 
 	args := flag.Args()
 
+	switch language {
+	case "python":
+		language = "python3"
+	case "javascript":
+		language = "spidermonkey"
+	}
 
 	lang := GetLanguage(language)
 	if !quiet {
@@ -46,6 +58,9 @@ func main() {
 	if interactive {
 		lang.REPL()
 	} else if ourInteractive {
+		LinenoiseSetCompleter(func(s string) []string {
+			return []string { s+"A", s+"B", s+"B"}
+		})
 		lang.InternalREPL()
 	}
 

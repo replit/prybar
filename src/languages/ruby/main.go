@@ -39,6 +39,16 @@ char * pry_eval(const char* code) {
 
 }
 
+void pry_eval_file(const char* file ) {
+	char* options[] = { "ruby", file };
+	void* node = ruby_options(2, options);
+
+	int state;
+	if (ruby_executable_node(node, &state))
+	{
+		state = ruby_exec_node(node);
+	}
+}
 
 */
 import "C"
@@ -69,6 +79,12 @@ func (p Ruby) EvalExpression(code string) string {
 	defer C.free(unsafe.Pointer(ccode))
 	res := C.pry_eval(ccode)
 	return C.GoString(res);
+}
+
+func (p Ruby) EvalFile(file string, args []string) {
+	cfile := C.CString(file)
+	defer C.free(unsafe.Pointer(cfile))
+	C.pry_eval_file(cfile)
 }
 
 func (p Ruby) REPL() {

@@ -5,6 +5,7 @@ import(
 	"plugin"
 	"fmt"
 	"runtime"
+	"path/filepath"
 )
 
 type PluginBase interface {
@@ -46,8 +47,20 @@ func finalizer(f *Langauge) {
         fmt.Println("a finalizer has run.")
 } 
 
-func GetLanguage(name string) *Langauge {	
-	plug, err := plugin.Open("./plugins/" + name + ".so")
+func GetLanguage(name string) *Langauge {
+	base := "."
+	exe, err := os.Executable()
+	for {
+		o, err := os.Readlink(exe)
+		if err == nil {
+			exe = o
+		} else {
+			break
+		}
+	}
+
+	base = filepath.Dir(exe)
+	plug, err := plugin.Open(base + "/plugins/" + name + ".so")
 
 	if err != nil {
 		fmt.Println(err)
