@@ -1,8 +1,8 @@
 package main
 
 import (
-	"fmt"
 	"flag"
+	"fmt"
 	"os"
 	"strings"
 )
@@ -15,9 +15,9 @@ func main() {
 	var code string
 	var quiet bool
 	var exp string
-	
+
 	defaultLangague := os.Args[0]
-	if defaultLangague == "prybar" || strings.ContainsAny(defaultLangague,"./") {
+	if defaultLangague == "prybar" || strings.ContainsAny(defaultLangague, "./") {
 		defaultLangague = "python2"
 	}
 
@@ -48,22 +48,25 @@ func main() {
 	}
 	if code != "" {
 		lang.Eval(code)
-	} 
+	}
 	if exp != "" {
 		lang.EvalAndTryToPrint(exp)
 	}
 	if len(args) > 0 {
-		lang.EvalFile(args[0], args[1:])
+		if _, err := os.Stat(args[0]); os.IsNotExist(err) {
+			fmt.Println("No such file:", args[0])
+			os.Exit(2)
+		} else {
+			lang.EvalFile(args[0], args[1:])
+		}
 	}
 	if interactive {
 		lang.REPL()
 	} else if ourInteractive {
 		LinenoiseSetCompleter(func(s string) []string {
-			return []string { s+"A", s+"B", s+"B"}
+			return []string{s + "A", s + "B", s + "B"}
 		})
 		lang.InternalREPL()
 	}
 
-	
 }
-
