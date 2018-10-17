@@ -46,6 +46,7 @@ func main() {
 	if !quiet {
 		fmt.Println(lang.Version())
 	}
+
 	if code != "" {
 		lang.Eval(code)
 	}
@@ -60,12 +61,14 @@ func main() {
 			lang.EvalFile(args[0], args[1:])
 		}
 	}
+
 	if interactive {
+		lang.SetPrompts(ps1, ps2)
 		lang.REPL()
 	} else if ourInteractive {
-		LinenoiseSetCompleter(func(s string) []string {
-			return []string{s + "A", s + "B", s + "B"}
-		})
+		//LinenoiseSetCompleter(func(s string) []string {
+		//	return []string{s + "A", s + "B", s + "B"}
+		//})
 		lang.InternalREPL()
 	}
 

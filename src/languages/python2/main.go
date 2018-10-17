@@ -19,7 +19,7 @@ void pry_eval_file(FILE* f, const char* file, int argn, const char *argv) {
 const char* pry_eval(const char *code, int start) {
 
 	PyObject *m, *d, *s, *v;
-	PyCodeObject *c;
+	PyObject *c;
 	m = PyImport_AddModule("__main__");
 
 	if (m == NULL) return NULL;
@@ -46,17 +46,24 @@ const char* pry_eval(const char *code, int start) {
 	return str;
 }
 
+void pry_set_prompts(const char* ps1, const char* ps2) {
+	PyObject *po1 = PyString_FromString(ps1);
+	PyObject *po2 = PyString_FromString(ps2);
+	PySys_SetObject("ps1", po1);
+	PySys_SetObject("ps2", po2);
+	Py_DECREF(po1);
+	Py_DECREF(po2);
+}
+
 */
 import "C"
 
 import (
-	"unsafe"
 	"strings"
+	"unsafe"
 )
 
-
 type Python struct {
-
 }
 
 func (p Python) Open() {
@@ -83,10 +90,10 @@ func (p Python) EvalFile(file string, args []string) {
 	handle := C.stdin
 	cfile := C.CString(file)
 	defer C.free(unsafe.Pointer(cfile))
-	
+
 	if file != "-" {
 		cmode := C.CString("r")
-		
+
 		defer C.free(unsafe.Pointer(cmode))
 		handle = C.fopen(cfile, cmode)
 		defer C.fclose(handle)
@@ -94,7 +101,7 @@ func (p Python) EvalFile(file string, args []string) {
 
 	argv := C.CString(file + "\x00" + strings.Join(args, "\x00"))
 	defer C.free(unsafe.Pointer(argv))
-	C.pry_eval_file(handle, cfile, C.int(len(args) + 1), argv)
+	C.pry_eval_file(handle, cfile, C.int(len(args)+1), argv)
 }
 
 func (p Python) REPLLikeEval(code string) {
@@ -109,7 +116,16 @@ func (p Python) REPL() {
 	C.PyRun_InteractiveLoopFlags(C.stdin, fn, nil)
 }
 
-func (p Python) Close() {    
+func (p Python) SetPrompts(ps1, ps2 string) {
+	cps1 := C.CString(ps1)
+	defer C.free(unsafe.Pointer(cps1))
+	cps2 := C.CString(ps2)
+	defer C.free(unsafe.Pointer(cps2))
+
+	C.pry_set_prompts(cps1, cps2)
+}
+
+func (p Python) Close() {
 	C.Py_Finalize()
 }
 

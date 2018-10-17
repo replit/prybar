@@ -1,11 +1,11 @@
 package main
 
-import(
-	"os"
-	"plugin"
+import (
 	"fmt"
-	"runtime"
+	"os"
 	"path/filepath"
+	"plugin"
+	"runtime"
 )
 
 type PluginBase interface {
@@ -39,13 +39,18 @@ type PluginREPLLikeEval interface {
 	REPLLikeEval(code string)
 }
 
+type PluginSetPrompts interface {
+	PluginBase
+	SetPrompts(ps1, ps2 string)
+}
+
 type Langauge struct {
 	ptr PluginBase
 }
 
 func finalizer(f *Langauge) {
-        fmt.Println("a finalizer has run.")
-} 
+	fmt.Println("a finalizer has run.")
+}
 
 func GetLanguage(name string) *Langauge {
 	base := "."
@@ -80,10 +85,10 @@ func GetLanguage(name string) *Langauge {
 		os.Exit(1)
 	}
 
-	result := &Langauge {
+	result := &Langauge{
 		ptr: lang,
 	}
-	lang.Open();
+	lang.Open()
 	runtime.SetFinalizer(result, finalizer)
 	return result
 }
@@ -126,7 +131,7 @@ func (lang Langauge) EvalFile(file string, args []string) {
 
 func (lang Langauge) REPL() {
 	repl, ok := lang.ptr.(PluginREPL)
-	if ok { 
+	if ok {
 		repl.REPL()
 	} else {
 		lang.InternalREPL()
@@ -136,8 +141,17 @@ func (lang Langauge) REPL() {
 func (lang Langauge) InternalREPL() {
 	for {
 		line, err := Linenoise(ps1)
-		if err != nil { break }
+		if err != nil {
+			break
+		}
 		lang.REPLLikeEval(line)
 		LinenoiseHistoryAdd(line)
+	}
+}
+
+func (lang Langauge) SetPrompts(ps1, ps2 string) {
+	ee, ok := lang.ptr.(PluginSetPrompts)
+	if ok {
+		ee.SetPrompts(ps1, ps2)
 	}
 }
