@@ -55,6 +55,37 @@ void pry_set_prompts(const char* ps1, const char* ps2) {
 	Py_DECREF(po2);
 }
 
+//From python3 sourcecode
+static void
+pymain_run_interactive_hook(void)
+{
+    PyObject *sys, *hook, *result;
+    sys = PyImport_ImportModule("sys");
+    if (sys == NULL) {
+        goto error;
+    }
+
+    hook = PyObject_GetAttrString(sys, "__interactivehook__");
+    Py_DECREF(sys);
+    if (hook == NULL) {
+        PyErr_Clear();
+        return;
+    }
+
+    result = _PyObject_CallNoArg(hook);
+    Py_DECREF(hook);
+    if (result == NULL) {
+        goto error;
+    }
+    Py_DECREF(result);
+
+    return;
+
+error:
+    PySys_WriteStderr("Failed calling sys.__interactivehook__\n");
+    PyErr_Print();
+}
+
 */
 import "C"
 
@@ -111,6 +142,8 @@ func (p Python) REPLLikeEval(code string) {
 }
 
 func (p Python) REPL() {
+	C.pymain_run_interactive_hook()
+
 	fn := C.CString("<stdin>")
 	defer C.free(unsafe.Pointer(fn))
 	C.PyRun_InteractiveLoopFlags(C.stdin, fn, nil)

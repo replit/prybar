@@ -110,7 +110,15 @@ func (p Python) REPLLikeEval(code string) {
 	C.pry_eval(ccode, C.Py_single_input)
 }
 
+func (p Python) LoadModule(mod string) {
+	cmode := C.CString(mod)
+	defer C.free(unsafe.Pointer(cmode))
+	C.PyImport_ImportModule(cmode)
+}
+
 func (p Python) REPL() {
+	p.LoadModule("readline")
+
 	fn := C.CString("<stdin>")
 	defer C.free(unsafe.Pointer(fn))
 	C.PyRun_InteractiveLoopFlags(C.stdin, fn, nil)

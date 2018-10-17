@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"plugin"
@@ -126,7 +127,16 @@ func (lang Langauge) REPLLikeEval(code string) {
 }
 
 func (lang Langauge) EvalFile(file string, args []string) {
-	lang.ptr.(PluginEvalFile).EvalFile(file, args)
+	pef, ok := lang.ptr.(PluginEvalFile)
+	if ok {
+		pef.EvalFile(file, args)
+	} else {
+		dat, err := ioutil.ReadFile(file)
+		if err != nil {
+			panic(err)
+		}
+		lang.Eval(string(dat))
+	}
 }
 
 func (lang Langauge) REPL() {
