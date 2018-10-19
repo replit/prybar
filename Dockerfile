@@ -9,5 +9,7 @@ RUN cd /prybar && make
 
 WORKDIR /prybar
 
-# ENTRYPOINT ['/prybar/prybar']
-# CMD ['/prybar/prybar', '-h']
+ENV LC_ALL=C.UTF-8
+
+ENTRYPOINT [ "/prybar/prybar" ]
+CMD [ "-h" ]
