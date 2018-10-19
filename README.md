@@ -1,6 +1,16 @@
 # ![Prybar](logo.svg)
 
-Pry open interperters to get a REPL.
+Prybar is a universal interpreter front-end. Same interface, same REPL, different languages. 
+
+## Why
+
+At [Repl.it](https://repl.it) we're in the bussiness of running REPLs. As it happens to be
+every language implements them differently. We wanted them to all behave the same: run code and drop into a REPL!
+
+## How it works
+
+Prybar, written in Golang, maintains a common command-line interface that calls into 
+a select language backend. The language backends are implemented using cgo and the langauge's C-bindings.
 
 ## Usage
 
