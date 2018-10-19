@@ -14,5 +14,6 @@ plugins/%.so: src/languages/%/*.*
 	cd src/languages/$* && CGO_LDFLAGS_ALLOW=".*" go build -buildmode=plugin -o ../../../$@
 
 clean:
+	@rm deps.lst
 	@rm prybar
 	@rm plugins/*
