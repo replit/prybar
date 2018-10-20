@@ -10,16 +10,9 @@ import "C"
 import (
 	"strings"
 	"unsafe"
-
-	"github.com/replit/prybar/utils"
 )
 
-func init() {
-	utils.Register(&Python{})
-}
-
-type Python struct {
-}
+type Python struct{}
 
 func (p Python) Open() {
 	C.Py_Initialize()
@@ -85,3 +78,5 @@ func (p Python) SetPrompts(ps1, ps2 string) {
 func (p Python) Close() {
 	C.Py_Finalize()
 }
+
+var Instance = Python{}

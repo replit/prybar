@@ -18,16 +18,9 @@ import "C"
 import (
 	"strings"
 	"unsafe"
-
-	"github.com/replit/prybar/utils"
 )
 
-func init() {
-	utils.Register(&Lua{})
-}
-
-type Lua struct {
-}
+type Lua struct{}
 
 func (p Lua) Open() {
 	C.pry_init()
@@ -62,5 +55,4 @@ func (p Lua) Close() {
 	C.lua_close(C.pry_L)
 }
 
-// exported
-var Instance Lua
+var Instance = Lua{}

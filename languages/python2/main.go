@@ -9,38 +9,31 @@ import "C"
 import (
 	"strings"
 	"unsafe"
-
-	"github.com/replit/prybar/utils"
 )
 
-func init() {
-	utils.Register(&Language{})
-}
+type Python struct{}
 
-type Language struct {
-}
-
-func (p Language) Open() {
+func (p Python) Open() {
 	C.Py_Initialize()
 }
 
-func (p Language) Version() string {
+func (p Python) Version() string {
 	return "Python " + C.GoString(C.Py_GetVersion()) + " on " + C.GoString(C.Py_GetPlatform())
 }
 
-func (p Language) Eval(code string) {
+func (p Python) Eval(code string) {
 	ccode := C.CString(code)
 	defer C.free(unsafe.Pointer(ccode))
 	C.GoString(C.pry_eval(ccode, C.Py_file_input))
 }
 
-func (p Language) EvalExpression(code string) string {
+func (p Python) EvalExpression(code string) string {
 	ccode := C.CString(code)
 	defer C.free(unsafe.Pointer(ccode))
 	return C.GoString(C.pry_eval(ccode, C.Py_eval_input))
 }
 
-func (p Language) EvalFile(file string, args []string) {
+func (p Python) EvalFile(file string, args []string) {
 	handle := C.stdin
 	cfile := C.CString(file)
 	defer C.free(unsafe.Pointer(cfile))
@@ -58,19 +51,19 @@ func (p Language) EvalFile(file string, args []string) {
 	C.pry_eval_file(handle, cfile, C.int(len(args)+1), argv)
 }
 
-func (p Language) REPLLikeEval(code string) {
+func (p Python) REPLLikeEval(code string) {
 	ccode := C.CString(code)
 	defer C.free(unsafe.Pointer(ccode))
 	C.pry_eval(ccode, C.Py_single_input)
 }
 
-func (p Language) LoadModule(mod string) {
+func (p Python) LoadModule(mod string) {
 	cmode := C.CString(mod)
 	defer C.free(unsafe.Pointer(cmode))
 	C.PyImport_ImportModule(cmode)
 }
 
-func (p Language) REPL() {
+func (p Python) REPL() {
 	p.LoadModule("readline")
 
 	fn := C.CString("<stdin>")
@@ -78,7 +71,7 @@ func (p Language) REPL() {
 	C.PyRun_InteractiveLoopFlags(C.stdin, fn, nil)
 }
 
-func (p Language) SetPrompts(ps1, ps2 string) {
+func (p Python) SetPrompts(ps1, ps2 string) {
 	cps1 := C.CString(ps1)
 	defer C.free(unsafe.Pointer(cps1))
 	cps2 := C.CString(ps2)
@@ -87,6 +80,8 @@ func (p Language) SetPrompts(ps1, ps2 string) {
 	C.pry_set_prompts(cps1, cps2)
 }
 
-func (p Language) Close() {
+func (p Python) Close() {
 	C.Py_Finalize()
 }
+
+var Instance = Python{}

@@ -8,7 +8,7 @@ default: $(BINS)
 
 prybar-%: ./languages/$(*) ./utils/* ./linenoise/* ./languages/$(*)/*
 	cp inject_launch.go ./languages/$(*)/inject_launch.go
-	go build -o prybar-$(*) ./languages/$(*)
+	CGO_LDFLAGS_ALLOW=".*" go build -o prybar-$(*) ./languages/$(*)
 	rm ./languages/$(*)/inject_launch.go
 
 clean:

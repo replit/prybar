@@ -1,3 +1,3 @@
 #!/bin/sh
 docker build -t prybar .
-docker run prybar tar -zc prybar plugins > prybar.tar.gz
+docker run prybar bash -c 'tar -zc prybar-*' > prybar.tar.gz

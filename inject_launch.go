@@ -3,4 +3,6 @@ package main
 
 import "github.com/replit/prybar/utils"
 
-func main() { utils.DoCli() }
+func main() {
+	utils.DoCli(Instance)
+}

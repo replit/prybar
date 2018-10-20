@@ -9,39 +9,35 @@ import "C"
 
 import (
 	"unsafe"
-
-	"github.com/replit/prybar/utils"
 )
 
-func init() {
-	utils.Register(&Language{})
-}
+type Tcl struct{}
 
-type Language struct{}
-
-func (p Language) Open() {
+func (p Tcl) Open() {
 	C.pry_open()
 }
 
-func (p Language) Version() string {
+func (p Tcl) Version() string {
 	cver := C.pry_version()
 	ver := C.GoString(cver)
 	C.free(unsafe.Pointer(cver))
-	return "Language " + ver
+	return "TCL " + ver
 }
 
-func (p Language) Eval(code string) {
+func (p Tcl) Eval(code string) {
 	ccode := C.CString(code)
 	defer C.free(unsafe.Pointer(ccode))
 	C.pry_eval(ccode)
 }
 
-func (p Language) EvalExpression(code string) string {
+func (p Tcl) EvalExpression(code string) string {
 	ccode := C.CString(code)
 	defer C.free(unsafe.Pointer(ccode))
 	return C.GoString(C.pry_eval(ccode))
 }
 
-func (p Language) Close() {
+func (p Tcl) Close() {
 	C.pry_close()
 }
+
+var Instance = Tcl{}

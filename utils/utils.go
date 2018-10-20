@@ -8,12 +8,6 @@ import (
 	"syscall"
 )
 
-var instance PluginBase
-
-func Register(b PluginBase) {
-	instance = b
-}
-
 type Red struct {
 	parent io.Writer
 }
@@ -25,7 +19,7 @@ func (r *Red) Write(p []byte) (n int, err error) {
 	return n, err
 }
 
-func DoCli() {
+func DoCli(p PluginBase) {
 	var interactive, ourInteractive bool
 	var code string
 	var quiet bool
@@ -49,8 +43,8 @@ func DoCli() {
 
 	args := flag.Args()
 
-	instance.Open()
-	lang := &Language{ptr: instance, ps1: ps1}
+	p.Open()
+	lang := &Language{ptr: p, ps1: ps1}
 
 	if !quiet {
 		fmt.Println(lang.Version())
