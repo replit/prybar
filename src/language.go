@@ -7,6 +7,8 @@ import (
 	"path/filepath"
 	"plugin"
 	"runtime"
+
+	"github.com/replit/prybar/linenoise"
 )
 
 type PluginBase interface {
@@ -150,12 +152,12 @@ func (lang Langauge) REPL() {
 
 func (lang Langauge) InternalREPL() {
 	for {
-		line, err := Linenoise(ps1)
+		line, err := linenoise.Linenoise(ps1)
 		if err != nil {
 			break
 		}
 		lang.REPLLikeEval(line)
-		LinenoiseHistoryAdd(line)
+		linenoise.LinenoiseHistoryAdd(line)
 	}
 }
 
