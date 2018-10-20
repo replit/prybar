@@ -11,35 +11,33 @@ import (
 	"unsafe"
 )
 
-type Python struct {
-}
+type Tcl struct{}
 
-func (p Python) Open() {
+func (p Tcl) Open() {
 	C.pry_open()
 }
 
-func (p Python) Version() string {
+func (p Tcl) Version() string {
 	cver := C.pry_version()
 	ver := C.GoString(cver)
 	C.free(unsafe.Pointer(cver))
 	return "TCL " + ver
 }
 
-func (p Python) Eval(code string) {
+func (p Tcl) Eval(code string) {
 	ccode := C.CString(code)
 	defer C.free(unsafe.Pointer(ccode))
 	C.pry_eval(ccode)
 }
 
-func (p Python) EvalExpression(code string) string {
+func (p Tcl) EvalExpression(code string) string {
 	ccode := C.CString(code)
 	defer C.free(unsafe.Pointer(ccode))
 	return C.GoString(C.pry_eval(ccode))
 }
 
-func (p Python) Close() {
+func (p Tcl) Close() {
 	C.pry_close()
 }
 
-// exported
-var Instance Python
+var Instance = Tcl{}

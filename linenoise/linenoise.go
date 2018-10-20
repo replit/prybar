@@ -1,23 +1,22 @@
-package main
+package linenoise
 
 /*
-#include <stdlib.h>
 #include <linenoise.h>
+#include <stdlib.h>
 
-void linenoise_setup(); 
+void linenoise_setup();
 
 
 */
 import "C"
 
 import (
-	"unsafe"
 	"fmt"
+	"unsafe"
 )
 
 type Completer func(line string) []string
 type Hinter func(line string) string
-
 
 var completer Completer
 var hinter Hinter
@@ -52,7 +51,7 @@ func linenoiseHintsStub(input *C.char, color *C.int, bold *C.int) *C.char {
 	return C.CString(hinter(C.GoString(input)))
 }
 
-func Linenoise(prompt string) (string,error) {
+func Linenoise(prompt string) (string, error) {
 	C.linenoise_setup()
 	cprompt := C.CString(prompt)
 	defer C.free(unsafe.Pointer(cprompt))
@@ -78,4 +77,3 @@ func LinenoiseSetCompleter(newCompleter Completer) {
 func LinenoiseSetHinter(newHinter Hinter) {
 	hinter = newHinter
 }
-

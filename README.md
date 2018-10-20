@@ -1,6 +1,6 @@
 # ![Prybar](logo.svg)
 
-Prybar is a universal interpreter front-end. Same interface, same REPL, different languages. 
+Prybar is a universal interpreter front-end. Same interface, same REPL, different languages.
 
 ## Why
 
@@ -9,7 +9,7 @@ every language implements them differently. We wanted them to all behave the sam
 
 ## How it works
 
-Prybar, written in Golang, maintains a common command-line interface that calls into 
+Prybar, written in Golang, maintains a common command-line interface that calls into
 a select language backend. The language backends are implemented using cgo and the langauge's C-bindings.
 
 ## Usage
@@ -23,8 +23,6 @@ Usage of ./prybar:
   -e string
     	expression to print
   -i	interactive
-  -l string
-    	langauge (default "python2")
   -ps1 string
     	PS1 (default "--> ")
   -ps2 string
@@ -43,7 +41,7 @@ Usage of ./prybar:
 
 ## Building
 
-Prybar uses a unix make file to build prybar along with plugins for the langage libraries `pkg-config` detects on your system.
+Prybar uses a unix make file to build each Prybar binary with `pkg-config` to find language dependencies on your system.
 
 ### Linux
 
@@ -57,9 +55,7 @@ brew install go r ruby python python@2 lua spidermonkey
 
 ## Docker
 
-The script `./extract.sh` can be used to compile all plugins and produce a tarball containing a `prybar` binary and supporting `plugin.so` files.
-
-
+The script `./extract.sh` can be used to compile and produce a tarball containing all the Prybar binaries. Each binary will be named `prybar-<language>`. You can build all languages by running `make` in the repo's root or run `make prybar-<language>` to build a specific language.
 
 ## License
 

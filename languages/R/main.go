@@ -37,12 +37,9 @@ import "C"
 
 import (
 	"unsafe"
-	//"strings"
 )
 
-
 type R struct {
-
 }
 
 func (p R) Open() {
@@ -56,17 +53,15 @@ func (p R) Version() string {
 func (p R) Eval(code string) {
 	ccode := C.CString(code)
 	defer C.free(unsafe.Pointer(ccode))
-	C.pry_eval(ccode) 
+	C.pry_eval(ccode)
 }
 
-
 func (p R) REPL() {
-	C.pry_repl();
+	C.pry_repl()
 }
 
 func (p R) Close() {
 	C.Rf_endEmbeddedR(0)
 }
 
-// exported
-var Instance R
+var Instance = R{}

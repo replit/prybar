@@ -1,15 +1,12 @@
-package main
+package utils
 
 import (
 	"flag"
 	"fmt"
 	"io"
 	"os"
-	"strings"
 	"syscall"
 )
-
-var ps1, ps2 string
 
 type Red struct {
 	parent io.Writer
@@ -22,20 +19,14 @@ func (r *Red) Write(p []byte) (n int, err error) {
 	return n, err
 }
 
-func main() {
-	var language string
+func DoCli(p PluginBase) {
 	var interactive, ourInteractive bool
 	var code string
 	var quiet bool
 	var exp string
 	var colorizeStderr bool
+	var ps1, ps2 string
 
-	defaultLangague := os.Args[0]
-	if defaultLangague == "prybar" || strings.ContainsAny(defaultLangague, "./") {
-		defaultLangague = "python2"
-	}
-
-	flag.StringVar(&language, "l", defaultLangague, "langauge")
 	flag.StringVar(&code, "c", "", "code to run")
 	flag.StringVar(&exp, "e", "", "expression to print")
 
@@ -52,14 +43,9 @@ func main() {
 
 	args := flag.Args()
 
-	switch language {
-	case "python":
-		language = "python3"
-	case "javascript":
-		language = "spidermonkey"
-	}
+	p.Open()
+	lang := &Language{ptr: p, ps1: ps1}
 
-	lang := GetLanguage(language)
 	if !quiet {
 		fmt.Println(lang.Version())
 	}

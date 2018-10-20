@@ -1,6 +1,5 @@
 package main
 
-
 /*
 #cgo pkg-config: mozjs185
 #include "jsapi.h"
@@ -66,30 +65,24 @@ import (
 	"unsafe"
 )
 
+type SpiderMonkey struct{}
 
-type Language struct {
-
-}
-
-func (p Language) Open() {
+func (p SpiderMonkey) Open() {
 	C.pry_open()
 }
 
-func (p Language) Version() string {
+func (p SpiderMonkey) Version() string {
 	return C.GoString(C.JS_GetImplementationVersion())
-	//return "JS";
 }
 
-func (p Language) Eval(code string) {
+func (p SpiderMonkey) Eval(code string) {
 	ccode := C.CString(code)
 	defer C.free(unsafe.Pointer(ccode))
-	C.pry_eval(ccode) 
+	C.pry_eval(ccode)
 }
 
-
-func (p Language) Close() {    
-    C.pry_close()
+func (p SpiderMonkey) Close() {
+	C.pry_close()
 }
 
-// exported
-var Instance Language
+var Instance = SpiderMonkey{}

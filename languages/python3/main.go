@@ -12,8 +12,7 @@ import (
 	"unsafe"
 )
 
-type Python struct {
-}
+type Python struct{}
 
 func (p Python) Open() {
 	C.Py_Initialize()
@@ -80,5 +79,4 @@ func (p Python) Close() {
 	C.Py_Finalize()
 }
 
-// exported
-var Instance Python
+var Instance = Python{}

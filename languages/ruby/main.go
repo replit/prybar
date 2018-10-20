@@ -10,7 +10,6 @@ import (
 	"unsafe"
 )
 
-/*  */
 type Ruby struct {
 }
 
@@ -42,10 +41,8 @@ func (p Ruby) EvalFile(file string, args []string) {
 func (p Ruby) REPL() {
 	p.Eval("require 'irb'\nbinding.irb")
 }
-
 func (p Ruby) Close() {
 	C.ruby_cleanup(0)
 }
 
-// exported
-var Instance Ruby
+var Instance = Ruby{}
