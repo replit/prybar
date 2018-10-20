@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"runtime"
 	"syscall"
 )
 
@@ -43,6 +44,7 @@ func DoCli(p PluginBase) {
 
 	args := flag.Args()
 
+	runtime.LockOSThread()
 	p.Open()
 	lang := &Language{ptr: p, ps1: ps1}
 
