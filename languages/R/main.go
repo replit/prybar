@@ -37,36 +37,36 @@ import "C"
 
 import (
 	"unsafe"
+
+	"github.com/replit/prybar/utils"
 	//"strings"
 )
 
-
-type R struct {
-
+func init() {
+	utils.Register(&Language{})
 }
 
-func (p R) Open() {
+type Language struct {
+}
+
+func (p Language) Open() {
 	C.pry_open()
 }
 
-func (p R) Version() string {
+func (p Language) Version() string {
 	return C.GoString(C.pry_version())
 }
 
-func (p R) Eval(code string) {
+func (p Language) Eval(code string) {
 	ccode := C.CString(code)
 	defer C.free(unsafe.Pointer(ccode))
-	C.pry_eval(ccode) 
+	C.pry_eval(ccode)
 }
 
-
-func (p R) REPL() {
-	C.pry_repl();
+func (p Language) REPL() {
+	C.pry_repl()
 }
 
-func (p R) Close() {
+func (p Language) Close() {
 	C.Rf_endEmbeddedR(0)
 }
-
-// exported
-var Instance R

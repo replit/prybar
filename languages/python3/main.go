@@ -10,7 +10,13 @@ import "C"
 import (
 	"strings"
 	"unsafe"
+
+	"github.com/replit/prybar/utils"
 )
+
+func init() {
+	utils.Register(&Python{})
+}
 
 type Python struct {
 }
@@ -79,6 +85,3 @@ func (p Python) SetPrompts(ps1, ps2 string) {
 func (p Python) Close() {
 	C.Py_Finalize()
 }
-
-// exported
-var Instance Python

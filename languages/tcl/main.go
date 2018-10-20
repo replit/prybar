@@ -9,37 +9,39 @@ import "C"
 
 import (
 	"unsafe"
+
+	"github.com/replit/prybar/utils"
 )
 
-type Python struct {
+func init() {
+	utils.Register(&Language{})
 }
 
-func (p Python) Open() {
+type Language struct{}
+
+func (p Language) Open() {
 	C.pry_open()
 }
 
-func (p Python) Version() string {
+func (p Language) Version() string {
 	cver := C.pry_version()
 	ver := C.GoString(cver)
 	C.free(unsafe.Pointer(cver))
-	return "TCL " + ver
+	return "Language " + ver
 }
 
-func (p Python) Eval(code string) {
+func (p Language) Eval(code string) {
 	ccode := C.CString(code)
 	defer C.free(unsafe.Pointer(ccode))
 	C.pry_eval(ccode)
 }
 
-func (p Python) EvalExpression(code string) string {
+func (p Language) EvalExpression(code string) string {
 	ccode := C.CString(code)
 	defer C.free(unsafe.Pointer(ccode))
 	return C.GoString(C.pry_eval(ccode))
 }
 
-func (p Python) Close() {
+func (p Language) Close() {
 	C.pry_close()
 }
-
-// exported
-var Instance Python

@@ -59,8 +59,6 @@ brew install go r ruby python python@2 lua spidermonkey
 
 The script `./extract.sh` can be used to compile all plugins and produce a tarball containing a `prybar` binary and supporting `plugin.so` files.
 
-
-
 ## License
 
    Copyright (C) 2004-2018 Neoreason, Inc.  et al.

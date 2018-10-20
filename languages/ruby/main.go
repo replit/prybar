@@ -8,44 +8,46 @@ import "C"
 
 import (
 	"unsafe"
+
+	"github.com/replit/prybar/utils"
 )
 
-/*  */
-type Ruby struct {
+func init() {
+	utils.Register(&Language{})
 }
 
-func (p Ruby) Open() {
+/*  */
+type Language struct {
+}
+
+func (p Language) Open() {
 	C.pry_open()
 }
 
-func (p Ruby) Version() string {
+func (p Language) Version() string {
 	return C.GoString(C.pry_ruby_version())
 }
 
-func (p Ruby) Eval(code string) {
+func (p Language) Eval(code string) {
 	p.EvalExpression(code)
 }
 
-func (p Ruby) EvalExpression(code string) string {
+func (p Language) EvalExpression(code string) string {
 	ccode := C.CString(code)
 	defer C.free(unsafe.Pointer(ccode))
 	res := C.pry_eval(ccode)
 	return C.GoString(res)
 }
 
-func (p Ruby) EvalFile(file string, args []string) {
+func (p Language) EvalFile(file string, args []string) {
 	cfile := C.CString(file)
 	defer C.free(unsafe.Pointer(cfile))
 	C.pry_eval_file(cfile)
 }
 
-func (p Ruby) REPL() {
+func (p Language) REPL() {
 	p.Eval("require 'irb'\nbinding.irb")
 }
-
-func (p Ruby) Close() {
+func (p Language) Close() {
 	C.ruby_cleanup(0)
 }
-
-// exported
-var Instance Ruby
