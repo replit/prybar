@@ -1,0 +1,12 @@
+#!/usr/bin/expect -f
+
+spawn ./prybar-python2 -i -ps1 somethingelse
+match_max 100000
+expect "Python 2.*\r"
+expect -exact "somethingelse"
+send -- "123\r"
+expect -exact "123\r
+123\r
+somethingelse"
+send -- ""
+expect eof

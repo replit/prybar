@@ -1,0 +1,11 @@
+#!/usr/bin/expect -f
+
+spawn ./prybar-python2 -q -i
+match_max 100000
+expect -exact "--> "
+send -- "1+1\r"
+expect -exact "1+1\r
+2\r
+--> "
+send -- ""
+expect eof

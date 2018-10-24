@@ -1,0 +1,6 @@
+#!/usr/bin/expect -f
+
+set timeout -1
+spawn ./prybar-python3 -e 1+1
+match_max 100000
+expect eof

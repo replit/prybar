@@ -1,0 +1,17 @@
+#!/usr/bin/expect -f
+
+set timeout -1
+spawn ./prybar-python3 -i -q -ps2 custom
+match_max 100000
+expect -exact "--> "
+send -- "while False:\r"
+expect -exact "while False:\r
+custom"
+send -- "  pass\r"
+expect -exact "  pass\r
+custom"
+send -- "\r"
+expect -exact "\r
+--> "
+send -- ""
+expect eof

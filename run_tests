@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+
+tests=$(find ./tests -printf '%P\n')
+
+for t in ${tests}; do
+  if [[ $t != *.exp ]]; then
+    echo "$t:"
+    continue
+  fi
+
+  name=$(echo -n $t | sed -s 's/.*\/\(.*\).exp/\1/' | sed -s 's/_/ /g')
+
+  echo -n "...     $name"
+
+  test_out=$(timeout 10 "./tests/$t" 2>&1)
+  if [[ $? != 0 ]]; then
+    echo -e "\n========== \"$t\" failed =========="
+    echo $test_out
+    exit 1;
+  fi
+
+  echo -ne '\r'
+  echo "      ✓ $name"
+done
