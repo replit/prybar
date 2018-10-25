@@ -5,4 +5,3 @@ services:
 
 script:
   - docker build -t prybar .
-  - docker run prybar make test

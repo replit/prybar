@@ -21,12 +21,11 @@ RUN wget \
 RUN mkdir -p /gocode/src/github.com/replit/prybar
 
 ENV GOPATH=/gocode
-
 ADD . /gocode/src/github.com/replit/prybar
-
 WORKDIR /gocode/src/github.com/replit/prybar
 
 RUN make prybar-python2 prybar-python3 prybar-ruby prybar-lua prybar-spidermonkey
+RUN make test
 
 ENV LC_ALL=C.UTF-8
 
