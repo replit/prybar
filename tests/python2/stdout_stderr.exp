@@ -6,9 +6,7 @@ expect -exact "--> "
 send -- "import sys\r"
 expect -exact "import sys\r
 --> "
-send -- "for i i"
-expect -exact "\[K"
-send -- "in range(0, 100):\r"
+send -- "for i in range(0, 100):\r"
 expect -exact "in range(0, 100):\r
 ... "
 send -- "  sys.stderr.write(str(i) + '\\n')\r"
