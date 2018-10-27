@@ -1,0 +1,14 @@
+#!/usr/bin/expect -f
+
+set timeout -1
+spawn ./prybar-python3 -i
+match_max 100000
+expect -exact "Python 3.6.6 (default, Sep 12 2018, 18:26:19) \r
+\[GCC 8.0.1 20180414 (experimental) \[trunk revision 259383\]\] on linux\r
+--> "
+send -- "1+1\r"
+expect -exact "1+1\r
+2\r
+--> "
+send -- ""
+expect eof

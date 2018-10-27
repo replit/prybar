@@ -1,0 +1,13 @@
+#!/usr/bin/expect -f
+
+spawn ./prybar-python2 -q -i
+match_max 100000
+expect -exact "--> "
+send -- "ohno\r"
+expect -exact "ohno\r
+Traceback (most recent call last):\r
+  File \"<stdin>\", line 1, in <module>\r
+NameError: name 'ohno' is not defined\r
+--> "
+send -- ""
+expect eof

@@ -1,0 +1,18 @@
+#!/usr/bin/expect -f
+
+spawn ./prybar-python2 -i -ps2 continuation
+match_max 100000
+expect "Python 2.*\r"
+expect -exact "--> "
+send -- "if True:\r"
+expect -exact "if True:\r
+continuation"
+send -- "  print('continued!')\r"
+expect -exact "continued!')\r
+continuation"
+send -- ""
+expect -exact "\r
+continued!\r
+--> "
+send -- ""
+expect eof

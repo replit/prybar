@@ -1,0 +1,16 @@
+#!/usr/bin/expect -f
+
+set timeout -1
+spawn ./prybar-python3 -i -q
+match_max 100000
+expect -exact "--> "
+send -- "print('hello!')\r"
+expect -exact "'hello!')\r
+hello!\r
+--> "
+send -- "print(1+1)\r"
+expect -exact "print(1+1)\r
+2\r
+--> "
+send -- ""
+expect eof
