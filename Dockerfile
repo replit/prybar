@@ -11,7 +11,8 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
 	tcl-dev \
 	libnspr4-dev \
 	libffi-dev \
-	expect
+	expect \
+	nodejs
 
 RUN wget \
 	http://launchpadlibrarian.net/309343864/libmozjs185-dev_1.8.5-1.0.0+dfsg-7_amd64.deb && \

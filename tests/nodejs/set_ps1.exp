@@ -1,0 +1,11 @@
+#!/usr/bin/expect -f
+
+set timeout -1
+spawn ./prybar-nodejs -i -q -ps1 custom
+match_max 100000
+expect -exact "\[1G\[0Jcustom\[7G"
+send -- "console.log('hit')"
+expect -exact "console.log('hit')"
+send -- "\r"
+send -- ""
+expect eof
