@@ -25,6 +25,8 @@ ENV GOPATH=/gocode
 ADD . /gocode/src/github.com/replit/prybar
 WORKDIR /gocode/src/github.com/replit/prybar
 
+RUN which node
+
 RUN make prybar-python2 prybar-python3 prybar-ruby prybar-lua prybar-spidermonkey prybar-nodejs
 RUN make test
 
