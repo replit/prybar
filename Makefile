@@ -7,12 +7,13 @@ BINS    := $(addprefix prybar-,$(LANGS))
 all: $(BINS)
 
 prybar-%: ./languages/$(*) ./utils/* ./linenoise/* ./languages/$(*)/*
-	cp inject_launch.go ./languages/$(*)/inject_launch.go
+	./scripts/inject.sh $(*)
+	go generate ./languages/$(*)/main.go
 	CGO_LDFLAGS_ALLOW=".*" go build -o prybar-$(*) ./languages/$(*)
-	rm ./languages/$(*)/inject_launch.go
+	rm ./languages/$(*)/generated_*.go
 
 test:
 	./run_tests
 
 clean:
-	@rm ./prybar-*
+	@rm ./prybar-* ./languages/*/generated_*.go

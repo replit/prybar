@@ -20,5 +20,5 @@ for t in ${tests}; do
   fi
 
   echo -ne '\r'
-  echo "      ✓ $name"
+  echo -e "      \e[32m✓\e[0m $name"
 done

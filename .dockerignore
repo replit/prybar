@@ -1,4 +1,4 @@
-prybar
+prybar-*
 plugins
 Dockerfile
 extract.sh

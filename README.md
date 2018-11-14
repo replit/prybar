@@ -15,8 +15,7 @@ a select language backend. The language backends are implemented using cgo and t
 ## Usage
 
 ```
-Usage of ./prybar:
-  -C	colorize stderr
+Usage of ./prybar-language:
   -I	like -i, but never use language REPL
   -c string
     	code to run

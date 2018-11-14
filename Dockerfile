@@ -11,7 +11,8 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
 	tcl-dev \
 	libnspr4-dev \
 	libffi-dev \
-	expect
+	expect \
+	nodejs
 
 RUN wget \
 	http://launchpadlibrarian.net/309343864/libmozjs185-dev_1.8.5-1.0.0+dfsg-7_amd64.deb && \
@@ -24,7 +25,9 @@ ENV GOPATH=/gocode
 ADD . /gocode/src/github.com/replit/prybar
 WORKDIR /gocode/src/github.com/replit/prybar
 
-RUN make prybar-python2 prybar-python3 prybar-ruby prybar-lua prybar-spidermonkey
+RUN which node
+
+RUN make prybar-python2 prybar-python3 prybar-ruby prybar-lua prybar-spidermonkey prybar-nodejs
 RUN make test
 
 ENV LC_ALL=C.UTF-8

@@ -1,4 +1,5 @@
 plugins/
-prybar
+prybar-*
 deps.lst
 prybar.tar.gz
+generated_*.go
