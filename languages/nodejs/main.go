@@ -11,7 +11,7 @@ import (
 )
 
 func findHelper(path string) string {
-	bytes, err := File(path)
+	bytes, err := File(path + ".js")
 	if bytes != nil {
 		f, err := ioutil.TempFile("", "prybar-nodejs-*.js")
 		if err != nil {
@@ -29,7 +29,7 @@ func findHelper(path string) string {
 	if err != nil {
 		panic(err)
 	}
-	return "./languages/nodejs/" + path + ".js"
+	panic("File not found")
 }
 
 func Execute(config *utils.Config) {
