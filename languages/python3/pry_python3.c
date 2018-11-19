@@ -12,12 +12,13 @@ void pry_eval_file(FILE *f, const char *file, int argn, const char *argv)
     xargv[argn] = NULL;
     PySys_SetArgvEx(argn, xargv, 1);
     PyRun_AnyFile(f, file);
+
 }
 
 const char *pry_eval(const char *code, int start)
 {
 
-    PyObject *m, *d, *s, *v;
+    PyObject *m, *d, *s, *t, *v;
     PyObject *c;
     m = PyImport_AddModule("__main__");
 
@@ -43,9 +44,19 @@ const char *pry_eval(const char *code, int start)
         PyErr_Print();
         return NULL;
     }
-    char *str = PyBytes_AS_STRING(s);
+
+    t = PyUnicode_AsUTF8String(s);
+    if (t == NULL)
+    {
+        PyErr_Print();
+        return NULL;
+    }
+
+
+    char *str = PyBytes_AsString(t);
     Py_DECREF(v);
     Py_DECREF(s);
+    Py_DECREF(t);
     return str;
 }
 
