@@ -4,7 +4,7 @@ Prybar is a universal interpreter front-end. Same interface, same REPL, differen
 
 ## Why
 
-At [Repl.it](https://repl.it) we're in the bussiness of running REPLs. As it happens to be
+At [Repl.it](https://repl.it) we're in the business of running REPLs. As it happens to be
 every language implements them differently. We wanted them to all behave the same: run code and drop into a REPL!
 
 ## How it works
