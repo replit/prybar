@@ -10,7 +10,7 @@ every language implements them differently. We wanted them to all behave the sam
 ## How it works
 
 Prybar, written in Golang, maintains a common command-line interface that calls into
-a select language backend. The language backends are implemented using cgo and the langauge's C-bindings.
+a select language backend. The language backends are implemented using cgo and the language's C-bindings.
 
 ## Usage
 
@@ -29,7 +29,7 @@ Usage of ./prybar-language:
   -q	quiet
 ```
 
-## Supported Lanuages
+## Supported Languages
 * Python 2.7
 * Python 3.x
 * Ruby 2.5
@@ -40,7 +40,7 @@ Usage of ./prybar-language:
 
 ## Building
 
-Prybar uses a unix make file to build each Prybar binary with `pkg-config` to find language dependencies on your system.
+Prybar uses a Unix make file to build each Prybar binary with `pkg-config` to find language dependencies on your system.
 
 ### Linux
 
