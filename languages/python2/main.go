@@ -15,6 +15,7 @@ type Python struct{}
 
 func (p Python) Open() {
 	C.Py_Initialize()
+	p.LoadModule("readline")
 	p.Eval("import signal")
 	p.Eval("signal.signal(signal.SIGINT, signal.default_int_handler)")
 }
