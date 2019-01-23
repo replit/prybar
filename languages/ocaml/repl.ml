@@ -27,6 +27,7 @@ let _ =
   let interactive_mode = ref false in
   let print_mode = ref false in
   let run_mode = ref false in
+  let ps1 = Sys.getenv_opt "PRYBAR_PS1" |> function | Some str -> str | None -> "#" in
   (* If there is code provided to interpret *)
   let code = ref "" in
   let parse_syntax = function
@@ -67,6 +68,8 @@ let _ =
     include Toploop
     open Format
 
+    (* Most stuff is straightly copied and modified
+     * from github.com/ocaml/ocaml/blob/trunk/toplevel/toploop.ml *)
     exception PPerror
 
     let first_line = ref true
@@ -79,8 +82,7 @@ let _ =
         0 )
       else
         let prompt =
-          if !Clflags.noprompt then ""
-          else if !first_line then "# "
+          if !first_line then ps1 ^ " "
           else if !Clflags.nopromptcont then ""
           else if Lexer.in_comment () then "* "
           else "  "
