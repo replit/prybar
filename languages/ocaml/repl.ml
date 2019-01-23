@@ -61,7 +61,7 @@ let _ =
     | true, false, false -> PrintExpression (!code, !syntax)
     | false, true, false -> RunCode (!code, !syntax)
     | false, false, true -> StartRepl !syntax
-    | _ -> Invalid "You can only use one mode: -e | -i | -s"
+    | _ -> Invalid "You can only use one mode: -e | -i | -c"
   in
   let module Custom_Toploop = struct
     include Toploop
@@ -96,8 +96,6 @@ let _ =
     let loop ppf =
       Clflags.debug := true ;
       Location.formatter_for_warnings := ppf ;
-      if not !Clflags.noversion then
-        fprintf ppf "        OCaml version %s@.@." Config.version ;
       ( try initialize_toplevel_env () with
       | (Env.Error _ | Typetexp.Error _) as exn ->
           Location.report_exception ppf exn ;
@@ -174,6 +172,7 @@ let _ =
       | Reason_syntax_util.Error _ -> Error "Reason Parsing Error"
       | _ -> Error ("Error while exec: " ^ str)
   end in
+  if not !quiet then print_endline ("OCaml " ^ Sys.ocaml_version ^ " on " ^ Sys.os_type);
   match mode with
   | PrintExpression (code, syntax) ->
       Repl.init_toploop () ;
