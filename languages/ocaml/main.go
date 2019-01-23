@@ -60,6 +60,10 @@ func Execute(config *utils.Config) {
 		env = append(env, "PRYBAR_PS1="+config.Ps1)
 	}
 
+	if config.Ps2 != "" {
+		env = append(env, "PRYBAR_PS2="+config.Ps2)
+	}
+
 	if config.Args != nil && len(config.Args) > 0 {
 		args = append(args, config.Args...)
 	}

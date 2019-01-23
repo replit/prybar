@@ -28,6 +28,7 @@ let _ =
   let print_mode = ref false in
   let run_mode = ref false in
   let ps1 = Sys.getenv_opt "PRYBAR_PS1" |> function | Some str -> str | None -> "#" in
+  let ps2 = Sys.getenv_opt "PRYBAR_PS2" |> function | Some str -> str | None -> " " in
   (* If there is code provided to interpret *)
   let code = ref "" in
   let parse_syntax = function
@@ -83,9 +84,8 @@ let _ =
       else
         let prompt =
           if !first_line then ps1 ^ " "
-          else if !Clflags.nopromptcont then ""
           else if Lexer.in_comment () then "* "
-          else "  "
+          else ps2 (* continuation prompt *)
         in
         first_line := false ;
         let len, eof = !read_interactive_input prompt buffer len in
