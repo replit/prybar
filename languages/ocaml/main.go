@@ -4,11 +4,12 @@ package main
 //go:generate ../../scripts/gofiles.sh generated_files.go
 
 import (
+  //"fmt"
+	"github.com/replit/prybar/utils"
 	"io/ioutil"
 	"os"
 	"os/exec"
 	"syscall"
-	"github.com/replit/prybar/utils"
 )
 
 func findHelper(path string) string {
@@ -30,7 +31,7 @@ func findHelper(path string) string {
 	if err != nil {
 		panic(err)
 	}
-  panic("File not found: " + path + ".ml")
+	panic("File not found: " + path + ".ml")
 }
 
 func Execute(config *utils.Config) {
@@ -41,34 +42,29 @@ func Execute(config *utils.Config) {
 	}
 
 	env := os.Environ()
-	args := []string{"ocaml"}
+	args := []string{"ocaml", findHelper("repl"), "-s", "ml"}
 
-	if !config.Quiet {
-		args = append(args, findHelper("version"))
-
+	if config.Quiet {
+		args = append(args, "-q")
 	}
 
 	if config.Code != "" {
-		args = append(args, findHelper("repl"), "-e", config.Code)
-	}
-
-	if config.Exp != "" {
-		args = append(args, "-p", config.Exp)
-	}
-
-	if config.Interactive {
-		args = append(args, "-r", findHelper("repl"))
+		args = append(args, "-c", config.Code)
+	} else if config.Exp != "" {
+		args = append(args, "-e", config.Exp)
+	} else if config.Interactive {
+		args = append(args, "-i")
 	}
 
 	if config.Ps1 != "" {
-		env = append(env, "NODE_PROMPT="+config.Ps1)
+		env = append(env, "PRYBAR_PS1="+config.Ps1)
 	}
 
 	if config.Args != nil && len(config.Args) > 0 {
 		args = append(args, config.Args...)
-	} else if config.Exp == "" && config.Code == "" {
-		args = append(args, "-e", "")
 	}
+
+  //fmt.Printf("%v", args)
 
 	syscall.Exec(path, args, env)
 }
