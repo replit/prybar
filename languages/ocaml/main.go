@@ -52,7 +52,7 @@ func Execute(config *utils.Config) {
 		args = append(args, "-c", config.Code)
 	} else if config.Exp != "" {
 		args = append(args, "-e", config.Exp)
-	} else if config.Interactive {
+	} else if (config.Interactive || config.OurInteractive) {
 		args = append(args, "-i")
 	}
 
