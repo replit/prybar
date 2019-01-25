@@ -1,0 +1,14 @@
+#!/usr/bin/expect -f
+
+spawn ./prybar-ocaml -q -i -ps2 continuation
+match_max 100000
+expect -exact "--> "
+send -- "let a =\r"
+expect -exact "let a =\r
+continuation"
+send -- "print_endline(\"continued!\");;\r"
+expect -exact "continued!\r
+val a : unit = ()\r
+-->"
+send -- ""
+expect eof
