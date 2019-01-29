@@ -33,7 +33,7 @@ RUN which node
 RUN add-apt-repository ppa:avsm/ppa && \
   apt-get update && \
   apt-get install opam -y && \
-  opam init -y --disable-sandboxing && \
+  opam init -n --disable-sandboxing && \
   eval `opam env` && \
   echo "eval \`opam env\`" >> ~/.bashrc && \
   opam update && \
