@@ -4,7 +4,6 @@ package main
 //go:generate ../../scripts/gofiles.sh generated_files.go
 
 import (
-  //"fmt"
 	"github.com/replit/prybar/utils"
 	"io/ioutil"
 	"os"
@@ -67,8 +66,6 @@ func Execute(config *utils.Config) {
 	if config.Args != nil && len(config.Args) > 0 {
 		args = append(args, config.Args...)
 	}
-
-  //fmt.Printf("%v", args)
 
 	syscall.Exec(path, args, env)
 }
