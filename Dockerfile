@@ -37,7 +37,6 @@ RUN add-apt-repository ppa:avsm/ppa && \
   eval `opam env` && \
   echo "eval \`opam env\`" >> ~/.bashrc && \
   opam update && \
-  opam switch create 4.06.1 && \
   opam install reason.3.4.0 -y
 
 RUN make prybar-python2 prybar-python3 prybar-ruby prybar-lua prybar-spidermonkey prybar-nodejs prybar-ocaml
