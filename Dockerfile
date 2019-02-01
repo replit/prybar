@@ -13,8 +13,8 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
 	libffi-dev \
 	expect \
 	nodejs \
-  m4 \
-  software-properties-common
+	m4 \
+	software-properties-common
 
 RUN wget \
 	http://launchpadlibrarian.net/309343864/libmozjs185-dev_1.8.5-1.0.0+dfsg-7_amd64.deb && \
@@ -31,13 +31,13 @@ RUN which node
 
 # OCaml / Reason stuff
 RUN add-apt-repository ppa:avsm/ppa && \
-  apt-get update && \
-  apt-get install opam -y && \
-  opam init -n --disable-sandboxing && \
-  eval `opam env` && \
-  echo "eval \`opam env\`" >> ~/.bashrc && \
-  opam update && \
-  opam install reason.3.4.0 -y
+	apt-get update && \
+	apt-get install opam -y && \
+	opam init -n --disable-sandboxing && \
+	eval `opam env` && \
+	echo "eval \`opam env\`" >> ~/.bashrc && \
+	opam update && \
+	opam install reason.3.4.0 -y
 
 RUN make prybar-python2 prybar-python3 prybar-ruby prybar-lua prybar-spidermonkey prybar-nodejs prybar-ocaml
 RUN make test
