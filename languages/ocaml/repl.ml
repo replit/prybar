@@ -1,10 +1,10 @@
 #use "topfind";;
 #require "compiler-libs";;
 #require "unix";;
-#require "reason";;
+(*#require "reason";;*)
 #load "ocamlcommon.cma";;
 #load "unix.cma";;
-#load "reason.cma";;
+(*#load "reason.cma";;*)
 
 type syntax = Reason | OCaml
 
@@ -151,10 +151,10 @@ let _ =
         let lex = Lexing.from_string str in
         let tpl_phrases =
           match syntax with
-          | OCaml -> Parse.use_file lex
-          | Reason ->
-              List.map Reason_toolchain.To_current.copy_toplevel_phrase
-                (Reason_toolchain.RE.use_file lex)
+          | OCaml | Reason -> Parse.use_file lex
+          (*| Reason ->*)
+              (*List.map Reason_toolchain.To_current.copy_toplevel_phrase*)
+                (*(Reason_toolchain.RE.use_file lex)*)
         in
         let exec phr =
           if Toploop.execute_phrase true fmt phr then Success
@@ -171,7 +171,7 @@ let _ =
         execAll tpl_phrases
       with
       | Syntaxerr.Error _ -> Error "Syntax Error occurred"
-      | Reason_syntax_util.Error _ -> Error "Reason Parsing Error"
+      (*| Reason_syntax_util.Error _ -> Error "Reason Parsing Error"*)
       | _ -> Error ("Error while exec: " ^ str)
   end in
   if not !quiet then print_endline ("OCaml " ^ Sys.ocaml_version ^ " on " ^ Sys.os_type);

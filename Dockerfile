@@ -32,12 +32,10 @@ RUN which node
 # OCaml / Reason stuff
 RUN add-apt-repository ppa:avsm/ppa && \
 	apt-get update && \
-	apt-get install opam -y && \
-	opam init -n --disable-sandboxing && \
+	apt-get install ocaml opam -y && \
+	opam init -c ocaml-system -n --disable-sandboxing && \
 	eval `opam env` && \
-	echo "eval \`opam env\`" >> ~/.bashrc && \
-	opam update && \
-	opam install reason.3.4.0 -y
+	echo "eval \`opam env\`" >> ~/.bashrc
 
 RUN make prybar-python2 prybar-python3 prybar-ruby prybar-lua prybar-spidermonkey prybar-nodejs prybar-ocaml
 RUN make test
