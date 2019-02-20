@@ -1,0 +1,14 @@
+#!/usr/bin/expect -f
+
+set timeout -1
+spawn ./prybar-lua -i ./test_files/hello.lua
+match_max 100000
+expect -exact "Lua 5.1.5  Copyright (C) 1994-2012 Lua.org, PUC-Rio\r
+hi!\r
+--> "
+send -- "a\r"
+expect -exact "a\r
+hello\r
+--> "
+send -- ""
+expect eof
