@@ -157,9 +157,9 @@ static int pushline(lua_State *L, int firstline) {
   return 1;
 }
 
-static int try_expression(lua_State *L, int status) {
+static int try_expression(lua_State *L) {
   if (status != LUA_ERRSYNTAX) {
-    return 0;
+    return 1;
   }
 
   lua_pushliteral(L, "return ");
@@ -171,13 +171,13 @@ static int try_expression(lua_State *L, int status) {
 
   if (rstatus) {
     lua_pop(L, 2);
-    return 0;
+    return 1;
   }
 
   lua_remove(L, 2);
   lua_remove(L, 2);
 
-  return 1;
+  return 0;
 }
 
 static int loadline(lua_State *L) {
@@ -187,12 +187,10 @@ static int loadline(lua_State *L) {
     return -1; /* no input */
 
   for (;;) { /* repeat until gets a complete line */
-    status = luaL_loadbuffer(L, lua_tostring(L, 1), lua_strlen(L, 1), "=stdin");
-
-    if (try_expression(L, status)) {
-      status = 0;
+    if (!(status = try_expression(L)))
       break;
-    }
+
+    status = luaL_loadbuffer(L, lua_tostring(L, 1), lua_strlen(L, 1), "=stdin");
 
     if (!incomplete(L, status))
       break; /* cannot try to add lines? */
