@@ -1,5 +1,7 @@
 package main
 
+// USING_CGO
+
 /*
 #cgo pkg-config: python3
 #include "pry_python3.h"

@@ -1,5 +1,7 @@
 package main
 
+// USING_CGO
+
 /*
 #cgo pkg-config: ruby-2.5
 #include "pry_ruby.h"
