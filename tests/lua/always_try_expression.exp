@@ -9,9 +9,17 @@ expect -exact "function a() return 123 end\r
 --> "
 send -- "a()\r"
 expect -exact "a()\r
+123\r
 --> "
 send -- "return a()\r"
 expect -exact "return a()\r
+123\r
+--> "
+send -- "a(\r"
+expect -exact "a(\r
+... "
+send -- ")\r"
+expect -exact ")\r
 123\r
 --> "
 send -- ""

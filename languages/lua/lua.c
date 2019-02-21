@@ -13,6 +13,7 @@
 #include <string.h>
 
 #define lua_c
+#define LUA_USE_LINUX
 
 #include <lua.h>
 
@@ -182,7 +183,8 @@ static int loadline(lua_State *L) {
     return -1; /* no input */
 
   for (;;) { /* repeat until gets a complete line */
-    if (!try_expression(L))
+    status = try_expression(L);
+    if (!status)
       break;
 
     status = luaL_loadbuffer(L, lua_tostring(L, 1), lua_strlen(L, 1), "=stdin");
