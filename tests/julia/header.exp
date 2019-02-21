@@ -1,0 +1,18 @@
+#!/usr/bin/expect -f
+
+set timeout -1
+spawn ./prybar-julia -i
+match_max 100000
+expect -exact "               \[1m\[32m_\[0m\r
+   \[1m\[34m_\[0m       \[0m_\[0m \[1m\[31m_\[1m\[32m(_)\[1m\[35m_\[0m     |  Documentation: https://docs.julialang.org\r
+  \[1m\[34m(_)\[0m     | \[1m\[31m(_)\[0m \[1m\[35m(_)\[0m    |\r
+   \[0m_ _   _| |_  __ _\[0m   |  Type \"?\" for help, \"\]?\" for Pkg help.\r
+  \[0m| | | | | | |/ _` |\[0m  |\r
+  \[0m| | |_| | | | (_| |\[0m  |  Version 1.1.0 (2019-01-21)\r
+ \[0m_/ |\\__'_|_|_|\\__'_|\[0m  |  \r
+\[0m|__/\[0m                   |\r
+\r
+\r
+\[?2004h\r\[0K\[32m\[1m--> \[0m\[0m\r\[4C\r\[4C"
+send -- ""
+expect eof
