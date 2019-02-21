@@ -3,7 +3,7 @@ package main
 // USING_CGO
 
 /*
-#cgo LDFLAGS: -ljulia
+#cgo pkg-config: julia
 #include "pry.h"
 */
 import "C"

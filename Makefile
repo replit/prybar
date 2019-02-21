@@ -9,7 +9,7 @@ all: $(BINS)
 prybar-%: ./languages/$(*) ./utils/* ./linenoise/* ./languages/$(*)/*
 	./scripts/inject.sh $(*)
 	go generate ./languages/$(*)/main.go
-	PKG_CONFIG="pkg-config" PKG_CONFIG_PATH=./languages/julia CGO_LDFLAGS_ALLOW=".*" go build -o prybar-$(*) ./languages/$(*)
+	PKG_CONFIG_PATH=./languages/julia go build -o prybar-$(*) ./languages/$(*)
 	rm ./languages/$(*)/generated_*.go
 
 test:

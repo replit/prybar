@@ -23,8 +23,7 @@
 #include <sys/types.h>
 #include <time.h>
 
-#include <julia/julia.h>
-#include <julia/uv.h>
+#include <julia.h>
 
 JULIA_DEFINE_FAST_TLS()
 
