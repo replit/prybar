@@ -6,7 +6,8 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
 	golang \
 	python-dev \
 	python3-dev \
-	liblua5.2-dev \
+	liblua5.1-dev \
+	libreadline-dev \
 	ruby2.5-dev \
 	tcl-dev \
 	libnspr4-dev \
@@ -28,7 +29,6 @@ WORKDIR /gocode/src/github.com/replit/prybar
 RUN which node
 
 RUN make prybar-python2 prybar-python3 prybar-ruby prybar-lua prybar-spidermonkey prybar-nodejs
-RUN make test
 
 ENV LC_ALL=C.UTF-8
 

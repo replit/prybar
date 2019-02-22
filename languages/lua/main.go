@@ -1,7 +1,8 @@
 package main
 
 /*
-#cgo pkg-config: lua-5.1 readline
+#cgo pkg-config: lua-5.1
+#cgo LDFLAGS: -lreadline
 #include <stdlib.h>
 #include <lua.h>
 #include <lauxlib.h>
