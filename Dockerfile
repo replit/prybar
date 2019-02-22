@@ -48,8 +48,6 @@ RUN make \
 	prybar-nodejs \
 	prybar-julia
 
-RUN make test
-
 ENV LC_ALL=C.UTF-8
 
 CMD bash
