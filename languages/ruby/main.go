@@ -67,9 +67,13 @@ func (p *Ruby) REPL() {
 	C.rb_gv_set(cps2n, vps2)
 
 	p.Eval(`
-require 'rubygems'
-gem "irb"
-require 'irb'
+begin
+  require 'irb'
+rescue LoadError
+  require 'rubygems'
+  gem "irb"
+  require 'irb'
+end
 
 STDOUT.sync = true
 IRB.setup nil
