@@ -18,7 +18,7 @@ type Python struct{}
 
 func (p Python) Open() {
 	C.Py_Initialize()
-	p.LoadModule("readline")
+	p.loadModule("readline")
 	p.Eval("import signal")
 	p.Eval("signal.signal(signal.SIGINT, signal.default_int_handler)")
 }
@@ -63,7 +63,7 @@ func (p Python) REPLLikeEval(code string) {
 	C.pry_eval(ccode, C.Py_single_input)
 }
 
-func (p Python) LoadModule(mod string) {
+func (p Python) loadModule(mod string) {
 	cmode := C.CString(mod)
 	defer C.free(unsafe.Pointer(cmode))
 	C.PyImport_ImportModule(cmode)

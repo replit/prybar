@@ -6,7 +6,8 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
 	golang \
 	python-dev \
 	python3-dev \
-	liblua5.2-dev \
+	liblua5.1-dev \
+	libreadline-dev \
 	ruby2.5-dev \
 	tcl-dev \
 	libnspr4-dev \
@@ -36,8 +37,6 @@ ADD . /gocode/src/github.com/replit/prybar
 WORKDIR /gocode/src/github.com/replit/prybar
 
 RUN which node
-
-RUN make prybar-julia
 
 RUN make \
 	prybar-python2 \
