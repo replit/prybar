@@ -9,7 +9,7 @@ all: $(BINS)
 prybar-%: ./languages/$(*) ./utils/* ./linenoise/* ./languages/$(*)/*
 	./scripts/inject.sh $(*)
 	go generate ./languages/$(*)/main.go
-	CGO_LDFLAGS_ALLOW=".*" go build -o prybar-$(*) ./languages/$(*)
+	go build -o prybar-$(*) ./languages/$(*)
 	rm ./languages/$(*)/generated_*.go
 
 test:

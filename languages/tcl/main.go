@@ -1,5 +1,7 @@
 package main
 
+// USING_CGO
+
 /*
 #cgo pkg-config: tcl
 #include "pry_tcl.h"

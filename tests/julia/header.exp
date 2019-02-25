@@ -1,0 +1,9 @@
+#!/usr/bin/expect -f
+
+set timeout -1
+spawn ./prybar-julia -i
+match_max 100000
+expect -exact "Version 1.1.0 (2019-01-21)"
+expect -exact "--> \[0m\[0m\r\[4C\r\[4C"
+send -- ""
+expect eof

@@ -1,5 +1,7 @@
 package main
 
+// USING_CGO
+
 /*
 #cgo pkg-config: lua-5.1
 #cgo LDFLAGS: -lreadline
