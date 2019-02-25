@@ -1,16 +1,13 @@
 #include <lua.h>
 
-#define luai_writestring(s,l)	fwrite((s), sizeof(char), (l), stdout)
-#define luai_writeline()	(luai_writestring("\n", 1), fflush(stdout))
-#define LUA_PROMPT pry_prompt
-#define LUA_PROMPT2 pry_prompt2
-
 extern lua_State *pry_L;
-extern char* pry_prompt;
-extern char* pry_prompt2;
 
-const char * pry_get_version();
-void pry_init();
+const char *pry_get_version(void);
 void pry_eval(const char *code);
-void pry_main();
-void pry_eval_file(const char* file, int argn, const char *argv);
+void pry_eval_file(char *file);
+void pry_do_repl(void);
+
+// from the lua repl lib (lua.c)
+void dotty(lua_State *L);
+int handle_script(lua_State *L, char **argv, int n);
+int dostring(lua_State *L, const char *s, const char *name);
