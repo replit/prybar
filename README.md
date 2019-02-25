@@ -36,11 +36,12 @@ Usage of ./prybar-language:
 | Python 2.7                | ✔    | ✔               | ✔         | ✔    | ✔              | ✔          |
 | Python 3.x                | ✔    | ✔               | ✔         | ✔    | ✔              | ✔          |
 | Ruby 2.5                  | ✔    | ✔               | ✔         | ✔    | ✗              | ✗          |
-| Lua 5.2                   | ✔    | ✗               | ✔         | ✔    | ✗              | ✗          |
+| Lua 5.1                   | ✔    | ✗               | ✔         | ✔    | ✗              | ✔          |
 | Tcl                       | ✔    | ✔               | ✗         | ✗    | ✗              | ✗          |
 | R                         | ✔    | ✗               | ✗         | ✔    | ✗              | ✗          |
 | Javascript (spidermonkey) | ✔    | ✗               | ✗         | ✗    | ✗              | ✗          |
 | Javascript (nodejs)       | ✔    | ✔               | ✔         | ✔    | ✔              | ✔          |
+| Julia                     | ✔    | ✗               | ✔         | ✔    | ✗              | ✔          |
 
 ## Building
 
