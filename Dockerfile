@@ -36,7 +36,7 @@ ENV GOPATH=/gocode
 ADD . /gocode/src/github.com/replit/prybar
 WORKDIR /gocode/src/github.com/replit/prybar
 
-RUN which node
+RUN cp languages/tcl/tcl.pc /usr/lib/pkgconfig/
 
 RUN make \
 	prybar-python2 \
@@ -45,7 +45,8 @@ RUN make \
 	prybar-lua \
 	prybar-spidermonkey \
 	prybar-nodejs \
-	prybar-julia
+	prybar-julia \
+	prybar-tcl
 
 ENV LC_ALL=C.UTF-8
 
