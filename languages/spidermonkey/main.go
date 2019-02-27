@@ -1,5 +1,7 @@
 package main
 
+// USING_CGO
+
 /*
 #cgo pkg-config: mozjs185
 #include "jsapi.h"

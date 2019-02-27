@@ -1,0 +1,30 @@
+#!/usr/bin/expect -f
+
+set timeout -1
+spawn ./prybar-lua -q -i
+match_max 100000
+expect -exact "--> "
+send -- "1\r"
+expect -exact "1\r
+1\r
+--> "
+send -- "2\r"
+expect -exact "2\r
+2\r
+--> "
+send -- "3\r"
+expect -exact "3\r
+3\r
+--> "
+send -- "\[A"
+expect -exact "3"
+send -- "\[A"
+expect -exact "2"
+send -- "\[A"
+expect -exact "1"
+send -- "\r"
+expect -exact "\r
+1\r
+--> "
+send -- ""
+expect eof
