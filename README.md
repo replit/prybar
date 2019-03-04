@@ -42,6 +42,7 @@ Usage of ./prybar-language:
 | Javascript (spidermonkey) | ✔    | ✗               | ✗         | ✗    | ✗              | ✗          |
 | Javascript (nodejs)       | ✔    | ✔               | ✔         | ✔    | ✔              | ✔          |
 | Julia                     | ✔    | ✗               | ✔         | ✔    | ✗              | ✔          |
+| OCaml                     | ✔    | ✔               | ✗         | ✔    | ✗              | ✔          |
 
 ## Building
 
@@ -54,7 +55,7 @@ See [Dockerfile](Dockerfile) for hints what packages to install on linux.
 ### OSX
 
 ```
-brew install go r ruby python python@2 lua spidermonkey
+brew install go r ruby python python@2 lua spidermonkey opam
 ```
 
 ## Docker

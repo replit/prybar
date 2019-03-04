@@ -1,0 +1,10 @@
+#!/usr/bin/expect -f
+
+spawn ./prybar-ocaml -q -i
+match_max 100000
+expect -exact "--> "
+send -- "raise (Invalid_argument \"doh\");;\r"
+expect -exact "Exception: Invalid_argument \"doh\".\r
+--> "
+send -- ""
+expect eof
