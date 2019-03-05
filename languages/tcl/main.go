@@ -4,42 +4,81 @@ package main
 
 /*
 #cgo pkg-config: tcl
-#include "pry_tcl.h"
+#include <tcl.h>
+#include <stdlib.h>
 
 */
 import "C"
 
 import (
+	"fmt"
+	"os"
+	"strconv"
 	"unsafe"
 )
 
-type Tcl struct{}
-
-func (p Tcl) Open() {
-	C.pry_open()
+type Tcl struct {
+	interp *C.Tcl_Interp
 }
 
-func (p Tcl) Version() string {
-	cver := C.pry_version()
-	ver := C.GoString(cver)
-	C.free(unsafe.Pointer(cver))
-	return "TCL " + ver
+func (p *Tcl) Open() {
+	p.interp = C.Tcl_CreateInterp()
+
+	if C.Tcl_Init(p.interp) != C.TCL_OK {
+		panic("tcl interp did not init")
+	}
 }
 
-func (p Tcl) Eval(code string) {
+func (p *Tcl) Version() string {
+	major := C.int(0)
+	minor := C.int(0)
+	patch := C.int(0)
+
+	C.Tcl_GetVersion(
+		&major,
+		&minor,
+		&patch,
+		nil,
+	)
+
+	return "TCL " +
+		strconv.Itoa(int(major)) + "." +
+		strconv.Itoa(int(minor)) + "." +
+		strconv.Itoa(int(patch))
+}
+
+func (p *Tcl) eval(code string) string {
 	ccode := C.CString(code)
-	defer C.free(unsafe.Pointer(ccode))
-	C.pry_eval(ccode)
+
+	status := C.Tcl_Eval(p.interp, ccode)
+
+	result := C.GoString(C.Tcl_GetStringResult(p.interp))
+
+	if status == C.TCL_OK {
+		return result
+	}
+
+	errstr := C.GoString(C.Tcl_GetStringResult(p.interp))
+	fmt.Fprintf(os.Stderr, "error: %s\n", errstr)
+	return ""
 }
 
-func (p Tcl) EvalExpression(code string) string {
-	ccode := C.CString(code)
-	defer C.free(unsafe.Pointer(ccode))
-	return C.GoString(C.pry_eval(ccode))
+func (p *Tcl) EvalFile(file string, args []string) {
+	cfile := C.CString(file)
+	defer C.free(unsafe.Pointer(cfile))
+
+	C.Tcl_EvalFile(p.interp, cfile)
 }
 
-func (p Tcl) Close() {
-	C.pry_close()
+func (p *Tcl) Eval(code string) {
+	p.eval(code)
 }
 
-var Instance = Tcl{}
+func (p *Tcl) EvalExpression(code string) string {
+	return p.eval(code)
+}
+
+func (p *Tcl) Close() {
+	C.Tcl_Finalize()
+}
+var Instance = &Tcl{}

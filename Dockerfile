@@ -38,7 +38,7 @@ ENV GOPATH=/gocode
 ADD . /gocode/src/github.com/replit/prybar
 WORKDIR /gocode/src/github.com/replit/prybar
 
-RUN which node
+RUN cp languages/tcl/tcl.pc /usr/lib/pkgconfig/
 
 # OCaml / Reason stuff
 RUN add-apt-repository ppa:avsm/ppa && \
@@ -56,7 +56,8 @@ RUN make \
 	prybar-spidermonkey \
 	prybar-nodejs \
 	prybar-julia \
-  prybar-ocaml
+	prybar-tcl \
+	prybar-ocaml
 
 ENV LC_ALL=C.UTF-8
 

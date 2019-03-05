@@ -1,0 +1,28 @@
+#!/usr/bin/expect -f
+
+set timeout -1
+spawn ./prybar-tcl -q -i
+match_max 100000
+expect -exact "--> "
+send -- "e"
+expect -exact "\r--> e\[0K\r\[5C"
+send -- "x"
+expect -exact "\r--> ex\[0K\r\[6C"
+send -- "p"
+expect -exact "\r--> exp\[0K\r\[7C"
+send -- "r"
+expect -exact "\r--> expr\[0K\r\[8C"
+send -- " "
+expect -exact "\r--> expr \[0K\r\[9C"
+send -- "1"
+expect -exact "\r--> expr 1\[0K\r\[10C"
+send -- "+"
+expect -exact "\r--> expr 1+\[0K\r\[11C"
+send -- "1"
+expect -exact "\r--> expr 1+1\[0K\r\[12C"
+send -- "\r"
+expect -exact "\r--> expr 1+1\[0K\r\[12C\r
+2\r
+--> "
+send -- ""
+expect eof
