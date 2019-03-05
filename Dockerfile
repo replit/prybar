@@ -57,7 +57,7 @@ RUN make \
 	prybar-nodejs \
 	prybar-julia \
 	prybar-tcl \
-  prybar-ocaml
+	prybar-ocaml
 
 ENV LC_ALL=C.UTF-8
 
