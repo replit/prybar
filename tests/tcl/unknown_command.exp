@@ -3,23 +3,23 @@
 set timeout -1
 spawn ./prybar-tcl -q -i
 match_max 100000
-expect -exact "--> "
+expect -exact "\[J\[2K\r-->  "
 send -- "h"
-expect -exact "\r--> h\[0K\r\[5C"
+expect -exact "\[J\[2K\r--> h"
 send -- "m"
-expect -exact "\r--> hm\[0K\r\[6C"
+expect -exact "\[J\[2K\r--> hm"
 send -- "m"
-expect -exact "\r--> hmm\[0K\r\[7C"
+expect -exact "\[J\[2K\r--> hmm"
 send -- "m"
-expect -exact "\r--> hmmm\[0K\r\[8C"
+expect -exact "\[J\[2K\r--> hmmm"
 send -- "m"
-expect -exact "\r--> hmmmm\[0K\r\[9C"
+expect -exact "\[J\[2K\r--> hmmmm"
 send -- "m"
-expect -exact "\r--> hmmmmm\[0K\r\[10C"
+expect -exact "\[J\[2K\r--> hmmmmm"
 send -- "\r"
-expect -exact "\r--> hmmmmm\[0K\r\[10C\r
+expect -exact "\[J\[2K\r--> hmmmmm\[J\[2K\r--> hmmmmm\r
 error: invalid command name \"hmmmmm\"\r
 \r
---> "
+\[J\[2K\r-->  "
 send -- ""
 expect eof

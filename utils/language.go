@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 
-	"github.com/replit/prybar/linenoise"
+	"github.com/chzyer/readline"
 )
 
 type PluginBase interface {
@@ -104,12 +104,12 @@ func (lang Language) REPL() {
 
 func (lang Language) InternalREPL() {
 	for {
-		line, err := linenoise.Linenoise(lang.ps1)
+		line, err := readline.Line(lang.ps1)
 		if err != nil {
 			break
 		}
 		lang.REPLLikeEval(line)
-		linenoise.LinenoiseHistoryAdd(line)
+		readline.AddHistory(line)
 	}
 }
 

@@ -6,7 +6,7 @@ BINS    := $(addprefix prybar-,$(LANGS))
 
 all: $(BINS)
 
-prybar-%: ./languages/$(*) ./utils/* ./linenoise/* ./languages/$(*)/*
+prybar-%: ./languages/$(*) ./utils/* ./languages/$(*)/*
 	./scripts/inject.sh $(*)
 	go generate ./languages/$(*)/main.go
 	go build -o prybar-$(*) ./languages/$(*)
