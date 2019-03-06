@@ -66,10 +66,6 @@ func DoCli(p PluginBase) {
 		lang.SetPrompts(config.Ps1, config.Ps2)
 		lang.REPL()
 	} else if config.OurInteractive {
-		//LinenoiseSetCompleter(func(s string) []string {
-		//	return []string{s + "A", s + "B", s + "B"}
-		//})
 		lang.InternalREPL()
 	}
-
 }
