@@ -22,9 +22,10 @@ type args = {mode: mode}
 exception LangException of string
 
 let _ =
+  let interactive_mode = ref false in
+  let eval_filepath = ref None in
   let quiet = ref false in
   let syntax = ref OCaml in
-  let interactive_mode = ref false in
   let print_mode = ref false in
   let run_mode = ref false in
   let ps1 = Sys.getenv_opt "PRYBAR_PS1" |> function | Some str -> str | None -> "#" in
@@ -36,7 +37,6 @@ let _ =
     | "ml" -> syntax := OCaml
     | arg -> raise (Arg.Bad ("Unknown syntax: " ^ arg))
   in
-  (*let string_of_syntax = function OCaml -> "ml" | Reason -> "re" in*)
   let print_mode_arg str =
     print_mode := true ;
     code := str
@@ -44,6 +44,9 @@ let _ =
   let run_mode_arg str =
     run_mode := true ;
     code := str
+  in
+  let interactive_mode_arg str =
+    interactive_mode := true ;
   in
   let speclist =
     [ ("-q", Arg.Set quiet, "Don't print OCaml version on startup")
@@ -56,7 +59,11 @@ let _ =
     "OCaml / Reason repl script for prybar. Options available:"
   in
   Arg.parse speclist
-    (fun str -> print_endline ("Anonymous arg: " ^ str))
+    (fun str -> 
+      match (str, !interactive_mode) with
+      | (path, true) -> eval_filepath := Some(path)
+      | _ -> print_endline ("Anonymous arg: " ^ str)
+      )
     usage_msg ;
   let mode =
     match (!print_mode, !run_mode, !interactive_mode) with
@@ -95,7 +102,22 @@ let _ =
           len )
         else len
 
+    (* Minimal version of just running any input file, we stripped a lot of original logic
+     * because we don't want to do any side effects on the compiler environment *)
+    let run_script ppf name =
+      let explicit_name =
+        (* Prevent use_silently from searching in the path. *)
+        if name <> "" && Filename.is_implicit name
+        then Filename.concat Filename.current_dir_name name
+        else name
+      in
+      use_silently ppf explicit_name
+
     let loop ppf =
+      (* If there's an entry file provided, run it before dropping into interactive mode *)
+      (match !eval_filepath with
+      | Some name -> run_script ppf name 
+      | _ -> false) |> ignore ; 
       Clflags.debug := true ;
       Location.formatter_for_warnings := ppf ;
       ( try initialize_toplevel_env () with
