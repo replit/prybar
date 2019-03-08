@@ -114,10 +114,6 @@ let _ =
       use_silently ppf explicit_name
 
     let loop ppf =
-      (* If there's an entry file provided, run it before dropping into interactive mode *)
-      (match !eval_filepath with
-      | Some name -> run_script ppf name 
-      | _ -> false) |> ignore ; 
       Clflags.debug := true ;
       Location.formatter_for_warnings := ppf ;
       ( try initialize_toplevel_env () with
@@ -130,6 +126,12 @@ let _ =
       Location.input_lexbuf := Some lb ;
       Sys.catch_break true ;
       (*load_ocamlinit ppf;*)
+
+      (* If there's an entry file provided, run it before dropping into interactive mode *)
+      (match !eval_filepath with
+      | Some name -> run_script ppf name 
+      | _ -> false) |> ignore ; 
+
       while true do
         let snap = Btype.snapshot () in
         try
