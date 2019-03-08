@@ -45,9 +45,6 @@ let _ =
     run_mode := true ;
     code := str
   in
-  let interactive_mode_arg str =
-    interactive_mode := true ;
-  in
   let speclist =
     [ ("-q", Arg.Set quiet, "Don't print OCaml version on startup")
     ; ( "-e" , Arg.String print_mode_arg , "Eval and output results of interpreted code" )
