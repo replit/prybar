@@ -42,7 +42,7 @@ Usage of ./prybar-language:
 | Javascript (spidermonkey) | ✔    | ✗               | ✗         | ✗    | ✗              | -          |
 | Javascript (nodejs)       | ✔    | ✔               | ✔         | ✔    | ✔              | ✔          |
 | Julia                     | ✔    | ✗               | ✔         | ✔    | ✗              | ✔          |
-| OCaml                     | ✔    | ✔               | ✗         | ✔    | ✗              | ✔          |
+| OCaml                     | ✔    | ✔               | ✔         | ✔    | ✗              | ✔          |
 
 ## Building
 
