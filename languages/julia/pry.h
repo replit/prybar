@@ -93,11 +93,13 @@ void setup() {
                 jl_cstr_to_string("julia> "));
   jl_eval_string(
       "atreplinit(function (r)"
-      "r.prompt_color=\"\\u001B[33m\";"
+      "pparts = match(r\"(\\e\\[.+m)?(.*)\", Base.replit_prompt);"
+      "r.prompt_color = pparts[1] == nothing ? \"\" : String(pparts[1]);"
       "r.interface = REPL.setup_interface(r, true, r.options.extra_keymap); "
-      "r.interface.modes[1].prompt=Base.replit_prompt;"
-      "r.interface.modes[2].prompt=\"shell> \";"
-      "r.interface.modes[3].prompt=\"help?> \";"
+      "r.interface.modes[1].prompt ="
+      " pparts[2] == nothing ? \"\" : String(pparts[2]);"
+      "r.interface.modes[2].prompt = \"shell> \";"
+      "r.interface.modes[3].prompt = \"help?> \";"
       "end)");
 }
 

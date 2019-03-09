@@ -3,11 +3,13 @@
 set timeout -1
 spawn ./prybar-julia -q -i
 match_max 100000
-expect -exact "\[?2004h\r\[0K\[32m\[1m--> \[0m\[0m\r\[4C\r\[4C"
-send -- "println(\"helloooooo\")\r"
-expect -exact "println(\"helloooooo\")\r\[0K\[32m\[1m--> \[0m\[0m\r\[4Cprintln(\"helloooooo\")\r\[25C\r
-\[?2004l\[0mhelloooooo\r
+expect -exact "\[?2004h\r\[0K\[1m--> \[0m\[0m\r\[4C\r\[4C"
+send -- "println()"
+expect -exact "\r\[0K\[1m--> \[0m\[0m\r\[4Cprintln(\r\[12C"
+send -- "\"hellooooooo\")\r"
+expect -exact "\"hellooooooo\")\r\[0K\[1m--> \[0m\[0m\r\[4Cprintln(\"hellooooooo\")\r\[26C\r
+\[?2004l\[0mhellooooooo\r
 \r
-\r\[0K\r\[0K\[32m\[1m--> \[0m\[0m\r\[4C\r\[4C\[?2004h\r\[0K\[32m\[1m--> \[0m\[0m\r\[4C\r\[4C"
+\r\[0K\r\[0K\[1m--> \[0m\[0m\r\[4C\r\[4C\[?2004h\r\[0K\[1m--> \[0m\[0m\r\[4C\r\[4C"
 send -- ""
 expect eof
