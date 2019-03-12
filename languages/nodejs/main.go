@@ -44,7 +44,6 @@ func Execute(config *utils.Config) {
 
 	if !config.Quiet {
 		args = append(args, "-r", findHelper("version"))
-
 	}
 
 	if config.Code != "" {
