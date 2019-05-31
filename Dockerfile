@@ -15,7 +15,8 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
 	expect \
 	nodejs \
 	m4 \
-	software-properties-common
+	software-properties-common \
+	emacs-nox
 
 RUN wget http://launchpadlibrarian.net/309343864/libmozjs185-dev_1.8.5-1.0.0+dfsg-7_amd64.deb && \
 	wget http://launchpadlibrarian.net/309343863/libmozjs185-1.0_1.8.5-1.0.0+dfsg-7_amd64.deb && \
@@ -56,7 +57,8 @@ RUN make \
 	prybar-nodejs \
 	prybar-julia \
 	prybar-tcl \
-	prybar-ocaml
+	prybar-ocaml \
+	prybar-elisp
 
 ENV LC_ALL=C.UTF-8
 

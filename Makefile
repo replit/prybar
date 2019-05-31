@@ -16,4 +16,4 @@ test:
 	./run_tests
 
 clean:
-	@rm ./prybar-* ./languages/*/generated_*.go
+	@rm -f ./prybar-* ./languages/*/generated_*.go
