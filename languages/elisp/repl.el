@@ -62,12 +62,35 @@
   (let* ((debug-on-error t)
          (debugger
           (lambda (&rest args)
-            (message "Lisp error: %S" args)
-            ;; For some reason, binding `standard-output' to t does
-            ;; not do the trick.
+            (let ((desc "Error"))
+              (when (eq (car args) 'error)
+                (setq desc "Lisp error")
+                (setq args (cdr args)))
+              (message "%s: %s" desc (mapconcat
+                                      (lambda (arg)
+                                        (format "%S" arg))
+                                      args " ")))
+            ;; Looking at the implementation of `backtrace' in Elisp,
+            ;; you might think there is a more clever way to do this.
+            ;; Unfortunately, back in Emacs 25.2 (which is what we use
+            ;; in polygott), the implementation is in C.
             (with-temp-buffer
               (let ((standard-output (current-buffer)))
                 (backtrace)
+                (goto-char (point-max))
+                (when (search-backward "eval(" nil 'noerror 2)
+                  (beginning-of-line)
+                  (delete-region (point) (point-max)))
+                (goto-char (point-min))
+                ;; Split string literal into two to avoid matching it
+                ;; in the search, since we are essentially searching
+                ;; our own code. Much like the ps aux | grep '[n]ame'
+                ;; trick to avoid the grep process showing up in
+                ;; search results.
+                (when (re-search-forward (concat "(" "lambda") nil 'noerror)
+                  (beginning-of-line)
+                  (forward-line)
+                  (delete-region (point-min) (point)))
                 (message "%s" (buffer-string))))
             (exit-recursive-edit))))
     (condition-case-unless-debug _
@@ -99,3 +122,4 @@
 
 ;; TODO: deal with extra newlines
 ;; TODO: fix debugger getting disabled
+;; TODO: control-c?
