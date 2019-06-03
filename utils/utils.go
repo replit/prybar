@@ -19,15 +19,20 @@ type Config struct {
 func ParseFlags() *Config {
 	config := &Config{}
 
-	flag.StringVar(&config.Code, "c", "", "code to run")
-	flag.StringVar(&config.Exp, "e", "", "expression to print")
+	flag.StringVar(&config.Code, "c", "", "execute without printing result")
+	flag.StringVar(&config.Exp, "e", "", "evaluate and print result")
 
-	flag.StringVar(&config.Ps1, "ps1", "--> ", "PS1")
-	flag.StringVar(&config.Ps2, "ps2", "... ", "PS2")
+	flag.StringVar(&config.Ps1, "ps1", "--> ", "repl prompt")
+	flag.StringVar(&config.Ps2, "ps2", "... ", "repl continuation prompt")
 
-	flag.BoolVar(&config.Interactive, "i", false, "interactive")
-	flag.BoolVar(&config.OurInteractive, "I", false, "like -i, but never use language REPL")
-	flag.BoolVar(&config.Quiet, "q", false, "quiet")
+	flag.BoolVar(&config.Interactive, "i", false, "interactive (use language repl)")
+	flag.BoolVar(&config.OurInteractive, "I", false, "interactive (use readline repl)")
+	flag.BoolVar(&config.Quiet, "q", false, "don't print language version")
+
+	flag.Usage = func() {
+		fmt.Fprintf(os.Stderr, "Usage: %s [FLAGS] [FILENAME]...\n", os.Args[0])
+		flag.PrintDefaults()
+	}
 
 	flag.Parse()
 
