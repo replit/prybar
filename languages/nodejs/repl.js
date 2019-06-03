@@ -180,5 +180,5 @@ var exit = (function() {
 
 exit((reallyExit) => {
 	let r = repl.start(process.env.NODE_PROMPT || '> ');
-	r.on('exit', reallyExit);	
+	r.on('exit', reallyExit);
 });

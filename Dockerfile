@@ -30,7 +30,7 @@ RUN wget https://julialang-s3.julialang.org/bin/linux/x64/1.1/julia-1.1.0-linux-
 	cp -r share/* /usr/share/ && \
 	cd .. && \
 	rm -rf julia-1.1.0-linux-x86_64.tar.gz julia-1.1.0
-	
+
 
 RUN mkdir -p /gocode/src/github.com/replit/prybar
 
@@ -62,3 +62,7 @@ RUN make \
 ENV LC_ALL=C.UTF-8
 
 CMD bash
+
+# Local Variables:
+# indent-tabs-mode: t
+# End:
