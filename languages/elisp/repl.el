@@ -98,7 +98,8 @@
       (error (throw :error nil)))))
 
 (defun prybar-repl ()
-  (let ((debug-on-error t))
+  (let ((debug-on-error t)
+        (kill-emacs-hook (cons (lambda () (terpri)) kill-emacs-hook)))
     (with-prybar-config
         (eval exec (ps1 "--> ") (ps2 "... ") quiet interactive)
       (unless prybar-quiet
@@ -122,4 +123,4 @@
 
 ;; TODO: deal with extra newlines
 ;; TODO: fix debugger getting disabled
-;; TODO: control-c?
+;; TODO: docstrings
