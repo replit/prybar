@@ -31,6 +31,13 @@ RUN wget https://julialang-s3.julialang.org/bin/linux/x64/1.1/julia-1.1.0-linux-
 	cd .. && \
 	rm -rf julia-1.1.0-linux-x86_64.tar.gz julia-1.1.0
 
+# OCaml / Reason stuff
+RUN add-apt-repository ppa:avsm/ppa && \
+	apt-get update && \
+	apt-get install ocaml opam -y && \
+	opam init -c ocaml-system -n --disable-sandboxing && \
+	eval `opam env` && \
+	echo "eval \`opam env\`" >> ~/.bashrc
 
 RUN mkdir -p /gocode/src/github.com/replit/prybar
 
@@ -39,14 +46,6 @@ ADD . /gocode/src/github.com/replit/prybar
 WORKDIR /gocode/src/github.com/replit/prybar
 
 RUN cp languages/tcl/tcl.pc /usr/lib/pkgconfig/
-
-# OCaml / Reason stuff
-RUN add-apt-repository ppa:avsm/ppa && \
-	apt-get update && \
-	apt-get install ocaml opam -y && \
-	opam init -c ocaml-system -n --disable-sandboxing && \
-	eval `opam env` && \
-	echo "eval \`opam env\`" >> ~/.bashrc
 
 RUN make \
 	prybar-python2 \
