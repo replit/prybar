@@ -56,7 +56,7 @@ let _ =
     "OCaml / Reason repl script for prybar. Options available:"
   in
   Arg.parse speclist
-    (fun str -> 
+    (fun str ->
       match (str, !interactive_mode) with
       | (path, true) -> eval_filepath := Some(path)
       | _ -> print_endline ("Anonymous arg: " ^ str)
@@ -126,8 +126,8 @@ let _ =
 
       (* If there's an entry file provided, run it before dropping into interactive mode *)
       (match !eval_filepath with
-      | Some name -> run_script ppf name 
-      | _ -> false) |> ignore ; 
+      | Some name -> run_script ppf name
+      | _ -> false) |> ignore ;
 
       while true do
         let snap = Btype.snapshot () in
