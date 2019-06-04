@@ -61,3 +61,7 @@ RUN make \
 ENV LC_ALL=C.UTF-8
 
 CMD bash
+
+# Local Variables:
+# indent-tabs-mode: t
+# End:
