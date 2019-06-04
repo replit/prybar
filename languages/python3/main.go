@@ -21,6 +21,7 @@ func (p Python) Open() {
 	p.loadModule("readline")
 	p.Eval("import signal")
 	p.Eval("signal.signal(signal.SIGINT, signal.default_int_handler)")
+	p.Eval("del signal")
 }
 
 func (p Python) Version() string {
