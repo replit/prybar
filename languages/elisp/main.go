@@ -12,16 +12,16 @@ import (
 
 func Execute(config *utils.Config) {
 
-	emacs, err1 := exec.LookPath("emacs")
+	emacs, err := exec.LookPath("emacs")
 
-	if err1 != nil {
-		panic(err1)
+	if err != nil {
+		panic(err)
 	}
 
-	execPath, err2 := os.Executable()
+	execPath, err := os.Executable()
 
-	if err2 != nil {
-		panic(err2)
+	if err != nil {
+		panic(err)
 	}
 
 	runDir := filepath.Dir(execPath)
@@ -52,10 +52,10 @@ func Execute(config *utils.Config) {
 	}
 
 	args := []string{"emacs", "-Q", "--load", replPath, "--eval", "(prybar-repl)"}
-	err3 := syscall.Exec(emacs, args, os.Environ())
+	err = syscall.Exec(emacs, args, os.Environ())
 
-	if err3 != nil {
-		panic(err3)
+	if err != nil {
+		panic(err)
 	}
 
 }
