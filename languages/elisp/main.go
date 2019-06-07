@@ -6,7 +6,6 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"strings"
 	"syscall"
 )
 
@@ -37,10 +36,12 @@ func Execute(config *utils.Config) {
 		os.Setenv("PRYBAR_QUIET", "")
 	}
 
-	if config.Args != nil {
-		os.Setenv("PRYBAR_FILES", strings.Join(config.Args, "\000"))
+	// We only support one file, despite the fact that this
+	// variable is a list.
+	if len(config.Args) >= 1 {
+		os.Setenv("PRYBAR_FILE", config.Args[0])
 	} else {
-		os.Setenv("PRYBAR_FILES", "")
+		os.Setenv("PRYBAR_FILE", "")
 	}
 
 	if !(config.Interactive || config.OurInteractive) {

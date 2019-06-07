@@ -57,18 +57,17 @@ handled, display the IELM buffer and return."
    (face-list))
   ;; IELM only supports PS1, not PS2.
   (with-prybar-config
-      (eval exec (ps1 "--> ") quiet files)
+      (eval exec (ps1 "--> ") quiet file)
     (setq ielm-prompt prybar-ps1)
     (with-current-buffer (get-buffer-create "*ielm*")
       (if prybar-quiet
           (setq ielm-header "")
         (insert (format "GNU Emacs %s\n" emacs-version)))
-      (when prybar-files
-        (dolist (file (split-string prybar-files "\0"))
-          (condition-case e
-              (load (expand-file-name file) nil 'nomessage)
-            (error
-             (insert (format "%s\n" (error-message-string e)))))))
+      (when prybar-file
+        (condition-case e
+            (load (expand-file-name prybar-file) nil 'nomessage)
+          (error
+           (insert (format "%s\n" (error-message-string e))))))
       (inferior-emacs-lisp-mode)
       (when prybar-exec
         (insert prybar-exec)
