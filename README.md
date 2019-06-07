@@ -1,33 +1,36 @@
 # ![Prybar](logo.svg)
 
-Prybar is a universal interpreter front-end. Same interface, same REPL, different languages.
+Prybar is a universal interpreter front-end. Same interface, same
+REPL, different languages.
 
 ## Why
 
-At [Repl.it](https://repl.it) we're in the business of running REPLs. As it happens to be
-every language implements them differently. We wanted them to all behave the same: run code and drop into a REPL!
+At [Repl.it](https://repl.it) we're in the business of running REPLs.
+As it happens to be, every language implements them differently. We
+wanted them to all behave the same: run code and drop into a REPL!
 
 ## How it works
 
-Prybar, written in Golang, maintains a common command-line interface that calls into
-a select language backend. The language backends are implemented using cgo and the language's C-bindings.
+Prybar, written in Golang, maintains a common command-line interface
+that calls into a select language backend. When possible, the language
+backends are implemented using cgo and the language's C-bindings.
+Otherwise, they make use of a small script written in the host
+language which starts a Prybar-compatible REPL.
 
 ## Usage
 
-```
-Usage of ./prybar-language:
-  -I	like -i, but never use language REPL
-  -c string
-    	code to run
-  -e string
-    	expression to print
-  -i	interactive
-  -ps1 string
-    	PS1 (default "--> ")
-  -ps2 string
-    	PS2 (default "... ")
-  -q	quiet
-```
+    Usage: ./prybar-LANG [FLAGS] [FILENAME]...
+      -I	interactive (use readline repl)
+      -c string
+        	execute without printing result
+      -e string
+        	evaluate and print result
+      -i	interactive (use language repl)
+      -ps1 string
+        	repl prompt (default "--> ")
+      -ps2 string
+        	repl continuation prompt (default "... ")
+      -q	don't print language version
 
 ## Language Support
 
@@ -44,23 +47,36 @@ Usage of ./prybar-language:
 | Julia                     | ✔    | ✗               | ✔         | ✔    | ✗              | ✔          |
 | OCaml                     | ✔    | ✔               | ✔         | ✔    | ✗              | ✔          |
 
-## Building
+## Build and run
 
-Prybar uses a Unix make file to build each Prybar binary with `pkg-config` to find language dependencies on your system.
+Prybar uses Docker to make it easy to get started with development.
+First, you must [install Docker](https://docs.docker.com/install/).
+Then, run:
 
-### Linux
+    $ docker build . -t prybar
 
-See [Dockerfile](Dockerfile) for hints what packages to install on linux.
+to create a Docker image containing the Prybar code and all of its
+dependencies. Building the image also includes compiling the Prybar
+binaries (there is one for each supported language).
 
-### OSX
+To run the code in a Docker container:
 
-```
-brew install go r ruby python python@2 lua spidermonkey opam
-```
+    $ docker run --rm -it prybar
+    # ./prybar-python3 -h
 
-## Docker
+The directory contains one `./prybar-LANG` binary for each supported
+language `LANG` ([see the `languages` subdirectory of this
+repository](languages)).
 
-The script `./extract.sh` can be used to compile and produce a tarball containing all the Prybar binaries. Each binary will be named `prybar-<language>`. You can build all languages by running `make` in the repo's root or run `make prybar-<language>` to build a specific language.
+When you make changes to the code, you must re-run `docker build` to
+create a new Docker image before you can run it with `docker run`.
+
+### Distribution
+
+The script `./extract.sh` can be used to compile and produce a tarball
+containing all the Prybar binaries. You can run it on its own; it will
+automatically compile a new Docker image if necessary and extract the
+binaries from a running container.
 
 ## License
 
@@ -78,7 +94,8 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
-Foundation, Inc., 51 Franklin Street, Suite 500, Boston, MA 02110-1335, USA.
+Foundation, Inc., 51 Franklin Street, Suite 500, Boston, MA
+02110-1335, USA.
 
 See the COPYING file for more information regarding the GNU General
 Public License.
