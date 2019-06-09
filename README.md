@@ -46,6 +46,7 @@ language which starts a Prybar-compatible REPL.
 | Javascript (nodejs)       | ✔    | ✔               | ✔         | ✔    | ✔              | ✔          |
 | Julia                     | ✔    | ✗               | ✔         | ✔    | ✗              | ✔          |
 | OCaml                     | ✔    | ✔               | ✔         | ✔    | ✗              | ✔          |
+| Emacs Lisp                | ✔    | ✔               | ✔         | ✔    | ✗              | ✔          |
 
 ## Build and run
 
