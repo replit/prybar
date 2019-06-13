@@ -48,13 +48,10 @@ expands to:
 The REPL uses `ielm', which see. After version information is
 printed and forms for immediate evaluation or execution are
 handled, display the IELM buffer and return."
+  ;; For some reason in the repl.it environment the text all gets
+  ;; underlined sometimes. Redisplaying fixes this.
+  (redisplay)
   (menu-bar-mode -1)
-  ;; Disable bold and underline, from
-  ;; <https://stackoverflow.com/a/2065305/3538165>.
-  (mapc
-   (lambda (face)
-     (set-face-attribute face nil :weight 'normal :underline nil))
-   (face-list))
   ;; Make it so you can `load' or `require' files from the project
   ;; directory.
   (add-to-list 'load-path default-directory)
