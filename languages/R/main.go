@@ -3,7 +3,7 @@ package main
 // USING_CGO
 
 /*
-#cgo pkg-config: libr
+#cgo pkg-config: libR
 #include <stdlib.h>
 #include <Rembedded.h>
 #include <RVersion.h>
