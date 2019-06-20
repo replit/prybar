@@ -1,0 +1,9 @@
+#!/usr/bin/expect -f
+
+set timeout -1
+spawn ./prybar-sqlite -i
+match_max 100000
+expect -exact "SQLite version 2.8.17"
+expect -exact "--> \[0m\[0m\r\[4C\r\[4C"
+send -- ""
+expect eof
