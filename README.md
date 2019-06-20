@@ -11,11 +11,11 @@ wanted them to all behave the same: run code and drop into a REPL!
 
 ## How it works
 
-Prybar, written in Golang, maintains a common command-line interface
-that calls into a select language backend. When possible, the language
-backends are implemented using cgo and the language's C-bindings.
-Otherwise, they make use of a small script written in the host
-language which starts a Prybar-compatible REPL.
+Prybar, written in [Golang](https://golang.org/), maintains a common
+command-line interface that calls into a select language backend. When
+possible, the language backends are implemented using cgo and the
+language's C-bindings. Otherwise, they make use of a small script
+written in the host language which starts a Prybar-compatible REPL.
 
 ## Usage
 
@@ -50,34 +50,47 @@ language which starts a Prybar-compatible REPL.
 
 ## Build and run
 
+    % make help
+    usage:
+      make all          Build all Prybar binaries
+      make prybar-LANG  Build the Prybar binary for LANG
+      make docker       Run a shell with Prybar inside Docker
+      make image        Build a Docker image with Prybar for distribution
+      make test         Run integration tests
+      make clean        Remove build artifacts
+      make help         Show this message
+
 Prybar uses Docker to make it easy to get started with development.
 First, you must [install Docker](https://docs.docker.com/install/).
 Then, run:
 
-    $ docker build . -t prybar
+    $ make docker
 
 to create a Docker image containing the Prybar code and all of its
-dependencies. Building the image also includes compiling the Prybar
-binaries (there is one for each supported language).
+dependencies, and launch a shell inside of it. The Prybar source
+repository will be synchronized with the working directory of the
+container's filesystem, so you only need to re-run `make docker` if
+you change the Dockerfile or any of its scripts.
 
-To run the code in a Docker container:
+To build Prybar (this should be done inside `make docker` unless you
+have installed all of Prybar's dependencies on your system), run
+`make` or `make all`. Then the `prybar-LANG` binaries will be
+available in the working directory and on `$PATH`, one for each
+supported language `LANG` ([see the `languages` subdirectory of this
+repository](languages)):
 
-    $ docker run --rm -it prybar
-    # ./prybar-python3 -h
-
-The directory contains one `./prybar-LANG` binary for each supported
-language `LANG` ([see the `languages` subdirectory of this
-repository](languages)).
-
-When you make changes to the code, you must re-run `docker build` to
-create a new Docker image before you can run it with `docker run`.
+    $ prybar-python3 -h
 
 ### Distribution
 
-The script `./extract.sh` can be used to compile and produce a tarball
-containing all the Prybar binaries. You can run it on its own; it will
-automatically compile a new Docker image if necessary and extract the
-binaries from a running container.
+Run `make image` to create a Docker image containing not only Prybar's
+dependencies and source code but also its compiled binaries, which can
+be embedded inside other Docker images by means of `COPY
+--from=basicer/prybar`.
+
+This image is automatically built and deployed to [Docker
+Hub](https://hub.docker.com/) every time a commit is merged to
+`master`.
 
 ## License
 
