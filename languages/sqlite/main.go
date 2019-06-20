@@ -1,19 +1,28 @@
 package main
 
+// USING_CGO
+
 import (
-	"bufio"
+	"database/sql"
 	"fmt"
-	"io"
 	"io/ioutil"
-	"os"
-	"os/exec"
+
+	_ "github.com/mattn/go-sqlite3"
 
 	"github.com/replit/prybar/utils"
 )
 
-type outputLine struct {
-	line string
-	source string
+var Instance = SQLite{}
+
+// some compile-time assertions that we satisfy interfaces
+var _ utils.PluginBase = SQLite{}
+var _ utils.PluginEval = SQLite{}
+var _ utils.PluginEvalExpression = SQLite{}
+
+
+type SQLite struct {
+	open bool
+	db *sql.DB
 }
 
 // constructConfigFile generates commands to configure the sqlite CLI.
@@ -41,66 +50,42 @@ func constructConfigFile(config *utils.Config) string {
 	return f.Name()
 }
 
-func filterOutput(stdout io.Reader, stderr io.Reader, config *utils.Config) {
-	outputChan := make(chan *outputLine)
-	// start reading from the pipes
-	go func() {
-		s := bufio.NewScanner(stdout)
-		for s.Scan() {
-			line := s.Text()
-			ol := &outputLine{line: line, source: "stdout"}
-			outputChan <- ol
-		}
-		if err := s.Err(); err != nil {
-			panic(err)
-		}
-	}()
-	go func() {
-		s := bufio.NewScanner(stderr)
-		for s.Scan() {
-			line := s.Text()
-			ol := &outputLine{line: line, source: "stderr"}
-			outputChan <- ol
-		}
-		if err := s.Err(); err != nil {
-			panic(err)
-		}
-	}()
+func (s SQLite) Version() string {
+	return "SQLite version TODO"
+}
 
-	for {
-		fmt.Printf("top of for")
-		for ol := range outputChan {
-			fmt.Fprintf(os.Stdout, "%+v", ol)
-		}
-		panic("output channel closed")
+func (s SQLite) Open() {
+	db, err := sql.Open("sqlite3", ":memory:")
+	if err != nil {
+		panic(err)
+	}
+	s.db = db
+	s.open = true
+}
+func (s SQLite) Close() {
+	s.db.Close()
+}
+
+func (s SQLite) Eval(line string) {
+	if !s.open {
+		s.Open()
+	}
+	_, err := s.db.Exec(line)
+	if err != nil {
+		panic(err)
 	}
 }
 
-func Execute(config *utils.Config) {
-	sqlite, err := exec.LookPath("sqlite")
+func (s SQLite) EvalExpression(line string) string {
+	db, err := sql.Open("sqlite3", ":memory:")
 	if err != nil {
 		panic(err)
 	}
 
-	// set up sqlite command
-	configFile := constructConfigFile(config)
-	cmd := exec.Command(sqlite, "-init", configFile)
-	cmd.Stdin = os.Stdin
-
-	// grab output pipes
-	cmdOut, err := cmd.StdoutPipe()
+	_, err = db.Exec(line)
+	// rows, err := s.db.Query(line)
 	if err != nil {
-		panic(err)
+		return err.Error()
 	}
-	cmdErr, err := cmd.StderrPipe()
-	if err != nil {
-		panic(err)
-	}
-
-	// run sqlite and filter its output
-	err = cmd.Start()
-	if err != nil {
-		panic(err)
-	}
-	filterOutput(cmdOut, cmdErr, config)
+	return "evaled"
 }
