@@ -30,15 +30,6 @@ func constructConfigFile(config *utils.Config) string {
 	// TODO: this probably doesn't handle quotation marks properly
 	f.WriteString(fmt.Sprintf(".prompt '%s' '%s'\n", config.Ps1, config.Ps2))
 
-	// version header (this is actually completely incorrect)
-	var headers string
-	if config.Quiet {
-		headers = "off"
-	} else {
-		headers = "on"
-	}
-	f.WriteString(fmt.Sprintf(".headers %s\n", headers))
-
 	return f.Name()
 }
 
@@ -47,23 +38,36 @@ func Execute(config *utils.Config) {
 	args := []string{"-init", configFile}
 	cmd := exec.Command("sqlite", args...)
 
-	ppty, tty, err := pty.Open()
+	ptty, tty, err := pty.Open()
 	if err != nil {
 		panic(err)
 	}
 	cmd.Stderr = tty
 	cmd.Stdin = tty
 	cmd.Stdout = tty
-	_ = ppty
 
 	err = cmd.Start()
 	if err != nil {
 		panic(err)
 	}
+
+	// file to execute
+	if len(config.Args) > 1 {
+		panic("too many arguments")
+	}
+	if len(config.Args) == 1 {
+		fileToRun := config.Args[0]
+		ptty.WriteString(fmt.Sprintf(".read %s\n", fileToRun))
+	}
 	
-	go io.Copy(os.Stderr, ppty)
-	go io.Copy(os.Stdout, filter(ppty))
-	io.Copy(ppty, os.Stdin)
+	// set up I/O
+	go io.Copy(os.Stderr, ptty)
+	if config.Quiet {
+		go io.Copy(os.Stdout, filter(ptty))
+	} else {
+		go io.Copy(os.Stdout, ptty)
+	}
+	io.Copy(ptty, os.Stdin)
 }
 
 // filter removes all output until we get a prompt
