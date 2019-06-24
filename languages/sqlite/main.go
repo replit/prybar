@@ -9,6 +9,7 @@ import (
 	"os/exec"
 
 	"github.com/kr/pty"
+	"golang.org/x/sys/unix"
 
 	"github.com/replit/prybar/utils"
 )
@@ -33,6 +34,39 @@ func constructConfigFile(config *utils.Config) string {
 	return f.Name()
 }
 
+// ripped from goval
+// Set some modes on the pty attached to fd such that it is
+// more suited to be connected to a terminal.
+func SaneTTY(fd int) (interface{}, error) {
+	termios, err := unix.IoctlGetTermios(fd, unix.TCGETS)
+	if err != nil {
+		return nil, err
+	}
+
+	termios.Iflag |= unix.ICRNL
+	termios.Oflag |= unix.OPOST
+	termios.Lflag |= unix.ECHO | unix.ISIG | unix.IEXTEN | unix.ICANON
+	if err := unix.IoctlSetTermios(fd, unix.TCSETS, termios); err != nil {
+		return nil, err
+	}
+	return termios, nil
+}
+
+// ripped from goval
+// Disable echo on the pty attached to fd
+func EchoOffTTY(fd int) (interface{}, error) {
+	termios, err := unix.IoctlGetTermios(fd, unix.TCGETS)
+	if err != nil {
+		return nil, err
+	}
+
+	termios.Lflag &^= unix.ECHO
+	if err := unix.IoctlSetTermios(fd, unix.TCSETS, termios); err != nil {
+		return nil, err
+	}
+	return termios, nil
+}
+
 func Execute(config *utils.Config) {
 	configFile := constructConfigFile(config)
 	args := []string{"-init", configFile}
@@ -42,6 +76,9 @@ func Execute(config *utils.Config) {
 	if err != nil {
 		panic(err)
 	}
+
+	SaneTTY(int(ptty.Fd()))
+	EchoOffTTY(int(ptty.Fd()))
 	cmd.Stderr = tty
 	cmd.Stdin = tty
 	cmd.Stdout = tty
