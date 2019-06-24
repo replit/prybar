@@ -27,7 +27,7 @@ opam
 python-dev
 python3-dev
 ruby2.5-dev
-sqlite
+sqlite3
 tcl-dev
 wget
 

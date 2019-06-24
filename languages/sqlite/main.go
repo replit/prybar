@@ -34,51 +34,31 @@ func constructConfigFile(config *utils.Config) string {
 	return f.Name()
 }
 
-// ripped from goval
-// Set some modes on the pty attached to fd such that it is
-// more suited to be connected to a terminal.
-func SaneTTY(fd int) (interface{}, error) {
+func disableEcho(file *os.File) {
+	fd := int(file.Fd())
 	termios, err := unix.IoctlGetTermios(fd, unix.TCGETS)
 	if err != nil {
-		return nil, err
-	}
-
-	termios.Iflag |= unix.ICRNL
-	termios.Oflag |= unix.OPOST
-	termios.Lflag |= unix.ECHO | unix.ISIG | unix.IEXTEN | unix.ICANON
-	if err := unix.IoctlSetTermios(fd, unix.TCSETS, termios); err != nil {
-		return nil, err
-	}
-	return termios, nil
-}
-
-// ripped from goval
-// Disable echo on the pty attached to fd
-func EchoOffTTY(fd int) (interface{}, error) {
-	termios, err := unix.IoctlGetTermios(fd, unix.TCGETS)
-	if err != nil {
-		return nil, err
+		panic(err)
 	}
 
 	termios.Lflag &^= unix.ECHO
+
 	if err := unix.IoctlSetTermios(fd, unix.TCSETS, termios); err != nil {
-		return nil, err
+		panic(err)
 	}
-	return termios, nil
 }
 
 func Execute(config *utils.Config) {
 	configFile := constructConfigFile(config)
 	args := []string{"-init", configFile}
-	cmd := exec.Command("sqlite", args...)
+	cmd := exec.Command("sqlite3", args...)
 
 	ptty, tty, err := pty.Open()
 	if err != nil {
 		panic(err)
 	}
+	disableEcho(ptty)
 
-	SaneTTY(int(ptty.Fd()))
-	EchoOffTTY(int(ptty.Fd()))
 	cmd.Stderr = tty
 	cmd.Stdin = tty
 	cmd.Stdout = tty
@@ -111,7 +91,7 @@ func Execute(config *utils.Config) {
 func filter(src io.Reader) io.Reader {
 	scanner := bufio.NewScanner(src)
 	for scanner.Scan() {
-		if scanner.Text() == "Enter \".help\" for instructions" {
+		if scanner.Text() == "Enter \".help\" for usage hints." {
 			break
 		}
 	}
