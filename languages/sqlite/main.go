@@ -16,7 +16,7 @@ import (
 
 var Instance = &SQLite{}
 
-type SQLite struct {}
+type SQLite struct{}
 
 // constructConfigFile generates commands to configure the sqlite CLI.
 // It writes them to a temporary file and returns its pathname.
@@ -49,6 +49,11 @@ func disableEcho(file *os.File) {
 }
 
 func Execute(config *utils.Config) {
+	// sanity check
+	if len(config.Args) > 1 {
+		panic("too many arguments")
+	}
+
 	configFile := constructConfigFile(config)
 	args := []string{"-init", configFile}
 	cmd := exec.Command("sqlite3", args...)
@@ -59,8 +64,9 @@ func Execute(config *utils.Config) {
 	}
 	disableEcho(ptty)
 
-	cmd.Stderr = tty
-	cmd.Stdin = tty
+	// don't hook up stderr until after our config is loaded to avoid unnecessary output
+	cmd.Stderr = ioutil.Discard
+	cmd.Stdin = os.Stdin
 	cmd.Stdout = tty
 
 	err = cmd.Start()
@@ -68,32 +74,27 @@ func Execute(config *utils.Config) {
 		panic(err)
 	}
 
-	// file to execute
-	if len(config.Args) > 1 {
-		panic("too many arguments")
+	if config.Quiet {
+		waitForPrompt(ptty, config.Ps1)
 	}
+
+	// now that we have a prompt, we can hook up stderr
+	cmd.Stderr = os.Stderr
+
+	// execute file, if specified
 	if len(config.Args) == 1 {
 		fileToRun := config.Args[0]
 		ptty.WriteString(fmt.Sprintf(".read %s\n", fileToRun))
 	}
-	
-	// set up I/O
-	go io.Copy(os.Stderr, ptty)
-	if config.Quiet {
-		go io.Copy(os.Stdout, filter(ptty))
-	} else {
-		go io.Copy(os.Stdout, ptty)
-	}
-	io.Copy(ptty, os.Stdin)
+
+	io.Copy(os.Stdout, ptty)
 }
 
-// filter removes all output until we get a prompt
-func filter(src io.Reader) io.Reader {
+func waitForPrompt(src io.Reader, prompt string) {
 	scanner := bufio.NewScanner(src)
 	for scanner.Scan() {
 		if scanner.Text() == "Enter \".help\" for usage hints." {
-			break
+			return
 		}
 	}
-	return src
 }

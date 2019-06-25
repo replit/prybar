@@ -1,7 +1,6 @@
 #!/usr/bin/expect -f
 
 spawn ./prybar-sqlite -i
-expect "Loading resources from /tmp/sqlite-config*\r\r
-SQLite version 3.22.0*\r\r
+expect "SQLite version 3.22.0*\r\r
 Enter \".help\" for usage hints.\r\r
 --> "
