@@ -37,17 +37,38 @@ func constructConfigFile(config *utils.Config) string {
 	return f.Name()
 }
 
-func Execute(config *utils.Config) {
-	// sanity check
-	if len(config.Args) > 1 {
-		panic("too many arguments")
+func evalAndPrint(sqlite string, config *utils.Config) {
+	args := []string{"sqlite3"}
+	env := os.Environ()
+
+	if len(config.Code) > 0 {
+		f, err := ioutil.TempFile("", "sqlite-config")
+		if err != nil {
+			panic(err)
+		}
+		f.WriteString(".output /dev/null\n")
+		f.Close()
+		args = append(args, []string{"-init", f.Name(), ":memory:", config.Code}...)
+
+		// add LD_PRELOAD lib to environment to suppress initialization output
+		execPath, err := os.Executable()
+		if err != nil {
+			panic(err)
+		}
+		runDir := filepath.Dir(execPath)
+		libPath := filepath.Join(runDir, "prybar_assets", "sqlite", "patch.so")
+		env = append(env, []string{"LD_PRELOAD="+libPath, "PRYBAR_QUIET=1"}...)
+	} else {
+		args = append(args, []string{":memory:", config.Exp}...)
 	}
 
-	sqlite, err := exec.LookPath("sqlite3")
+	err := syscall.Exec(sqlite, args, env)
 	if err != nil {
 		panic(err)
 	}
+}
 
+func interactive(sqlite string, config *utils.Config) {
 	configFile := constructConfigFile(config)
 	args := []string{"sqlite3", "-init", configFile}
 
@@ -69,4 +90,29 @@ func Execute(config *utils.Config) {
 	if err != nil {
 		panic(err)
 	}
+}
+
+func Execute(config *utils.Config) {
+	// sanity check
+	if len(config.Args) > 1 {
+		fmt.Fprint(os.Stderr, "too many arguments\n")
+		os.Exit(1)
+	}
+
+	if config.OurInteractive {
+		fmt.Fprint(os.Stderr, "not supported\n")
+		os.Exit(1)
+	}
+
+	sqlite, err := exec.LookPath("sqlite3")
+	if err != nil {
+		panic(err)
+	}
+
+	if len(config.Code) > 0 || len(config.Exp) > 0 {
+		evalAndPrint(sqlite, config)
+	} else {
+		interactive(sqlite, config)
+	}
+
 }

@@ -36,17 +36,18 @@ written in the host language which starts a Prybar-compatible REPL.
 
 | language                  | eval | eval expression | eval file | repl | repl like eval | set prompt |
 | ------------------------- | ---- | --------------- | --------- | ---- | -------------- | ---------- |
+| Emacs Lisp                | ✔    | ✔               | ✔         | ✔    | ✗              | ✔          |
+| Javascript (nodejs)       | ✔    | ✔               | ✔         | ✔    | ✔              | ✔          |
+| Javascript (spidermonkey) | ✔    | ✗               | ✗         | ✗    | ✗              | -          |
+| Julia                     | ✔    | ✗               | ✔         | ✔    | ✗              | ✔          |
+| Lua 5.1                   | ✔    | ✗               | ✔         | ✔    | ✗              | ✔          |
+| OCaml                     | ✔    | ✔               | ✔         | ✔    | ✗              | ✔          |
 | Python 2.7                | ✔    | ✔               | ✔         | ✔    | ✔              | ✔          |
 | Python 3.x                | ✔    | ✔               | ✔         | ✔    | ✔              | ✔          |
-| Ruby 2.5                  | ✔    | ✔               | ✔         | ✔    | ✗              | ✗          |
-| Lua 5.1                   | ✔    | ✗               | ✔         | ✔    | ✗              | ✔          |
-| Tcl                       | ✔    | ✔               | ✔         | ✗    | ✗              | -          |
 | R                         | ✔    | ✗               | ✗         | ✔    | ✗              | ✗          |
-| Javascript (spidermonkey) | ✔    | ✗               | ✗         | ✗    | ✗              | -          |
-| Javascript (nodejs)       | ✔    | ✔               | ✔         | ✔    | ✔              | ✔          |
-| Julia                     | ✔    | ✗               | ✔         | ✔    | ✗              | ✔          |
-| OCaml                     | ✔    | ✔               | ✔         | ✔    | ✗              | ✔          |
-| Emacs Lisp                | ✔    | ✔               | ✔         | ✔    | ✗              | ✔          |
+| Ruby 2.5                  | ✔    | ✔               | ✔         | ✔    | ✗              | ✗          |
+| SQLite                    | ✔    | ✔               | ✔         | ✔    | ✗              | ✔          |
+| Tcl                       | ✔    | ✔               | ✔         | ✗    | ✗              | -          |
 
 ## Build and run
 
