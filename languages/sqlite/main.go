@@ -28,6 +28,12 @@ func constructConfigFile(config *utils.Config) string {
 	// TODO: this probably doesn't handle quotation marks properly
 	f.WriteString(fmt.Sprintf(".prompt '%s' '%s'\n", config.Ps1, config.Ps2))
 
+	// execute file, if specified
+	if len(config.Args) == 1 {
+		fileToRun := config.Args[0]
+		f.WriteString(fmt.Sprintf(".read %s\n", fileToRun))
+	}
+
 	return f.Name()
 }
 
@@ -63,11 +69,4 @@ func Execute(config *utils.Config) {
 	if err != nil {
 		panic(err)
 	}
-
-	// execute file, if specified
-	// if len(config.Args) == 1 {
-	// 	fileToRun := config.Args[0]
-	// 	ptty.WriteString(fmt.Sprintf(".read %s\n", fileToRun))
-	// }
-
 }
