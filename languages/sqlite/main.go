@@ -53,7 +53,7 @@ func Execute(config *utils.Config) {
 
 	env := os.Environ()
 	if config.Quiet {
-		env = append(env, "PRYBAR_QUIET=true")
+		env = append(env, "PRYBAR_QUIET=1")
 	}
 
 	// add LD_PRELOAD lib to environment

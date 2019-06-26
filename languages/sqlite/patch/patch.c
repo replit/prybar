@@ -12,8 +12,6 @@
 
  */
 
-int (*orig_fprintf_chk)(FILE *out, int flag, const char *format, ...) = NULL;
-
 int env_checked = 0;
 int quiet;
 
