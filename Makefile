@@ -5,6 +5,7 @@ all: $(addprefix prybar-,$(filter-out R,$(shell ls languages))) ## Build all Pry
 # mtimes are updated every time we build.
 prybar-%: utils/*.go languages/%/* ## Build the Prybar binary for LANG
 	@echo "build prybar-$(*)"
+	@if [ -f "languages/$(*)/compile.sh" ]; then languages/$(*)/compile.sh; fi
 	@scripts/inject.sh $(*)
 	@go generate languages/$(*)/main.go
 	@go build -o prybar-$(*) ./languages/$(*)

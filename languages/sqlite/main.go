@@ -1,15 +1,12 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"os"
 	"os/exec"
-
-	"github.com/kr/pty"
-	"golang.org/x/sys/unix"
+	"path/filepath"
+	"syscall"
 
 	"github.com/replit/prybar/utils"
 )
@@ -34,67 +31,39 @@ func constructConfigFile(config *utils.Config) string {
 	return f.Name()
 }
 
-func disableEcho(file *os.File) {
-	fd := int(file.Fd())
-	termios, err := unix.IoctlGetTermios(fd, unix.TCGETS)
-	if err != nil {
-		panic(err)
-	}
-
-	termios.Lflag &^= unix.ECHO
-
-	if err := unix.IoctlSetTermios(fd, unix.TCSETS, termios); err != nil {
-		panic(err)
-	}
-}
-
 func Execute(config *utils.Config) {
 	// sanity check
 	if len(config.Args) > 1 {
 		panic("too many arguments")
 	}
 
+	sqlite, err := exec.LookPath("sqlite3")
+	if err != nil {
+		panic(err)
+	}
+
 	configFile := constructConfigFile(config)
-	args := []string{"-init", configFile}
-	cmd := exec.Command("sqlite3", args...)
+	args := []string{"sqlite3", "-init", configFile}
 
-	ptty, tty, err := pty.Open()
+	// add LD_PRELOAD lib to environment
+	execPath, err := os.Executable()
 	if err != nil {
 		panic(err)
 	}
-	disableEcho(ptty)
+	runDir := filepath.Dir(execPath)
+	libPath := filepath.Join(runDir, "prybar_assets", "sqlite", "patch.so")
+	env := append(os.Environ(), "LD_PRELOAD="+libPath)
+	fmt.Printf("%+v", env)
 
-	// don't hook up stderr until after our config is loaded to avoid unnecessary output
-	cmd.Stderr = ioutil.Discard
-	cmd.Stdin = os.Stdin
-	cmd.Stdout = tty
-
-	err = cmd.Start()
+	err = syscall.Exec(sqlite, args, env)
 	if err != nil {
 		panic(err)
 	}
-
-	if config.Quiet {
-		waitForPrompt(ptty, config.Ps1)
-	}
-
-	// now that we have a prompt, we can hook up stderr
-	cmd.Stderr = os.Stderr
 
 	// execute file, if specified
-	if len(config.Args) == 1 {
-		fileToRun := config.Args[0]
-		ptty.WriteString(fmt.Sprintf(".read %s\n", fileToRun))
-	}
+	// if len(config.Args) == 1 {
+	// 	fileToRun := config.Args[0]
+	// 	ptty.WriteString(fmt.Sprintf(".read %s\n", fileToRun))
+	// }
 
-	io.Copy(os.Stdout, ptty)
-}
-
-func waitForPrompt(src io.Reader, prompt string) {
-	scanner := bufio.NewScanner(src)
-	for scanner.Scan() {
-		if scanner.Text() == "Enter \".help\" for usage hints." {
-			return
-		}
-	}
 }
