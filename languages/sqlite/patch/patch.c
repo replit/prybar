@@ -12,8 +12,16 @@
 
  */
 
-int env_checked = 0;
-int quiet;
+// this macro lets us roll up the varargs once instead of in four separate
+// places below.
+#define VAR_PRINT(out, format)                                                 \
+    {                                                                          \
+        va_list arg;                                                           \
+        va_start(arg, format);                                                 \
+        int rc = internal_print(out, format, arg);                             \
+        va_end(arg);                                                           \
+        return rc;                                                             \
+    }
 
 /* three states:
     0: no output suppressed
@@ -22,19 +30,6 @@ int quiet;
 */
 int current_state = 0;
 
-int prybar_quiet() {
-    if (env_checked)
-        return quiet;
-
-    if (getenv("PRYBAR_QUIET"))
-        quiet = 1;
-    else
-        quiet = 0;
-
-    env_checked = 1;
-    return quiet;
-}
-
 int internal_print(FILE *out, const char *format, va_list args) {
     return vfprintf(out, format, args);
 }
@@ -42,58 +37,39 @@ int internal_print(FILE *out, const char *format, va_list args) {
 int __fprintf_chk(FILE *out, int flag, const char *format, ...) {
     // don't do anything; pass through print
     if (current_state != 0) {
-        va_list arg;
-        va_start(arg, format);
-        int rc = internal_print(out, format, arg);
-        va_end(arg);
-
-        return rc;
+        VAR_PRINT(out, format);
     }
 
     // check if this is the first time we're seeing the output that we're aiming
     // to suppress
     char *expected = "-- Loading resources from /tmp/sqlite-config";
-    if (prybar_quiet() && out == stderr && strstr(format, expected) == 0) {
+    if (getenv("PRYBAR_QUIET") && out == stderr &&
+        strstr(format, expected) == 0) {
         // advance to next state and suppress output
         current_state++;
         return 0;
     }
 
     // this isn't the output we were looking for...
-    va_list arg;
-    va_start(arg, format);
-    int rc = internal_print(stdout, format, arg);
-    va_end(arg);
-
-    return rc;
+    VAR_PRINT(out, format);
 }
 
 int __printf_chk(int flag, const char *format, ...) {
     // don't do anything; pass through print
     if (current_state != 1) {
-        va_list arg;
-        va_start(arg, format);
-        int rc = internal_print(stdout, format, arg);
-        va_end(arg);
-
-        return rc;
+        VAR_PRINT(stdout, format);
     }
 
     // check if this is the first time we're seeing the output that we're aiming
     // to suppress
     char *expected = "SQLite version %s %s\nEnter\".help\" for usage "
                      "hints.\n";
-    if (prybar_quiet() && strstr(format, expected) == 0) {
+    if (getenv("PRYBAR_QUIET") && strstr(format, expected) == 0) {
         // advance to next state and suppress output
         current_state++;
         return 0;
     }
 
     // this isn't the output we were looking for...
-    va_list arg;
-    va_start(arg, format);
-    int rc = internal_print(stdout, format, arg);
-    va_end(arg);
-
-    return rc;
+    VAR_PRINT(stdout, format);
 }
