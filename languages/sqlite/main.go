@@ -45,6 +45,11 @@ func Execute(config *utils.Config) {
 	configFile := constructConfigFile(config)
 	args := []string{"sqlite3", "-init", configFile}
 
+	env := os.Environ()
+	if config.Quiet {
+		env = append(env, "PRYBAR_QUIET=true")
+	}
+
 	// add LD_PRELOAD lib to environment
 	execPath, err := os.Executable()
 	if err != nil {
@@ -52,8 +57,7 @@ func Execute(config *utils.Config) {
 	}
 	runDir := filepath.Dir(execPath)
 	libPath := filepath.Join(runDir, "prybar_assets", "sqlite", "patch.so")
-	env := append(os.Environ(), "LD_PRELOAD="+libPath)
-	fmt.Printf("%+v", env)
+	env = append(env, "LD_PRELOAD="+libPath)
 
 	err = syscall.Exec(sqlite, args, env)
 	if err != nil {
