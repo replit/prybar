@@ -55,7 +55,7 @@ int __fprintf_chk(FILE *out, int flag, const char *format, ...) {
     // check if this is the first time we're seeing the output that we're aiming
     // to suppress
     char *expected = "-- Loading resources from /tmp/sqlite-config";
-    if (prybar_quiet() && strstr(format, expected) == 0) {
+    if (prybar_quiet() && out == stderr && strstr(format, expected) == 0) {
         // advance to next state and suppress output
         current_state++;
         return 0;
