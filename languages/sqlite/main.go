@@ -15,50 +15,48 @@ var Instance = &SQLite{}
 
 type SQLite struct{}
 
-// constructConfigFile generates commands to configure the sqlite CLI.
-// It writes them to a temporary file and returns its pathname.
-func constructConfigFile(config *utils.Config) string {
+
+// writeConfig writes the provided slice of strings out to temporary file and
+// returns its pathname.
+func writeConfig(lines []string) string {
 	f, err := ioutil.TempFile("", "sqlite-config")
 	if err != nil {
 		panic(err)
 	}
 	defer f.Close()
 
-	// main and continuation prompts
-	// TODO: this probably doesn't handle quotation marks properly
-	f.WriteString(fmt.Sprintf(".prompt '%s' '%s'\n", config.Ps1, config.Ps2))
-
-	// execute file, if specified
-	if len(config.Args) == 1 {
-		fileToRun := config.Args[0]
-		f.WriteString(fmt.Sprintf(".read %s\n", fileToRun))
+	for _, line := range lines {
+		f.WriteString(line)
 	}
 
 	return f.Name()
 }
 
-func evalAndPrint(sqlite string, config *utils.Config) {
+// preloadQuietLib adds our LD_PRELOAD lib to environment and enables it
+func preloadQuietLib(env []string) []string {
+	execPath, err := os.Executable()
+	if err != nil {
+		panic(err)
+	}
+	runDir := filepath.Dir(execPath)
+	libPath := filepath.Join(runDir, "prybar_assets", "sqlite", "patch.so")
+	return append(env, []string{"LD_PRELOAD="+libPath, "PRYBAR_QUIET=1"}...)
+}
+
+func eval(sqlite string, config *utils.Config) {
 	args := []string{"sqlite3"}
 	env := os.Environ()
 
 	if len(config.Code) > 0 {
-		f, err := ioutil.TempFile("", "sqlite-config")
-		if err != nil {
-			panic(err)
-		}
-		f.WriteString(".output /dev/null\n")
-		f.Close()
-		args = append(args, []string{"-init", f.Name(), ":memory:", config.Code}...)
+		// We have to execute provided code without showing output.
+		// So, let's have sqlite run a command that will output to /dev/null.
+		confLines := []string{".output /dev/null\n"}
+		args = append(args, []string{"-init", writeConfig(confLines), ":memory:", config.Code}...)
 
 		// add LD_PRELOAD lib to environment to suppress initialization output
-		execPath, err := os.Executable()
-		if err != nil {
-			panic(err)
-		}
-		runDir := filepath.Dir(execPath)
-		libPath := filepath.Join(runDir, "prybar_assets", "sqlite", "patch.so")
-		env = append(env, []string{"LD_PRELOAD="+libPath, "PRYBAR_QUIET=1"}...)
+		env = preloadQuietLib(env)
 	} else {
+		// we can just run the code without a config file since we want its output
 		args = append(args, []string{":memory:", config.Exp}...)
 	}
 
@@ -69,24 +67,26 @@ func evalAndPrint(sqlite string, config *utils.Config) {
 }
 
 func interactive(sqlite string, config *utils.Config) {
-	configFile := constructConfigFile(config)
-	args := []string{"sqlite3", "-init", configFile}
+	// main and continuation prompts
+	// TODO: this doesn't handle quotation marks properly
+	confLines := []string{
+		fmt.Sprintf(".prompt '%s' '%s'\n", config.Ps1, config.Ps2),
+	}
+
+	// execute file, if specified
+	if len(config.Args) == 1 {
+		fileToRun := config.Args[0]
+		confLines = append(confLines, fmt.Sprintf(".read %s\n", fileToRun))
+	}
+
+	args := []string{"sqlite3", "-init", writeConfig(confLines)}
 
 	env := os.Environ()
 	if config.Quiet {
-		env = append(env, "PRYBAR_QUIET=1")
+		env = preloadQuietLib(env)
 	}
 
-	// add LD_PRELOAD lib to environment
-	execPath, err := os.Executable()
-	if err != nil {
-		panic(err)
-	}
-	runDir := filepath.Dir(execPath)
-	libPath := filepath.Join(runDir, "prybar_assets", "sqlite", "patch.so")
-	env = append(env, "LD_PRELOAD="+libPath)
-
-	err = syscall.Exec(sqlite, args, env)
+	err := syscall.Exec(sqlite, args, env)
 	if err != nil {
 		panic(err)
 	}
@@ -104,14 +104,17 @@ func Execute(config *utils.Config) {
 		os.Exit(1)
 	}
 
+	// make sure we have the sqlite CLI
 	sqlite, err := exec.LookPath("sqlite3")
 	if err != nil {
 		panic(err)
 	}
 
 	if len(config.Code) > 0 || len(config.Exp) > 0 {
-		evalAndPrint(sqlite, config)
+		// we're executing provided code
+		eval(sqlite, config)
 	} else {
+		// running sqlite CLI interactively
 		interactive(sqlite, config)
 	}
 
