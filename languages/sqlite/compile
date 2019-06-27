@@ -1,5 +1,6 @@
 #!/bin/bash
 
-DIR="$(dirname "$0")"
-mkdir $DIR/../../prybar_assets/sqlite
-gcc -Wall -shared -fPIC -ldl -o $DIR/../../prybar_assets/sqlite/patch.so $DIR/patch/patch.c
+COMPILE_DIR=$(dirname "$0")
+DEST_DIR=$COMPILE_DIR/../../prybar_assets/sqlite
+mkdir $DEST_DIR
+gcc -Wall -shared -fPIC -ldl -o $DEST_DIR/patch.so $COMPILE_DIR/patch/patch.c
