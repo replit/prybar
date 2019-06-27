@@ -19,7 +19,6 @@ var Instance = &SQLite{}
 
 type SQLite struct{}
 
-
 // writeConfig writes the provided slice of strings out to temporary file and
 // returns its pathname.
 func writeConfig(lines []string) string {
@@ -44,7 +43,7 @@ func preloadQuietLib(env []string) []string {
 	}
 	runDir := filepath.Dir(execPath)
 	libPath := filepath.Join(runDir, "prybar_assets", "sqlite", "patch.so")
-	return append(env, []string{"LD_PRELOAD="+libPath, "PRYBAR_QUIET=1"}...)
+	return append(env, []string{"LD_PRELOAD=" + libPath, "PRYBAR_QUIET=1"}...)
 }
 
 func eval(sqlite string, config *utils.Config) {
