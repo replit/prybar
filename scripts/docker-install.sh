@@ -8,12 +8,13 @@ export DEBIAN_FRONTEND=noninteractive
 apt-get update
 apt-get install -y software-properties-common
 add-apt-repository ppa:avsm/ppa
+add-apt-repository ppa:kelleyk/emacs
 
 packages="
 
 bsdmainutils
 build-essential
-emacs-nox
+emacs26
 expect
 golang
 libffi-dev

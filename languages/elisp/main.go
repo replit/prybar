@@ -52,7 +52,7 @@ func Execute(config *utils.Config) {
 		fmt.Fprintln(os.Stderr, "prybar-elisp: warn: ps2 not implemented");
 	}
 
-	args := []string{"emacs", "-Q", "--load", replPath, "--eval", "(prybar-repl)"}
+	args := []string{"emacs", "-nw", "-Q", "--load", replPath, "--eval", "(prybar-repl)"}
 	err = syscall.Exec(emacs, args, os.Environ())
 
 	if err != nil {
