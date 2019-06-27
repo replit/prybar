@@ -1,3 +1,7 @@
+// Take a Prybar config and exec the SQLite CLI with it.
+//
+// Note: the prompt config (ps1 and ps2) must be SQL strings, i.e. single quotation
+// marks must be properly escaped.
 package main
 
 import (
@@ -68,7 +72,6 @@ func eval(sqlite string, config *utils.Config) {
 
 func interactive(sqlite string, config *utils.Config) {
 	// main and continuation prompts
-	// TODO: this doesn't handle quotation marks properly
 	confLines := []string{
 		fmt.Sprintf(".prompt '%s' '%s'\n", config.Ps1, config.Ps2),
 	}
