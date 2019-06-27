@@ -5,13 +5,13 @@ REPL, different languages.
 
 ## Why
 
-At [Repl.it](https://repl.it) we're in the business of running REPLs.
+At [Repl.it](https://repl.it), we're in the business of running REPLs.
 As it happens to be, every language implements them differently. We
 wanted them to all behave the same: run code and drop into a REPL!
 
 ## How it works
 
-Prybar, written in [Golang](https://golang.org/), maintains a common
+Prybar, written in [Go](https://golang.org/), maintains a common
 command-line interface that calls into a select language backend. When
 possible, the language backends are implemented using cgo and the
 language's C-bindings. Otherwise, they make use of a small script

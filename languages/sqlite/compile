@@ -1,0 +1,5 @@
+#!/bin/bash
+
+DIR="$(dirname "$0")"
+mkdir $DIR/../../prybar_assets/sqlite
+gcc -Wall -shared -fPIC -ldl -o $DIR/../../prybar_assets/sqlite/patch.so $DIR/patch/patch.c
