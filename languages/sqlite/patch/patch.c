@@ -36,15 +36,19 @@ https://www.sqlite.org/src/artifact/4e1bcf8c70b8fb97
     }
 
 /* three states:
-    0: no output suppressed
-    1: suppressed "Loading resources..." message on stderr
-    2: suppressed version and help string on stdout
+    - no output suppressed
+    - suppressed "Loading resources..." message on stderr
+    - suppressed version and help string on stdout
 */
-int current_state = 0;
+static enum {
+    INITIAL,
+    LOADING_SUPPRESSED,
+    VERSION_SUPPRESSED
+} current_state = INITIAL;
 
 int __fprintf_chk(FILE *out, int flag, const char *format, ...) {
     // don't do anything; pass through print
-    if (current_state != 0) {
+    if (current_state != INITIAL) {
         VAR_PRINT(out, format);
     }
 
@@ -54,7 +58,7 @@ int __fprintf_chk(FILE *out, int flag, const char *format, ...) {
     if (getenv("PRYBAR_QUIET") && out == stderr &&
         strcmp(format, expected) == 0) {
         // advance to next state and suppress output
-        current_state++;
+        current_state = LOADING_SUPPRESSED;
         return 0;
     }
 
@@ -64,7 +68,7 @@ int __fprintf_chk(FILE *out, int flag, const char *format, ...) {
 
 int __printf_chk(int flag, const char *format, ...) {
     // don't do anything; pass through print
-    if (current_state != 1) {
+    if (current_state != LOADING_SUPPRESSED) {
         VAR_PRINT(stdout, format);
     }
 
@@ -74,7 +78,7 @@ int __printf_chk(int flag, const char *format, ...) {
                            "hints.\n";
     if (getenv("PRYBAR_QUIET") && strcmp(format, expected) == 0) {
         // advance to next state and suppress output
-        current_state++;
+        current_state = VERSION_SUPPRESSED;
         return 0;
     }
 
