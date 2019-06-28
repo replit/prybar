@@ -50,7 +50,7 @@ int __fprintf_chk(FILE *out, int flag, const char *format, ...) {
 
     // check if this is the first time we're seeing the output that we're aiming
     // to suppress
-    char *expected = "-- Loading resources from /tmp/sqlite-config";
+    const char *expected = "-- Loading resources from /tmp/sqlite-config";
     if (getenv("PRYBAR_QUIET") && out == stderr &&
         strstr(format, expected) == 0) {
         // advance to next state and suppress output
@@ -70,8 +70,8 @@ int __printf_chk(int flag, const char *format, ...) {
 
     // check if this is the first time we're seeing the output that we're aiming
     // to suppress
-    char *expected = "SQLite version %s %s\nEnter\".help\" for usage "
-                     "hints.\n";
+    const char *expected = "SQLite version %s %s\nEnter\".help\" for usage "
+                           "hints.\n";
     if (getenv("PRYBAR_QUIET") && strstr(format, expected) == 0) {
         // advance to next state and suppress output
         current_state++;
