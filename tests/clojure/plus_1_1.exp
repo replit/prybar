@@ -1,0 +1,15 @@
+#!/usr/bin/expect -f
+
+set timeout -1
+spawn ./prybar-clojure -i
+match_max 100000
+expect -re {Clojure (?:.*)} # ignore version
+expect -exact "user=> "
+
+send -- "(+ 1 1)\r"
+expect -exact "(+ 1 1)\r"
+expect -exact "2\r"
+expect -exact "user=> "
+
+send -- ""
+expect eof
