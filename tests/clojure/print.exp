@@ -7,7 +7,7 @@ expect -re {Clojure (?:.*)} # ignore version
 expect -exact "user=> "
 
 send -- "(print \"hello!\")\r"
-expect -exact "(print \"hello!\")"
+expect -exact "(print \"hello!\")\r"
 expect -exact "hello!nil\r"
 expect -exact "user=> "
 

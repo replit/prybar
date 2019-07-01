@@ -1,2 +1,3 @@
 (def a "hello")
-(print a)
+(def b 42)
+(println a)

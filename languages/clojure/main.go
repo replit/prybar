@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"os/exec"
 	"syscall"
@@ -17,16 +18,49 @@ func Execute(config *utils.Config) {
 	env := os.Environ()
 	args := []string{"clj"}
 
-	if config.Code != "" {
-		args = append(args, "--eval", config.Code)
-	}
+	hasOption := config.Code != "" || config.Exp != "" ||
+		config.Interactive || config.OurInteractive
+	hasFile := false
 
-	if config.Exp != "" {
-		args = append(args, "--eval", config.Exp)
-	}
+	if hasOption {
+		if config.Args != nil && len(config.Args) > 0 {
+			if _, err := os.Stat(config.Args[0]); os.IsNotExist(err) {
+				fmt.Println("No such file:", config.Args[0])
+				os.Exit(2)
+			}
 
-	if (config.Interactive || config.OurInteractive) {
-		args = append(args, "--repl", config.Exp)
+			hasFile = true
+		}
+
+		if hasFile {
+			args = append(args, "--init", config.Args[0])
+		}
+
+		if config.Code != "" {
+			args = append(args, "--eval", config.Code)
+		}
+
+		if config.Exp != "" {
+			args = append(args, "--eval", config.Exp)
+		}
+
+		if config.Interactive || config.OurInteractive {
+			args = append(args, "--repl")
+		}
+
+		if config.Quiet {
+			// no-op:
+			// not supported by `clojure`.
+		}
+
+		if hasFile {
+			args = append(args, config.Args[1:]...)
+		} else {
+			args = append(args, config.Args...)
+		}
+	} else {
+		args = append(args, "--eval", "")
+		args = append(args, config.Args...)
 	}
 
 	if config.Ps1 != "" {
@@ -35,17 +69,6 @@ func Execute(config *utils.Config) {
 
 	if config.Ps2 != "" {
 		env = append(env, "PRYBAR_PS2="+config.Ps2)
-	}
-
-	if config.Quiet {
-		// no-op:
-		// not supported by `clojure`.
-	}
-
-	if config.Args != nil && len(config.Args) > 0 {
-		args = append(args, config.Args...)
-	} else if config.Exp == "" && config.Code == "" {
-		args = append(args, "--eval", "")
 	}
 
 	syscall.Exec(path, args, env)

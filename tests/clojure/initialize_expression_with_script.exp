@@ -1,0 +1,8 @@
+#!/usr/bin/expect -f
+
+set timeout -1
+spawn ./prybar-clojure -e "(inc b)" ./test_files/hello.clj
+match_max 100000
+expect -exact "43"
+expect eof
+
