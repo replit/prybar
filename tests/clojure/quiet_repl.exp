@@ -1,0 +1,7 @@
+#!/usr/bin/expect -f
+
+spawn ./prybar-clojure -i -q
+expect -exact "user=> "
+
+send -- ""
+expect eof

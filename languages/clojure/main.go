@@ -45,12 +45,14 @@ func Execute(config *utils.Config) {
 		}
 
 		if config.Interactive || config.OurInteractive {
-			args = append(args, "--repl")
-		}
+			// "The appearance of any eval option before running a repl
+			// suppresses the usual greeting message: \"Clojure ~(clojure-version)\"."
+			// (https://github.com/clojure/clojure/blob/653b8465845a78ef7543e0a250078eea2d56b659/src/clj/clojure/main.clj#L644)
+			if config.Quiet {
+				args = append(args, "--eval", "")
+			}
 
-		if config.Quiet {
-			// no-op:
-			// not supported by `clojure`.
+			args = append(args, "--repl")
 		}
 
 		if hasFile {
