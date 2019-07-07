@@ -1,36 +1,38 @@
 #!/usr/bin/expect -f
 
+# ignore ANSI escape sequences
+set _ "(?:.*?)"
+
 set timeout -1
-spawn ./prybar-clojure -c "(defn f \[x\] (inc x))" -e "(def s \"bar\")" -I -i ./test_files/hello.clj
+spawn ./prybar-clojure -c {(defn f [x] (inc x))} -e {(def s "bar")} -I -i -q ./test_files/hello.clj
 match_max 100000
-expect -exact "hello\r"
-expect -exact "#'user/f\r"
-expect -exact "#'user/s\r"
-expect -exact "user=> "
+expect -re "^${_}hello${_}\r
+${_}#'user/s${_}\r
+${_}--> $"
 
-# defined in ./test_files/hello.clj
+# a is defined in ./test_files/hello.clj
 send -- "a\r"
-expect -exact "a\r"
-expect -exact "\"hello\"\r"
-expect -exact "user=> "
+expect -re "^${_}a${_}\r
+${_}\"hello\"${_}\r
+${_}--> $"
 
-# defined in ./test_files/hello.clj
+# b is defined in ./test_files/hello.clj
 send -- "b\r"
-expect -exact "b\r"
-expect -exact "42\r"
-expect -exact "user=> "
+expect -re "^${_}b${_}\r
+${_}42${_}\r
+${_}--> $"
 
 # defined with "-c"
 send -- "(f b)\r"
-expect -exact "(f b)\r"
-expect -exact "43\r"
-expect -exact "user=> "
+expect -re "^${_}(f b)${_}\r
+${_}43${_}\r
+${_}--> $"
 
 # defined with  "-e"
 send -- "s\r"
-expect -exact "s\r"
-expect -exact "\"bar\"\r"
-expect -exact "user=> "
+expect -re "^${_}s${_}\r
+${_}\"bar\"${_}\r
+${_}--> $"
 
 send -- ""
 expect eof

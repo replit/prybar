@@ -1,16 +1,21 @@
 #!/usr/bin/expect -f
 
+# ignore ANSI escape sequences
+set _ "(?:.*?)"
+
 set timeout -1
 spawn ./prybar-clojure -i ./test_files/hello.clj
 match_max 100000
-expect -re {Clojure (?:.*)\r}
-expect -exact "hello\r"
-expect -exact "user=> \r"
+expect -re "^${_}hello${_}\r
+${_}Clojure${_}\r
+${_}--> $"
 
+# b is defined in ./test_files/hello.clj
 send -- "b\r"
-expect -exact "b\r"
-expect -exact "42\r"
-expect -exact "user=> "
+expect -re "^${_}b${_}\r
+${_}42${_}\r
+${_}--> $"
 
 send -- ""
 expect eof
+

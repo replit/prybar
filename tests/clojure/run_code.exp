@@ -1,7 +1,8 @@
 #!/usr/bin/expect -f
 
 set timeout -1
-spawn ./prybar-clojure -c "(print \"hello\")"
+spawn ./prybar-clojure -c {(do (println "foo") "bar")}
 match_max 100000
-expect -exact "hello"
+expect -re "^\r\r\u001b\\\[K\rfoo\r\r\n$"
 expect eof
+
