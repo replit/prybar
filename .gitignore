@@ -1,5 +1,6 @@
 plugins/
 prybar-*
+prybar_assets/sqlite/patch.so
 deps.lst
 prybar.tar.gz
 generated_*.go
