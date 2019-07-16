@@ -1,12 +1,38 @@
 package main
 
+//go:generate ../../scripts/gofiles.sh generated_files.go
+
 import (
 	"fmt"
+	"io/ioutil"
 	"os"
 	"os/exec"
 	"syscall"
 	"github.com/replit/prybar/utils"
 )
+
+func findHelper(path string) string {
+    fileName := path + ".clj"
+	bytes, err := File(fileName)
+	if bytes != nil {
+		f, err := ioutil.TempFile("", fileName)
+		if err != nil {
+			panic(err)
+		}
+
+		if _, err = f.Write(bytes); err != nil {
+			panic(err)
+		}
+		if err = f.Close(); err != nil {
+			panic(err)
+		}
+		return f.Name()
+	}
+	if err != nil {
+		panic(err)
+	}
+    panic("File not found: " + fileName)
+}
 
 func Execute(config *utils.Config) {
 	path, err := exec.LookPath("clj")
@@ -21,6 +47,18 @@ func Execute(config *utils.Config) {
 	hasOption := config.Code != "" || config.Exp != "" ||
 		config.Interactive || config.OurInteractive
 	hasFile := false
+
+	if config.Ps1 != "" {
+		args = append(args, "-J-DPRYBAR_PS1=" + config.Ps1)
+	}
+
+	if config.Ps2 != "" {
+		args = append(args, "-J-DPRYBAR_PS2=" + config.Ps2)
+	}
+
+	if config.Quiet {
+		args = append(args, "-J-DPRYBAR_QUIET=true")
+	}
 
 	if hasOption {
 		if config.Args != nil && len(config.Args) > 0 {
@@ -45,14 +83,8 @@ func Execute(config *utils.Config) {
 		}
 
 		if config.Interactive || config.OurInteractive {
-			// "The appearance of any eval option before running a repl
-			// suppresses the usual greeting message: \"Clojure ~(clojure-version)\"."
-			// (https://github.com/clojure/clojure/blob/653b8465845a78ef7543e0a250078eea2d56b659/src/clj/clojure/main.clj#L644)
-			if config.Quiet {
-				args = append(args, "--eval", "")
-			}
 
-			args = append(args, "--repl")
+			args = append(args, findHelper("prybar_repl"))
 		}
 
 		if hasFile {
@@ -63,14 +95,6 @@ func Execute(config *utils.Config) {
 	} else {
 		args = append(args, "--eval", "")
 		args = append(args, config.Args...)
-	}
-
-	if config.Ps1 != "" {
-		env = append(env, "PRYBAR_PS1="+config.Ps1)
-	}
-
-	if config.Ps2 != "" {
-		env = append(env, "PRYBAR_PS2="+config.Ps2)
 	}
 
 	syscall.Exec(path, args, env)
