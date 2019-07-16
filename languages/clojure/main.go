@@ -75,7 +75,9 @@ func Execute(config *utils.Config) {
 		}
 
 		if config.Code != "" {
-			args = append(args, "--eval", config.Code)
+			// "--eval" prints non-nil results only.
+			sideEffect := fmt.Sprintf("(do %s nil)", config.Code)
+			args = append(args, "--eval", sideEffect)
 		}
 
 		if config.Exp != "" {
