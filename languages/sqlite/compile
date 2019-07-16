@@ -1,9 +1,6 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
-set -e
-set -o pipefail
-
-COMPILE_DIR="$(dirname "$0")"
-DEST_DIR="$COMPILE_DIR/../../prybar_assets/sqlite"
-mkdir -p "$DEST_DIR"
-gcc -Wall -shared -fPIC -ldl -o "$DEST_DIR/patch.so" "$COMPILE_DIR/patch/patch.c"
+COMPILE_DIR=$(dirname "$0")
+DEST_DIR=$COMPILE_DIR/../../prybar_assets/sqlite
+mkdir $DEST_DIR
+gcc -Wall -shared -fPIC -ldl -o $DEST_DIR/patch.so $COMPILE_DIR/patch/patch.c

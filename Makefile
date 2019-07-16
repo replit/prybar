@@ -26,7 +26,7 @@ test: ## Run integration tests
 
 .PHONY: clean
 clean: ## Remove build artifacts
-	rm -f prybar-* languages/*/generated_*.go prybar_assets/sqlite/patch.so
+	rm -f prybar-* languages/*/generated_*.go
 
 .PHONY: help
 help: ## Show this message
