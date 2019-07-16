@@ -33,10 +33,12 @@ libnspr4-dev
 
 # used during installation
 git
+curl
 wget
 
 # used during runtime
 rlwrap
+
 "
 
 export DEBIAN_FRONTEND=noninteractive
