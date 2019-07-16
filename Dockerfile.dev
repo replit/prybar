@@ -1,4 +1,4 @@
-FROM ubuntu:disco
+FROM ubuntu:bionic
 
 COPY scripts/docker-install.sh /tmp/docker-install.sh
 RUN /tmp/docker-install.sh

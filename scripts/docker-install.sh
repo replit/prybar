@@ -3,59 +3,57 @@
 set -e
 set -o pipefail
 
-cd /tmp
+export DEBIAN_FRONTEND=noninteractive
+
+apt-get update
+apt-get install -y software-properties-common
+add-apt-repository ppa:avsm/ppa
+add-apt-repository ppa:kelleyk/emacs
 
 packages="
 
-# languages
-emacs-nox
-liblua5.1-dev
-nodejs
-ocaml
-python-dev
-python3-dev
-ruby-dev
-sqlite3
-tcl-dev
-
-# build and test
 bsdmainutils
 build-essential
+emacs26
 expect
 golang
-
-# things we link against
-libreadline-dev
-
-# needed for the version of libmozjs that we download
 libffi-dev
+liblua5.1-dev
 libnspr4-dev
-
-# used during installation
+libreadline-dev
+m4
+nodejs
+ocaml
+opam
+python-dev
+python3-dev
+ruby2.5-dev
+sqlite3
+tcl-dev
 wget
 
 "
 
-export DEBIAN_FRONTEND=noninteractive
-apt-get update
-apt-get install -y $(grep -v "^#" <<< "$packages")
+apt-get install -y $packages
 rm -rf /var/lib/apt/lists/*
 
-# The version in the Disco repos is out of date (1.0 series) and does
-# not expose the API we need.
-wget -nv https://julialang-s3.julialang.org/bin/linux/x64/1.1/julia-1.1.1-linux-x86_64.tar.gz
-tar -xf *.tar.gz
-cp -R   julia-*/bin/*     /usr/local/bin/
-cp -R   julia-*/include/* /usr/local/include/
-cp -R   julia-*/lib/*     /usr/local/lib/
-cp -R   julia-*/share/*   /usr/local/share/
-rm -rf  julia-*
-
-# The version in the Disco repos is not compatible with cgo ("invalid
-# flag in pkg-config --cflags: -include").
 wget -nv https://launchpadlibrarian.net/309343863/libmozjs185-1.0_1.8.5-1.0.0+dfsg-7_amd64.deb
 wget -nv https://launchpadlibrarian.net/309343864/libmozjs185-dev_1.8.5-1.0.0+dfsg-7_amd64.deb
-dpkg -i *.deb
-rm *.deb
+dpkg -i libmozjs185*.deb
+rm libmozjs185*.deb
+
+wget https://julialang-s3.julialang.org/bin/linux/x64/1.1/julia-1.1.0-linux-x86_64.tar.gz
+tar -xf julia-1.1.0-linux-x86_64.tar.gz
+cp -R   julia-1.1.0/bin/* /usr/bin/
+cp -R   julia-1.1.0/include/* /usr/include/
+cp -R   julia-1.1.0/lib/* /usr/lib/
+cp -R   julia-1.1.0/share/* /usr/share/
+rm -rf  julia-1.1.0*
+
+opam init -c ocaml-system -n --disable-sandboxing
+cat <<"EOF" >> "$HOME/.bashrc"
+export OPAMROOTISOK=1
+eval "$(opam env)"
+EOF
 
 rm /tmp/docker-install.sh
