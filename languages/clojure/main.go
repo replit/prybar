@@ -76,8 +76,8 @@ func Execute(config *utils.Config) {
 
 		if config.Code != "" {
 			// "--eval" prints non-nil results only.
-			sideEffect := fmt.Sprintf("(do %s nil)", config.Code)
-			args = append(args, "--eval", sideEffect)
+			effect := fmt.Sprintf("(do %s nil)", config.Code)
+			args = append(args, "--eval", effect)
 		}
 
 		if config.Exp != "" {
@@ -85,7 +85,6 @@ func Execute(config *utils.Config) {
 		}
 
 		if config.Interactive || config.OurInteractive {
-
 			args = append(args, findHelper("prybar_repl"))
 		}
 

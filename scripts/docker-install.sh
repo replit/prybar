@@ -47,7 +47,7 @@ apt-get update
 apt-get install -y $(grep -v "^#" <<< "$packages")
 rm -rf /var/lib/apt/lists/*
 
-clojure_version=1.10.1.462
+clojure_version=1.10.1.466
 wget "https://download.clojure.org/install/linux-install-${clojure_version}.sh"
 chmod +x "linux-install-${clojure_version}.sh"
 "./linux-install-${clojure_version}.sh"
