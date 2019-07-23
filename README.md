@@ -58,6 +58,7 @@ written in the host language which starts a Prybar-compatible REPL.
       make docker       Run a shell with Prybar inside Docker
       make image        Build a Docker image with Prybar for distribution
       make test         Run integration tests
+      make test-image   Test Docker image for distribution
       make clean        Remove build artifacts
       make help         Show this message
 

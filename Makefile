@@ -25,7 +25,7 @@ test: ## Run integration tests
 	./run_tests
 
 .PHONY: test-image
-test-image: image
+test-image: image ## Test Docker image for distribution
 	docker run -it --rm prybar ./run_tests
 
 .PHONY: clean
