@@ -24,6 +24,10 @@ image: ## Build a Docker image with Prybar for distribution
 test: ## Run integration tests
 	./run_tests
 
+.PHONY: test-image
+test-image: image ## Test Docker image for distribution
+	docker run -t --rm prybar ./run_tests
+
 .PHONY: clean
 clean: ## Remove build artifacts
 	rm -f prybar-* languages/*/generated_*.go prybar_assets/sqlite/patch.so

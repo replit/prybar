@@ -1,0 +1,36 @@
+version: 2.1
+jobs:
+  build_and_test:
+    docker:
+      - image: docker:18.09
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run: apk add --no-cache --no-progress make
+      - run: make test-image
+  build_test_and_deploy:
+    docker:
+      - image: docker:18.09
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run: apk add --no-cache --no-progress make
+      - run: make test-image
+      - deploy:
+          command: |
+            echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_USERNAME" --password-stdin
+            docker tag prybar:latest replco/prybar:latest
+            docker push replco/prybar:latest
+workflows:
+  ci:
+    jobs:
+      - build_and_test:
+          filters:
+            branches:
+              ignore: master
+      - build_test_and_deploy:
+          context: Docker Hub
+          filters:
+            branches:
+              only:
+                - master
