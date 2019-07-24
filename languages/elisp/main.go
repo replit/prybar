@@ -2,29 +2,35 @@ package main
 
 import (
 	"fmt"
-	"github.com/replit/prybar/utils"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"syscall"
+
+	"github.com/replit/prybar/utils"
 )
 
 func Execute(config *utils.Config) {
+	args := []string{}
 
-	emacs, err := exec.LookPath("emacs")
-
-	if err != nil {
-		panic(err)
+	if _, err := os.Stat("Cask"); err == nil {
+		if _, err := exec.LookPath("cask"); err == nil {
+			args = append(args, "cask", "exec")
+		}
 	}
 
 	execPath, err := os.Executable()
-
 	if err != nil {
 		panic(err)
 	}
 
 	runDir := filepath.Dir(execPath)
 	replPath := filepath.Join(runDir, "prybar_assets", "elisp", "repl.el")
+
+	args = append(
+		args, "emacs", "-nw", "-Q", "--load", replPath,
+		"--eval", "(prybar-repl)",
+	)
 
 	os.Setenv("PRYBAR_EVAL", config.Exp)
 	os.Setenv("PRYBAR_EXEC", config.Code)
@@ -45,18 +51,22 @@ func Execute(config *utils.Config) {
 	}
 
 	if !(config.Interactive || config.OurInteractive) {
-		fmt.Fprintln(os.Stderr, "prybar-elisp: warn: non-interactive mode not implemented");
+		fmt.Fprintln(os.Stderr, "prybar-elisp: warn: non-interactive mode not implemented")
 	}
 
 	if config.Ps2 != "... " {
-		fmt.Fprintln(os.Stderr, "prybar-elisp: warn: ps2 not implemented");
+		fmt.Fprintln(os.Stderr, "prybar-elisp: warn: ps2 not implemented")
 	}
 
-	args := []string{"emacs", "-nw", "-Q", "--load", replPath, "--eval", "(prybar-repl)"}
-	err = syscall.Exec(emacs, args, os.Environ())
-
+	path, err := exec.LookPath(args[0])
 	if err != nil {
-		panic(err)
+		fmt.Fprintf(os.Stderr, "%s: command not found\n", args[0])
+	}
+
+	err = syscall.Exec(path, args, os.Environ())
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "failed to exec %s: %s\n", path, err)
+		os.Exit(1)
 	}
 
 }
