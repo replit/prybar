@@ -3,36 +3,9 @@
 set timeout -1
 spawn ./prybar-tcl -q -i ./test_files/hello_tcl.tcl
 match_max 100000
-expect -exact "Hello, Tcl!\r\r
-\[J\[2K\r-->  "
-send -- "p"
-expect -exact "\[J\[2K\r--> p"
-send -- "u"
-expect -exact "\[J\[2K\r--> pu"
-send -- "t"
-expect -exact "\[J\[2K\r--> put"
-send -- "s"
-expect -exact "\[J\[2K\r--> puts"
-send -- " "
-expect -exact "\[J\[2K\r--> puts "
-send -- "\$"
-expect -exact "\[J\[2K\r--> puts \$"
-send -- "m"
-expect -exact "\[J\[2K\r--> puts \$m"
-send -- "y"
-expect -exact "\[J\[2K\r--> puts \$my"
-send -- "_"
-expect -exact "\[J\[2K\r--> puts \$my_"
-send -- "n"
-expect -exact "\[J\[2K\r--> puts \$my_n"
-send -- "u"
-expect -exact "\[J\[2K\r--> puts \$my_nu"
-send -- "m"
-expect -exact "\[J\[2K\r--> puts \$my_num"
-send -- "\r"
-expect -exact "\[J\[2K\r--> puts \$my_num\[J\[2K\r--> puts \$my_num\r
-1000\r\r
-\r
-\[J\[2K\r-->  "
-send -- ""
-expect eof
+
+expect -exact "Hello, Tcl!\r"
+
+send "puts \$my_num\r"
+expect -exact "--> puts \$my_num\r"
+expect -exact "1000\r"
