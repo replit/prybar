@@ -4,25 +4,8 @@ set timeout -1
 spawn ./prybar-tcl -q -i
 match_max 100000
 expect -exact "\[J\[2K\r-->  "
-send -- "e"
-expect -exact "\[J\[2K\r--> e"
-send -- "x"
-expect -exact "\[J\[2K\r--> ex"
-send -- "p"
-expect -exact "\[J\[2K\r--> exp"
-send -- "r"
-expect -exact "\[J\[2K\r--> expr"
-send -- " "
-expect -exact "\[J\[2K\r--> expr "
-send -- "1"
-expect -exact "\[J\[2K\r--> expr 1"
-send -- "+"
-expect -exact "\[J\[2K\r--> expr 1+"
-send -- "1"
-expect -exact "\[J\[2K\r--> expr 1+1"
-send -- "\r"
-expect -exact "\[J\[2K\r--> expr 1+1\[J\[2K\r--> expr 1+1\r
-2\r
+send -- "expr 1+1\r"
+expect -exact "2\r
 \[J\[2K\r-->  "
 send -- ""
 expect eof
