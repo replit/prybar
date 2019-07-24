@@ -32,6 +32,7 @@ libffi-dev
 libnspr4-dev
 
 # used during installation
+git
 wget
 
 "
@@ -57,5 +58,12 @@ wget -nv https://launchpadlibrarian.net/309343863/libmozjs185-1.0_1.8.5-1.0.0+df
 wget -nv https://launchpadlibrarian.net/309343864/libmozjs185-dev_1.8.5-1.0.0+dfsg-7_amd64.deb
 dpkg -i *.deb
 rm *.deb
+
+# prybar-elisp has support for automatically running inside a Cask
+# environment if there is a Cask file in the working directory. Might
+# as well install Cask so it's easy to test.
+git clone https://github.com/cask/cask.git /usr/local/cask
+ln -s /usr/local/cask/bin/cask /usr/local/bin/cask
+cask upgrade-cask
 
 rm /tmp/docker-install.sh
