@@ -53,8 +53,10 @@ handled, display the IELM buffer and return."
   (redisplay)
   (menu-bar-mode -1)
   ;; Make it so you can `load' or `require' files from the project
-  ;; directory.
+  ;; directory, and any lisp/ subdirectory (often seen in larger
+  ;; projects).
   (add-to-list 'load-path default-directory)
+  (add-to-list 'load-path (expand-file-name "lisp" default-directory))
   ;; IELM only supports PS1, not PS2.
   (with-prybar-config
       (eval exec (ps1 "--> ") quiet file)
