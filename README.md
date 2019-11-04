@@ -36,6 +36,7 @@ written in the host language which starts a Prybar-compatible REPL.
 
 | language                  | eval | eval expression | eval file | repl | repl like eval | set prompt |
 | ------------------------- | ---- | --------------- | --------- | ---- | -------------- | ---------- |
+| Clojure                   | ✔    | ✔               | ✔         | ✔    | ✔              | -          |
 | Emacs Lisp                | ✔    | ✔               | ✔         | ✔    | ✗              | ✔          |
 | Javascript (nodejs)       | ✔    | ✔               | ✔         | ✔    | ✔              | ✔          |
 | Javascript (spidermonkey) | ✔    | ✗               | ✗         | ✗    | ✗              | -          |

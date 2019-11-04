@@ -13,7 +13,7 @@ func File(name string) ([]byte, error) {
 
 EOF
 
-for fn in $(ls | egrep -i '.*\.(js|ml)'); do
+for fn in $(ls | egrep -i '.*\.(clj|js|ml)'); do
 
 	echo "		case \"$fn\":" >> $1
 	echo "			return base64.StdEncoding.DecodeString(\"$(base64 -i $fn | tr -d \\n)\")" >> $1

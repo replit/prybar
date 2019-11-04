@@ -1,0 +1,11 @@
+#!/usr/bin/expect -f
+
+# ignore ANSI escape sequences
+set _ "(?:.*?)"
+
+spawn ./prybar-clojure -i -q
+expect -re "^${_}--> $"
+
+send -- ""
+expect eof
+

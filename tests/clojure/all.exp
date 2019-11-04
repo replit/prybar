@@ -1,0 +1,39 @@
+#!/usr/bin/expect -f
+
+# ignore ANSI escape sequences
+set _ "(?:.*?)"
+
+set timeout -1
+spawn ./prybar-clojure -c {(defn f [x] (inc x))} -e {(def s "bar")} -I -i -q ./test_files/hello.clj
+match_max 100000
+expect -re "^${_}hello${_}\r
+${_}#'user/s${_}\r
+${_}--> $"
+
+# a is defined in ./test_files/hello.clj
+send -- "a\r"
+expect -re "^${_}a${_}\r
+${_}\"hello\"${_}\r
+${_}--> $"
+
+# b is defined in ./test_files/hello.clj
+send -- "b\r"
+expect -re "^${_}b${_}\r
+${_}42${_}\r
+${_}--> $"
+
+# defined with "-c"
+send -- "(f b)\r"
+expect -re "^${_}(f b)${_}\r
+${_}43${_}\r
+${_}--> $"
+
+# defined with  "-e"
+send -- "s\r"
+expect -re "^${_}s${_}\r
+${_}\"bar\"${_}\r
+${_}--> $"
+
+send -- ""
+expect eof
+
