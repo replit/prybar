@@ -67,7 +67,12 @@ func (p *Tcl) EvalFile(file string, args []string) {
 	cfile := C.CString(file)
 	defer C.free(unsafe.Pointer(cfile))
 
-	C.Tcl_EvalFile(p.interp, cfile)
+	status := C.Tcl_EvalFile(p.interp, cfile)
+
+	if status != C.TCL_OK {
+		errstr := C.GoString(C.Tcl_GetStringResult(p.interp))
+		fmt.Fprintf(os.Stderr, "error: %s\n", errstr)
+	}
 }
 
 func (p *Tcl) Eval(code string) {
