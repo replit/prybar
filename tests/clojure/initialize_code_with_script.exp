@@ -1,0 +1,11 @@
+#!/usr/bin/expect -f
+
+# ignore ANSI escape sequences
+set _ "(?:.*?)"
+
+set timeout -1
+spawn ./prybar-clojure -c {(do (print (str a " " b)) "return-value")} ./test_files/hello.clj
+match_max 100000
+expect -re "^${_}hello 42${_}$"
+expect eof
+
