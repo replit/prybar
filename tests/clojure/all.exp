@@ -1,4 +1,4 @@
-#!/usr/bin/expect -d
+#!/usr/bin/expect -f
 
 # ignore ANSI escape sequences
 set _ "(?:.*?)"

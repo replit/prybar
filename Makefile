@@ -1,3 +1,5 @@
+MAKEFILE := $(lastword $(MAKEFILE_LIST))
+
 .PHONY: all
 all: $(addprefix prybar-,$(filter-out R,$(shell ls languages))) ## Build all Prybar binaries
 
@@ -27,6 +29,9 @@ test: ## Run integration tests
 .PHONY: test-image
 test-image: image ## Test Docker image for distribution
 	docker run -t --rm prybar ./run_tests
+
+test-image-ci: image
+	script --return --quiet -c $(MAKE) -f $(MAKEFILE) test-image /dev/null
 
 .PHONY: clean
 clean: ## Remove build artifacts

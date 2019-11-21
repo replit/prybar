@@ -35,18 +35,14 @@ func findHelper(path string) string {
 }
 
 func Execute(config *utils.Config) {
-	path, err := exec.LookPath("clojure")
-	if err != nil {
-		panic(err)
-	}
+	path, err := exec.LookPath("clj")
 
-	cljPath, err := exec.LookPath("clj")
 	if err != nil {
 		panic(err)
 	}
 
 	env := os.Environ()
-	args := []string{"clojure"}
+	args := []string{"clj"}
 
 	hasOption := config.Code != "" || config.Exp != "" ||
 		config.Interactive || config.OurInteractive
@@ -90,8 +86,6 @@ func Execute(config *utils.Config) {
 
 		if config.Interactive || config.OurInteractive {
 			args = append(args, findHelper("prybar_repl"))
-			args[0] = "clj"
-			path = cljPath
 		}
 
 		if hasFile {

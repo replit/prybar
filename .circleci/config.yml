@@ -16,7 +16,7 @@ jobs:
       - checkout
       - setup_remote_docker
       - run: apk add --no-cache --no-progress make
-      - run: make test-image
+      - run: make test-image-ci
       - deploy:
           command: |
             echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_USERNAME" --password-stdin
