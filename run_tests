@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-tests=$(find ./tests -printf '%P\n')
+tests=$(find ./tests -printf '%P\n' | sort)
 
 for t in ${tests}; do
   if [[ $t != *.exp ]]; then
