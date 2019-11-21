@@ -4,7 +4,7 @@ tests=$(find ./tests -printf '%P\n' | sort)
 
 # wait a second because of https://github.com/moby/moby/issues/28009
 # otherwise clojure tests may fail
-sleep 1
+sleep 10
 
 for t in ${tests}; do
   if [[ $t != *.exp ]]; then
