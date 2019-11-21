@@ -35,14 +35,14 @@ func findHelper(path string) string {
 }
 
 func Execute(config *utils.Config) {
-	path, err := exec.LookPath("clj")
+	path, err := exec.LookPath("clojure")
 
 	if err != nil {
 		panic(err)
 	}
 
 	env := os.Environ()
-	args := []string{"clj"}
+	args := []string{"clojure"}
 
 	hasOption := config.Code != "" || config.Exp != "" ||
 		config.Interactive || config.OurInteractive
