@@ -31,8 +31,8 @@ test-image: image ## Test Docker image for distribution
 	docker run -t --rm prybar ./run_tests
 
 .PHONY: test-image-ci
-test-image-ci: image ## Test Docker image with a fake TTY
-	script --return --quiet -c '$(MAKE) -f $(MAKEFILE) test-image' /dev/null
+test-image-ci: ## Test Docker image with a fake TTY
+	@script --return --quiet -c '$(MAKE) -f $(MAKEFILE) test-image' /dev/null
 
 .PHONY: clean
 clean: ## Remove build artifacts
