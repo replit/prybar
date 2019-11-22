@@ -7,7 +7,7 @@ jobs:
       - checkout
       - setup_remote_docker:
           version: 18.09.3
-      - run: apk add --no-cache --no-progress make script
+      - run: apk add --no-cache --no-progress make util-linux
       - run: make test-image-ci
   build_test_and_deploy:
     docker:
@@ -16,7 +16,7 @@ jobs:
       - checkout
       - setup_remote_docker:
           version: 18.09.3
-      - run: apk add --no-cache --no-progress make script
+      - run: apk add --no-cache --no-progress make util-linux
       - run: make test-image-ci
       - deploy:
           command: |
