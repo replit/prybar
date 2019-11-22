@@ -32,7 +32,7 @@ test-image: image ## Test Docker image for distribution
 
 .PHONY: test-image-ci
 test-image-ci: image ## Test Docker image with a fake TTY
-	script --return --quiet -c $(MAKE) -f $(MAKEFILE) test-image /dev/null
+	script --return --quiet -c '$(MAKE) -f $(MAKEFILE) test-image' /dev/null
 
 .PHONY: clean
 clean: ## Remove build artifacts
