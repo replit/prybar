@@ -14,10 +14,13 @@ liblua5.1-dev
 nodejs
 ocaml
 python-dev
-python3-dev
 ruby-dev
 sqlite3
 tcl-dev
+
+# install the same version of Python in this image that we intend to use with
+# Python in prod, since Prybar is dynamically linked.
+python3.8-dev
 
 # build and test
 bsdmainutils
