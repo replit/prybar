@@ -1,5 +1,5 @@
 # ![Prybar](logo.svg)
-
+[![Run on Repl.it](https://repl.it/badge/github/replit/prybar)](https://repl.it/github/replit/prybar)
 Prybar is a universal interpreter front-end. Same interface, same
 REPL, different languages.
 
