@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+stty cols 80
+stty row 20
+
 tests=$(find ./tests -printf '%P\n')
 
 for t in ${tests}; do
