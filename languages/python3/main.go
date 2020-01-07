@@ -3,9 +3,8 @@ package main
 // USING_CGO
 
 /*
-#cgo pkg-config: python3
+#cgo pkg-config: python-3.8-embed
 #include "pry_python3.h"
-
 */
 import "C"
 
