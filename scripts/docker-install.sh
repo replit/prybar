@@ -72,6 +72,12 @@ wget -nv https://launchpadlibrarian.net/309343864/libmozjs185-dev_1.8.5-1.0.0+df
 dpkg -i *.deb
 rm *.deb
 
+wget -nv https://downloads.lightbend.com/scala/2.13.1/scala-2.13.1.tgz
+tar -xf *.tgz
+cp -R   scala-*/bin/*     /usr/local/bin/
+cp -R   scala-*/lib/*     /usr/local/lib/
+rm -rf  scala-*
+
 # prybar-elisp has support for automatically running inside a Cask
 # environment if there is a Cask file in the working directory. Might
 # as well install Cask so it's easy to test.
