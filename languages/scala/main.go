@@ -8,6 +8,7 @@ import (
 	"github.com/replit/prybar/utils"
 )
 
+
 func Execute(config *utils.Config) {
 	path, err := exec.LookPath("scala")
 
@@ -18,37 +19,33 @@ func Execute(config *utils.Config) {
 	env := os.Environ()
 	args := []string{"scala"}
 
-	hasOption := config.Code != "" || config.Exp != "" ||
-		config.Interactive || config.OurInteractive
-	hasFile := false
-
-	if hasOption {
-		if config.Args != nil && len(config.Args) > 0 {
-			if _, err := os.Stat(config.Args[0]); os.IsNotExist(err) {
-				fmt.Println("No such file:", config.Args[0])
-				os.Exit(2)
-			}
-
-			hasFile = true
-		}
-
-		if hasFile {
-			args = append(args, "--i", config.Args[0])
-		}
-
-		if config.Exp != "" {
-			args = append(args, "--eval", config.Exp)
-		}
-
-		if hasFile {
-			args = append(args, config.Args[1:]...)
-		} else {
-			args = append(args, config.Args...)
-		}
-	} else {
-		args = append(args, config.Args...)
+	if config.Quiet {
+		args = append(args, "-Dscala.shell.welcome=")
 	}
+
+	if config.Code != "" {
+		args = append(args, "-e", config.Code)
+	}
+
+	if config.Exp != "" {
+		printStatement := fmt.Sprintf("print(%s)", config.Exp)
+		args = append(args, "-e", printStatement)
+	}
+
+	// if config.Interactive {
+	// 	args = append(args, "-r", findHelper("repl"))
+	// }
+
+	if config.Ps1 != "" {
+		args = append(args, "-Dscala.shell.prompt=%n" + config.Ps1)
+	}
+
+	if config.Args != nil && len(config.Args) > 0 {
+		args = append(args, "-i")
+		args = append(args, config.Args...)
+	} // else if config.Exp == "" && config.Code == "" {
+	// 	args = append(args, "-e", "")
+	// }
 
 	syscall.Exec(path, args, env)
 }
-
