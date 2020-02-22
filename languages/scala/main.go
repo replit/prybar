@@ -32,10 +32,6 @@ func Execute(config *utils.Config) {
 		args = append(args, "-e", printStatement)
 	}
 
-	// if config.Interactive {
-	// 	args = append(args, "-r", findHelper("repl"))
-	// }
-
 	if config.Ps1 != "" {
 		args = append(args, "-Dscala.shell.prompt=%n" + config.Ps1)
 	}
@@ -43,9 +39,7 @@ func Execute(config *utils.Config) {
 	if config.Args != nil && len(config.Args) > 0 {
 		args = append(args, "-i")
 		args = append(args, config.Args...)
-	} // else if config.Exp == "" && config.Code == "" {
-	// 	args = append(args, "-e", "")
-	// }
+	}
 
 	syscall.Exec(path, args, env)
 }
