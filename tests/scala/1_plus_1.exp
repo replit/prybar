@@ -1,0 +1,14 @@
+#!/usr/bin/expect -f
+
+set timeout -1
+spawn ./prybar-scala -i -q
+match_max 100000
+expect -exact "\[35m\r
+--> \[0m"
+send -- "1 + 1\r"
+expect -exact "1 + 1\r
+res0: Int = 2\r
+\[35m\r
+--> \[0m"
+send -- ":quit\r"
+expect eof
