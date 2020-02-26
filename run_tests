@@ -15,7 +15,7 @@ for t in ${tests}; do
 
   echo -n "...     $name"
 
-  test_out=$(timeout 10 "./tests/$t" 2>&1)
+  test_out=$(timeout 15 "./tests/$t" 2>&1)
   if [[ $? != 0 ]]; then
     echo -e "\n========== \"$t\" failed =========="
     echo $test_out
