@@ -1,0 +1,21 @@
+#!/usr/bin/expect -f
+
+set timeout -1
+spawn ./prybar-scala -ps1 {sc> }
+match_max 100000
+expect -exact "Welcome to Scala 2.13.1 (OpenJDK 64-Bit Server VM, Java 11.0.5).\r
+Type in expressions for evaluation. Or try :help.\r
+\[35m\r
+sc> \[0m"
+send -- "print(\"hit"
+expect -exact "\[K"
+send -- ""
+expect -exact "\[K"
+send -- ""
+expect -exact "\[K"
+send -- "prompt\")\r"
+expect -exact "prompt\")\r
+prompt\[35m\r
+sc> \[0m"
+send -- ":quit\r"
+expect eof
