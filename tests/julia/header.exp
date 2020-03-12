@@ -3,7 +3,7 @@
 set timeout -1
 spawn ./prybar-julia -i
 match_max 100000
-expect -exact "Version 1.1.1 (2019-05-16)"
+expect -exact "Version 1.3.1 (2019-12-30)"
 expect -exact "--> \[0m\[0m\r\[4C\r\[4C"
 send -- ""
 expect eof
