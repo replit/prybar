@@ -50,10 +50,10 @@ apt-get update
 apt-get install -y $(grep -v "^#" <<< "$packages")
 rm -rf /var/lib/apt/lists/*
 
-clojure_version=1.10.1.478
-wget "https://download.clojure.org/install/linux-install-${clojure_version}.sh"
-chmod +x "linux-install-${clojure_version}.sh"
-"./linux-install-${clojure_version}.sh"
+clj_cli_version=1.10.1.536
+wget "https://download.clojure.org/install/linux-install-${clj_cli_version}.sh"
+chmod +x "linux-install-${clj_cli_version}.sh"
+"./linux-install-${clj_cli_version}.sh"
 
 # The version in the Disco repos is out of date (1.0 series) and does
 # not expose the API we need.
