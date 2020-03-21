@@ -6,15 +6,15 @@ set _ "(?:.*?)"
 set timeout -1
 spawn ./prybar-clojure -i ./test_files/hello.clj
 match_max 100000
-expect -re "^${_}hello${_}\r
-${_}Clojure${_}\r
-${_}--> $"
+expect -re "^${_}Clojure${_}\r
+${_}hello${_}\r
+${_}user=> $"
 
 # b is defined in ./test_files/hello.clj
 send -- "b\r"
 expect -re "^${_}b${_}\r
 ${_}42${_}\r
-${_}--> $"
+${_}user=> $"
 
 send -- ""
 expect eof

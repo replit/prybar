@@ -6,33 +6,33 @@ set _ "(?:.*?)"
 set timeout -1
 spawn ./prybar-clojure -c {(defn f [x] (inc x))} -e {(def s "bar")} -I -i -q ./test_files/hello.clj
 match_max 100000
-expect -re "^${_}hello${_}\r
-${_}#'user/s${_}\r
-${_}--> $"
+expect -re "^${_}#'user/s${_}\r
+${_}hello${_}\r
+${_}user=> $"
 
 # a is defined in ./test_files/hello.clj
 send -- "a\r"
 expect -re "^${_}a${_}\r
 ${_}\"hello\"${_}\r
-${_}--> $"
+${_}user=> $"
 
 # b is defined in ./test_files/hello.clj
 send -- "b\r"
 expect -re "^${_}b${_}\r
 ${_}42${_}\r
-${_}--> $"
+${_}user=> $"
 
 # defined with "-c"
 send -- "(f b)\r"
 expect -re "^${_}(f b)${_}\r
 ${_}43${_}\r
-${_}--> $"
+${_}user=> $"
 
 # defined with  "-e"
 send -- "s\r"
 expect -re "^${_}s${_}\r
 ${_}\"bar\"${_}\r
-${_}--> $"
+${_}user=> $"
 
 send -- ""
 expect eof
