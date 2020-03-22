@@ -8,11 +8,11 @@ cd /tmp
 packages="
 
 # languages
-default-jre-headless
 emacs-nox
 liblua5.1-dev
 nodejs
 ocaml
+openjdk-11-jre-headless
 python-dev
 ruby-dev
 sqlite3
