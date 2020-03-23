@@ -59,10 +59,10 @@ chmod +x "linux-install-${clojure_version}.sh"
 # not expose the API we need.
 wget -nv https://julialang-s3.julialang.org/bin/linux/x64/1.3/julia-1.3.1-linux-x86_64.tar.gz
 tar -xf *.tar.gz
-cp -R   julia-*/bin/*     /usr/local/bin/
-cp -R   julia-*/include/* /usr/local/include/
-cp -R   julia-*/lib/*     /usr/local/lib/
-cp -R   julia-*/share/*   /usr/local/share/
+cp -R   julia-*/bin/*     /usr/bin/
+cp -R   julia-*/include/* /usr/include/
+cp -R   julia-*/lib/*     /usr/lib/
+cp -R   julia-*/share/*   /usr/share/
 rm -rf  julia-*
 
 # The version in the Disco repos is not compatible with cgo ("invalid
