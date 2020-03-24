@@ -6,7 +6,7 @@ jobs:
     steps:
       - add_ssh_keys:
           fingerprints:
-            - "37:92:31:a7:d9:3f:f0:ba:2a:97:84:e6:5f:a0:0b:68"
+            - "dd:6f:07:f7:7e:b0:ab:07:1c:1a:43:ba:a0:a3:b9:6f"
       - checkout
       - setup_remote_docker
       - run: apk add --no-cache --no-progress make git
