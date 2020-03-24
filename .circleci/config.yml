@@ -7,6 +7,7 @@ jobs:
       - add_ssh_keys:
           fingerprints:
             - "dd:6f:07:f7:7e:b0:ab:07:1c:1a:43:ba:a0:a3:b9:6f"
+      - run: echo << pipeline.number >>
       - run: apk add --no-cache --no-progress make git openssh
       - run:
           name: Keyscan Github (HACK) #https://discuss.circleci.com/t/known-hosts-in-circle-2-0/18544
