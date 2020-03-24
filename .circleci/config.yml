@@ -12,23 +12,32 @@ jobs:
           name: Keyscan Github (HACK) #https://discuss.circleci.com/t/known-hosts-in-circle-2-0/18544
           command: ssh-keyscan -H github.com >> ~/.ssh/known_hosts
       - checkout
+      - run: git tag "circleci_job_${CIRCLE_JOB}_build_${CIRCLE_BUILD_NUM}"
+      - run: git push origin "circleci_job_${CIRCLE_JOB}_build_${CIRCLE_BUILD_NUM}"
       - setup_remote_docker
-      - run: git tag "circleci_build_${CIRCLE_BUILD_NUM}"
-      - run: git push origin "circleci_build_${CIRCLE_BUILD_NUM}"
       - run: make test-image
   build_test_and_deploy:
     docker:
       - image: docker:18.09
     steps:
+      - add_ssh_keys:
+          fingerprints:
+            - "dd:6f:07:f7:7e:b0:ab:07:1c:1a:43:ba:a0:a3:b9:6f"
+      - run: apk add --no-cache --no-progress make git openssh
+      - run:
+          name: Keyscan Github (HACK) #https://discuss.circleci.com/t/known-hosts-in-circle-2-0/18544
+          command: ssh-keyscan -H github.com >> ~/.ssh/known_hosts
       - checkout
       - setup_remote_docker
-      - run: apk add --no-cache --no-progress make
       - run: make test-image
       - deploy:
           command: |
             echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_USERNAME" --password-stdin
             docker tag prybar:latest replco/prybar:latest
             docker push replco/prybar:latest
+            git tag "circleci_job_${CIRCLE_JOB}_build_${CIRCLE_BUILD_NUM}"
+            git push origin "circleci_job_${CIRCLE_JOB}_build_${CIRCLE_BUILD_NUM}"
+
 workflows:
   ci:
     jobs:
