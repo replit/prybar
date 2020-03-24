@@ -10,9 +10,12 @@ jobs:
       - checkout
       - setup_remote_docker
       - run: apk add --no-cache --no-progress make git openssh
-      - run: make test-image
       - run: git tag "circleci_build_${CIRCLE_BUILD_NUM}"
       - run: git push origin "circleci_build_${CIRCLE_BUILD_NUM}"
+      - run:
+          name: Keyscan Github (HACK) #https://discuss.circleci.com/t/known-hosts-in-circle-2-0/18544
+          command: ssh-keyscan -H github.com >> ~/.ssh/known_hosts
+      - run: make test-image
   build_test_and_deploy:
     docker:
       - image: docker:18.09
