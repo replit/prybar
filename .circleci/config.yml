@@ -4,6 +4,9 @@ jobs:
     docker:
       - image: docker:18.09
     steps:
+      - add_ssh_keys:
+          fingerprints:
+            - "37:92:31:a7:d9:3f:f0:ba:2a:97:84:e6:5f:a0:0b:68"
       - checkout
       - setup_remote_docker
       - run: apk add --no-cache --no-progress make git
