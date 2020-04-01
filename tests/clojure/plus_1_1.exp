@@ -7,12 +7,12 @@ set timeout -1
 spawn ./prybar-clojure -i
 match_max 100000
 expect -re "^${_}Clojure${_}\r
-${_}user=> $"
+${_}user--> $"
 
 send -- "(str (+ 1 1))\r"
 expect -re "${_}\\(str \\(\\+ 1 1\\)\\)${_}\r
 ${_}2${_}\r
-${_}user=> $"
+${_}user--> $"
 
 send -- ""
 expect eof

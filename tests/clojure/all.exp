@@ -8,31 +8,31 @@ spawn ./prybar-clojure -c {(defn f [x] (inc x))} -e {(def s "bar")} -I -i -q ./t
 match_max 100000
 expect -re "^${_}#'user/s${_}\r
 ${_}hello${_}\r
-${_}user=> $"
+${_}user--> $"
 
 # a is defined in ./test_files/hello.clj
 send -- "a\r"
 expect -re "^${_}a${_}\r
 ${_}\"hello\"${_}\r
-${_}user=> $"
+${_}user--> $"
 
 # b is defined in ./test_files/hello.clj
 send -- "b\r"
 expect -re "^${_}b${_}\r
 ${_}42${_}\r
-${_}user=> $"
+${_}user--> $"
 
 # defined with "-c"
 send -- "(f b)\r"
 expect -re "^${_}(f b)${_}\r
 ${_}43${_}\r
-${_}user=> $"
+${_}user--> $"
 
 # defined with  "-e"
 send -- "s\r"
 expect -re "^${_}s${_}\r
 ${_}\"bar\"${_}\r
-${_}user=> $"
+${_}user--> $"
 
 send -- ""
 expect eof

@@ -1,12 +1,38 @@
 package main
 
+//go:generate ../../scripts/gofiles.sh generated_files.go
+
 import (
 	"fmt"
+	"io/ioutil"
 	"os"
 	"os/exec"
 	"syscall"
 	"github.com/replit/prybar/utils"
 )
+
+
+func findHelper(path string) string {
+	bytes, err := File(path)
+	if bytes != nil {
+		f, err := ioutil.TempFile("", path)
+		if err != nil {
+			panic(err)
+		}
+
+		if _, err = f.Write(bytes); err != nil {
+			panic(err)
+		}
+		if err = f.Close(); err != nil {
+			panic(err)
+		}
+		return f.Name()
+	}
+	if err != nil {
+		panic(err)
+	}
+	panic("File not found at path: " + path)
+}
 
 func Execute(config *utils.Config) {
 	cljPath, err := exec.LookPath("clj")
@@ -16,18 +42,24 @@ func Execute(config *utils.Config) {
 	}
 
 	env := os.Environ()
-	args := []string{"clj", "-Sdeps", "{:deps {org.clojure/tools.namespace {:mvn/version \"1.0.0\"}} :paths [\"src\" \".\"]}"}
+	args := []string{
+		"clj",
+		"-Sdeps",
+		"{:deps {org.clojure/tools.namespace {:mvn/version \"1.0.0\"}} :paths [\"src\" \".\"]}"}
 
-	hasOption := config.Code != "" || config.Exp != "" ||
+	hasAction := config.Code != "" || config.Exp != "" ||
 		config.Interactive || config.OurInteractive
 	filePath := ""
 
-	if config.Quiet {
-		// An empty eval-opt suppresses the greeting (e.g., "Clojure 1.10.1")
-		args = append(args, "--eval", "")
+	if config.Ps1 != "" {
+		args = append(args, fmt.Sprintf("-J-DPRYBAR_PS1=%s", config.Ps1))
 	}
 
-	if !hasOption {
+	if config.Quiet {
+		args = append(args, "-J-DPRYBAR_QUIET=true")
+	}
+
+	if !hasAction {
 		// An empty eval-opt suppresses the start of a REPL.
 		args = append(args, "--eval", "")
 		args = append(args, config.Args...)
@@ -60,14 +92,14 @@ func Execute(config *utils.Config) {
 		syscall.Exec(cljPath, args, env)
 
 		return
-        }
+	}
 
 	// Starting a REPL, pass the file along, if exists, as an init-opt.
 	if filePath != "" {
 		args = append(args, "--init", filePath)
 	}
 
-	args = append(args, "--repl")
+	args = append(args, findHelper("prybar_clojure_repl.clj"))
 
 	if filePath != "" {
 		args = append(args, config.Args[1:]...)

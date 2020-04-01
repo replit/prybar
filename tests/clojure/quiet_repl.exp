@@ -4,7 +4,7 @@
 set _ "(?:.*?)"
 
 spawn ./prybar-clojure -i -q
-expect -re "^${_}user=> $"
+expect -re "^${_}user--> $"
 
 send -- ""
 expect eof
