@@ -11,20 +11,20 @@ ${_}hello${_}\r
 ${_}user--> $"
 
 # a is defined in ./test_files/hello.clj
-send -- "a\r"
-expect -re "^${_}a${_}\r
+send -- "hello/a\r"
+expect -re "^${_}hello/a${_}\r
 ${_}\"hello\"${_}\r
 ${_}user--> $"
 
 # b is defined in ./test_files/hello.clj
-send -- "b\r"
-expect -re "^${_}b${_}\r
+send -- "hello/b\r"
+expect -re "^${_}hello/b${_}\r
 ${_}42${_}\r
 ${_}user--> $"
 
 # defined with "-c"
-send -- "(f b)\r"
-expect -re "^${_}(f b)${_}\r
+send -- "(f hello/b)\r"
+expect -re "^${_}(f hello/b)${_}\r
 ${_}43${_}\r
 ${_}user--> $"
 
