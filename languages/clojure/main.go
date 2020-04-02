@@ -14,24 +14,30 @@ import (
 
 func findHelper(path string) string {
 	bytes, err := File(path)
-	if bytes != nil {
-		f, err := ioutil.TempFile("", path)
-		if err != nil {
-			panic(err)
-		}
 
-		if _, err = f.Write(bytes); err != nil {
-			panic(err)
-		}
-		if err = f.Close(); err != nil {
-			panic(err)
-		}
-		return f.Name()
-	}
 	if err != nil {
 		panic(err)
 	}
-	panic("File not found at path: " + path)
+
+	if bytes == nil {
+		panic("File not found at path: " + path)
+	}
+
+	f, err := ioutil.TempFile("", path)
+
+	if err != nil {
+		panic(err)
+	}
+
+	if _, err = f.Write(bytes); err != nil {
+		panic(err)
+	}
+
+	if err = f.Close(); err != nil {
+		panic(err)
+	}
+
+	return f.Name()
 }
 
 func Execute(config *utils.Config) {
