@@ -55,7 +55,11 @@ wget "https://download.clojure.org/install/linux-install-${clj_cli_version}.sh"
 chmod +x "linux-install-${clj_cli_version}.sh"
 "./linux-install-${clj_cli_version}.sh"
 # Trigger downloading of Clojure JARs now to avoid downloading them at runtime.
-clojure -Sverbose -Sforce --eval ''
+clojure \
+    -Sdeps '{:deps {org.clojure/tools.namespace {:mvn/version "1.0.0"}}}' \
+    -Sforce \
+    -Sverbose \
+    --eval ''
 
 # The version in the Disco repos is out of date (1.0 series) and does
 # not expose the API we need.
