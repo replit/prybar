@@ -54,6 +54,7 @@ clj_cli_version=1.10.1.536
 wget "https://download.clojure.org/install/linux-install-${clj_cli_version}.sh"
 chmod +x "linux-install-${clj_cli_version}.sh"
 "./linux-install-${clj_cli_version}.sh"
+rm "linux-install-${clj_cli_version}.sh"
 # Trigger downloading of Clojure JARs now to avoid downloading them at runtime.
 clojure \
     -Sdeps '{:deps {org.clojure/tools.namespace {:mvn/version "1.0.0"}} :paths ["src" "."]}' \
