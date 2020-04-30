@@ -33,7 +33,7 @@ jobs:
             echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_USERNAME" --password-stdin
             docker tag prybar:latest replco/prybar:latest
             docker push replco/prybar:latest
-            git tag "circleci_pipeline<< pipeline.number >>_build_${CIRCLE_BUILD_NUM}"
+            git tag "circleci_pipeline_<< pipeline.number >>_build_${CIRCLE_BUILD_NUM}"
             git push origin "circleci_pipeline_<< pipeline.number >>_build_${CIRCLE_BUILD_NUM}"
 
 workflows:
