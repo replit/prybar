@@ -1,8 +1,0 @@
-#!/usr/bin/expect -f
-
-set timeout -1
-spawn ./prybar-scala -i -q
-match_max 100000
-expect -exact "--> "
-send -- ":quit\r"
-expect eof
