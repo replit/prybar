@@ -9,9 +9,43 @@ package main
 import "C"
 
 import (
+	"fmt"
+	"os"
+	"path"
 	"strings"
 	"unsafe"
 )
+
+var programName *C.wchar_t
+
+func Py_SetProgramName(name string) error {
+	cname := C.CString(name)
+	defer C.free(unsafe.Pointer(cname))
+
+	newProgramName := C.Py_DecodeLocale(cname, nil)
+	if newProgramName == nil {
+		return fmt.Errorf("fail to call Py_DecodeLocale on '%s'", name)
+	}
+	C.Py_SetProgramName(newProgramName)
+
+	//no operation is performed if nil
+	C.PyMem_RawFree(unsafe.Pointer(programName))
+	programName = newProgramName
+
+	return nil
+}
+
+func init() {
+	name := "python"
+	virtualEnv, virtualEnvSet := os.LookupEnv("VIRTUAL_ENV")
+	if virtualEnvSet {
+		name = path.Join(virtualEnv, "bin", "python")
+	}
+	err := Py_SetProgramName(name)
+	if err != nil {
+		panic(fmt.Sprintf("cannot set prybar-python3 program name to '%s': %s", name, err))
+	}
+}
 
 type Python struct{}
 
