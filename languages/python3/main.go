@@ -36,10 +36,10 @@ func Py_SetProgramName(name string) error {
 }
 
 func init() {
-	name := "prybar-python3"
+	name := "python"
 	virtualEnv, virtualEnvSet := os.LookupEnv("VIRTUAL_ENV")
 	if virtualEnvSet {
-		name = path.Join(virtualEnv, "bin", "prybar-python3")
+		name = path.Join(virtualEnv, "bin", "python")
 	}
 	err := Py_SetProgramName(name)
 	if err != nil {
