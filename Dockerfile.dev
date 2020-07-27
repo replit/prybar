@@ -1,4 +1,4 @@
-FROM ubuntu:disco
+FROM ubuntu:18.04
 
 COPY scripts/docker-install.sh /tmp/docker-install.sh
 RUN /tmp/docker-install.sh
