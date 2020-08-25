@@ -56,7 +56,7 @@ func Execute(config *utils.Config) {
 	}
 
 	if config.Interactive {
-		args = append(args, "-r", findHelper("repl"))
+		args = append(args, findHelper("repl"))
 	}
 
 	if config.Ps1 != "" {
