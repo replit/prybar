@@ -1,16 +1,24 @@
-const repl = require('repl');
-const path = require('path');
-const fs = require('fs');
-const vm = require('vm');
-const rl = require(path.join(process.cwd(), 'prybar_assets', 'nodejs', 'readline-sync.js'));
-const tty = require('tty');
-const Module = require('module');
+const repl = require("repl");
+const path = require("path");
+const fs = require("fs");
+const vm = require("vm");
+const rl = require(path.join(
+  process.cwd(),
+  "prybar_assets",
+  "nodejs",
+  "readline-sync.js"
+));
+const tty = require("tty");
+const Module = require("module");
 
 let r;
+if (!process.env.PRYBAR_QUIET) {
+  console.log("Node " + process.version + " on " + process.platform);
+}
 
 // Red errors.
 function logError(msg) {
-  process.stdout.write('\u001b[0m\u001b[31m' + msg + '\u001b[0m');
+  process.stdout.write("\u001b[0m\u001b[31m" + msg + "\u001b[0m");
 }
 
 // The nodejs repl operates in raw mode and does some funky stuff to
@@ -42,17 +50,17 @@ function handleError(e) {
     r.lastError = e;
   }
 
-  if (e && typeof e === 'object' && e.stack && e.name) {
-    if (e.name === 'SyntaxError') {
+  if (e && typeof e === "object" && e.stack && e.name) {
+    if (e.name === "SyntaxError") {
       e.stack = e.stack
-        .replace(/^repl:\d+\r?\n/, '')
-        .replace(/^\s+at\s.*\n?/gm, '');
+        .replace(/^repl:\d+\r?\n/, "")
+        .replace(/^\s+at\s.*\n?/gm, "");
     }
 
     logError(e.stack);
   } else {
     // For some reason needs a newline to flush.
-    logError('Thrown: ' + r.writer(e) + '\n');
+    logError("Thrown: " + r.writer(e) + "\n");
   }
 
   if (r) {
@@ -64,18 +72,18 @@ function handleError(e) {
 
 function start(context) {
   r = repl.start({
-    prompt: process.env.NODE_PROMPT,
+    prompt: process.env.PRYBAR_PS1,
   });
   if (context) r.context = context;
 
   // remove the internal error and ours for red etc.
-  r._domain.removeListener('error', r._domain.listeners('error')[0]);
-  r._domain.on('error', handleError);
-  process.on('uncaughtException', handleError);
+  r._domain.removeListener("error", r._domain.listeners("error")[0]);
+  r._domain.on("error", handleError);
+  process.on("uncaughtException", handleError);
 }
 
 global.alert = console.log;
-global.prompt = p => {
+global.prompt = (p) => {
   pauseRepl();
   clearLine();
 
@@ -91,7 +99,7 @@ global.prompt = p => {
   return ret;
 };
 
-global.confirm = q => {
+global.confirm = (q) => {
   pauseRepl();
   clearLine();
 
@@ -103,13 +111,23 @@ global.confirm = q => {
   if (r) setImmediate(() => r.displayPrompt());
   return ret;
 };
-console.log(process.argv)
-if (process.argv[2]) {
-  const mainPath = path.resolve(process.argv[2]);
-  const main = fs.readFileSync(mainPath, 'utf-8');
+
+if (process.env.PRYBAR_CODE) {
+  vm.runInThisContext(process.env.PRYBAR_CODE);
+  if (process.env.PRYBAR_INTERACTIVE) {
+    start();
+  }
+} else if (process.env.PRYBAR_EXP) {
+  console.log(vm.runInThisContext(process.env.PRYBAR_EXP));
+  if (process.env.PRYBAR_INTERACTIVE) {
+    start();
+  }
+} else if (process.env.PRYBAR_FILE) {
+  const mainPath = path.resolve(process.env.PRYBAR_FILE);
+  const main = fs.readFileSync(mainPath, "utf-8");
   const module = new Module(mainPath, null);
 
-  module.id = '.';
+  module.id = ".";
   module.filename = mainPath;
   module.paths = Module._nodeModulePaths(path.dirname(mainPath));
 
@@ -136,7 +154,7 @@ if (process.argv[2]) {
   }
 
   console.log(
-    '\u001b[0m\u001b[90mHint: hit control+c anytime to enter REPL.\u001b[0m',
+    "\u001b[0m\u001b[90mHint: hit control+c anytime to enter REPL.\u001b[0m"
   );
   const context = vm.createContext(sandbox);
 
@@ -162,14 +180,15 @@ if (process.argv[2]) {
 
     module.loaded = true;
 
-    if (typeof res !== 'undefined') {
+    if (typeof res !== "undefined") {
       console.log(res);
     }
   }
 
-  process.on('SIGINT', () => start(context));
-
-  process.on('beforeExit', () => start(context));
-} else {
+  if (process.env.PRYBAR_INTERACTIVE) {
+    process.once("SIGINT", () => start(context));
+    process.once("beforeExit", () => start(context));
+  }
+} else if (process.env.PRYBAR_INTERACTIVE) {
   start();
 }
