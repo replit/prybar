@@ -47,6 +47,7 @@ rlwrap
 
 export DEBIAN_FRONTEND=noninteractive
 apt-get update
+curl -sL https://deb.nodesource.com/setup_12.x | bash -
 apt-get install -y $(grep -v "^#" <<< "$packages")
 rm -rf /var/lib/apt/lists/*
 
