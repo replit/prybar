@@ -1,3 +1,4 @@
+const util = require('util');
 const repl = require("repl");
 const path = require("path");
 const fs = require("fs");
@@ -181,7 +182,7 @@ if (process.env.PRYBAR_CODE) {
     module.loaded = true;
 
     if (typeof res !== "undefined") {
-      console.log(res);
+      console.log(util.inspect(res, { colors: true }));
     }
   }
 
