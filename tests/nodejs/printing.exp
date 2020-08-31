@@ -1,0 +1,13 @@
+#!/usr/bin/expect -f
+
+set timeout -1
+spawn ./prybar-nodejs -i -q
+match_max 100000
+expect -exact "\[1G\[0J--> \[5G"
+send -- "console.log('x')\r"
+expect -exact "console.log('x')\r\r
+x\r
+\[90mundefined\[39m\r
+\[1G\[0J--> "
+send -- ""
+expect eof

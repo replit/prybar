@@ -1,0 +1,8 @@
+#!/usr/bin/expect -d
+
+set timeout -1
+spawn ./prybar-nodejs -q -e 1+1
+match_max 100000
+expect -exact "\u001b\[33m2\u001b\[39m\r
+"
+expect eof

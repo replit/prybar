@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/exec"
 	"syscall"
+
 	"github.com/replit/prybar/utils"
 )
 
@@ -39,35 +40,27 @@ func Execute(config *utils.Config) {
 		panic(err)
 	}
 
-	env := os.Environ()
-	args := []string{"node"}
+	args := []string{"node", findHelper("repl")}
 
-	if !config.Quiet {
-		args = append(args, "-r", findHelper("version"))
-
+	if config.Quiet {
+		os.Setenv("PRYBAR_QUIET", "1")
 	}
 
-	if config.Code != "" {
-		args = append(args, "-e", config.Code)
-	}
-
-	if config.Exp != "" {
-		args = append(args, "-p", config.Exp)
-	}
+	os.Setenv("PRYBAR_CODE", config.Code)
+	os.Setenv("PRYBAR_EXP", config.Exp)
+	os.Setenv("PRYBAR_PS1", config.Ps1)
 
 	if config.Interactive {
-		args = append(args, "-r", findHelper("repl"))
+		os.Setenv("PRYBAR_INTERACTIVE", "1")
 	}
 
-	if config.Ps1 != "" {
-		env = append(env, "NODE_PROMPT="+config.Ps1)
+	// We only support one file, despite the fact that this
+	// variable is a list.
+	if len(config.Args) >= 1 {
+		os.Setenv("PRYBAR_FILE", config.Args[0])
+	} else {
+		os.Setenv("PRYBAR_FILE", "")
 	}
 
-	if config.Args != nil && len(config.Args) > 0 {
-		args = append(args, config.Args...)
-	} else if config.Exp == "" && config.Code == "" {
-		args = append(args, "-e", "")
-	}
-
-	syscall.Exec(path, args, env)
+	syscall.Exec(path, args, os.Environ())
 }

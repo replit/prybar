@@ -1,184 +1,195 @@
-var repl = require('repl');
+const util = require('util');
+const repl = require("repl");
+const path = require("path");
+const fs = require("fs");
+const vm = require("vm");
+const rl = require(path.join(
+  process.cwd(),
+  "prybar_assets",
+  "nodejs",
+  "readline-sync.js"
+));
+const tty = require("tty");
+const Module = require("module");
 
+let r;
+if (!process.env.PRYBAR_QUIET) {
+  console.log("Node " + process.version + " on " + process.platform);
+}
 
-//Taken from module async-exit-hook
-var exit = (function() {
-	'use strict';
+// Red errors.
+function logError(msg) {
+  process.stdout.write("\u001b[0m\u001b[31m" + msg + "\u001b[0m");
+}
 
-	const hooks = [];
-	const errHooks = [];
-	let called = false;
-	let waitingFor = 0;
-	let asyncTimeoutMs = 10000;
+// The nodejs repl operates in raw mode and does some funky stuff to
+// the terminal. This ns the repl and forces non-raw mode.
+function pauseRepl() {
+  if (!r) return;
 
-	const events = {};
-	const filters = {};
+  r.pause();
+  process.stdin.setRawMode(false);
+}
 
-	function exit(exit, code, err) {
-		// Helper functions
-		let doExitDone = false;
+// Forces raw mode and resumes the repl.
+function resumeRepl() {
+  if (!r) return;
 
-		function doExit() {
-			if (doExitDone) {
-				return;
-			}
-			doExitDone = true;
+  process.stdin.setRawMode(true);
+  r.resume();
+}
 
-			if (exit === true) {
-				// All handlers should be called even if the exit-hook handler was registered first
-				process.nextTick(process.exit.bind(null, code));
-			}
-		}
+// Clear the line if it has anything on it.
+function clearLine() {
+  if (r && r.line) r.clearLine();
+}
 
-		// Async hook callback, decrements waiting counter
-		function stepTowardExit() {
-			process.nextTick(() => {
-				if (--waitingFor === 0) {
-					doExit();
-				}
-			});
-		}
+// Adapted from the internal node repl code just a lot simpler and adds
+// red errors (see https://bit.ly/2FRM86S)
+function handleError(e) {
+  if (r) {
+    r.lastError = e;
+  }
 
-		// Runs a single hook
-		function runHook(syncArgCount, err, hook) {
-			// Cannot perform async hooks in `exit` event
-			if (exit && hook.length > syncArgCount) {
-				// Hook is async, expects a finish callback
-				waitingFor++;
+  if (e && typeof e === "object" && e.stack && e.name) {
+    if (e.name === "SyntaxError") {
+      e.stack = e.stack
+        .replace(/^repl:\d+\r?\n/, "")
+        .replace(/^\s+at\s.*\n?/gm, "");
+    }
 
-				if (err) {
-					// Pass error, calling uncaught exception handlers
-					return hook(err, stepTowardExit);
-				}
-				return hook(stepTowardExit);
-			}
+    logError(e.stack);
+  } else {
+    // For some reason needs a newline to flush.
+    logError("Thrown: " + r.writer(e) + "\n");
+  }
 
-			// Hook is synchronous
-			if (err) {
-				// Pass error, calling uncaught exception handlers
-				return hook(err);
-			}
-			return hook();
-		}
+  if (r) {
+    r.clearBufferedCommand();
+    r.lines.level = [];
+    r.displayPrompt();
+  }
+}
 
-		// Only execute hooks once
-		if (called) {
-			return;
-		}
+function start(context) {
+  r = repl.start({
+    prompt: process.env.PRYBAR_PS1,
+  });
+  if (context) r.context = context;
 
-		called = true;
+  // remove the internal error and ours for red etc.
+  r._domain.removeListener("error", r._domain.listeners("error")[0]);
+  r._domain.on("error", handleError);
+  process.on("uncaughtException", handleError);
+}
 
-		// Run hooks
-		if (err) {
-			// Uncaught exception, run error hooks
-			errHooks.map(runHook.bind(null, 1, err));
-		}
-		hooks.map(runHook.bind(null, 0, null));
+global.alert = console.log;
+global.prompt = (p) => {
+  pauseRepl();
+  clearLine();
 
-		if (waitingFor) {
-			// Force exit after x ms (10000 by default), even if async hooks in progress
-			setTimeout(() => {
-				doExit();
-			}, asyncTimeoutMs);
-		} else {
-			// No asynchronous hooks, exit immediately
-			doExit();
-		}
-	}
+  let ret = rl.question(`${p}> `, {
+    hideEchoBack: false,
+  });
 
-	// Add a hook
-	function add(hook) {
-		hooks.push(hook);
+  resumeRepl();
 
-		if (hooks.length === 1) {
-			add.hookEvent('exit');
-			add.hookEvent('beforeExit', 0);
-			add.hookEvent('SIGHUP', 128 + 1);
-			add.hookEvent('SIGINT', 128 + 2);
-			add.hookEvent('SIGTERM', 128 + 15);
-			add.hookEvent('SIGBREAK', 128 + 21);
+  // Display prompt on the next turn.
+  if (r) setImmediate(() => r.displayPrompt());
 
-			// PM2 Cluster shutdown message. Caught to support async handlers with pm2, needed because
-			// explicitly calling process.exit() doesn't trigger the beforeExit event, and the exit
-			// event cannot support async handlers, since the event loop is never called after it.
-			add.hookEvent('message', 0, function (msg) { // eslint-disable-line prefer-arrow-callback
-				if (msg !== 'shutdown') {
-					return true;
-				}
-			});
-		}
-	}
+  return ret;
+};
 
-	// New signal / event to hook
-	add.hookEvent = function (event, code, filter) {
-		events[event] = function () {
-			const eventFilters = filters[event];
-			for (let i = 0; i < eventFilters.length; i++) {
-				if (eventFilters[i].apply(this, arguments)) {
-					return;
-				}
-			}
-			exit(code !== undefined && code !== null, code);
-		};
+global.confirm = (q) => {
+  pauseRepl();
+  clearLine();
 
-		if (!filters[event]) {
-			filters[event] = [];
-		}
+  const ret = rl.keyInYNStrict(q);
 
-		if (filter) {
-			filters[event].push(filter);
-		}
-		process.on(event, events[event]);
-	};
+  resumeRepl();
 
-	// Unhook signal / event
-	add.unhookEvent = function (event) {
-		process.removeListener(event, events[event]);
-		delete events[event];
-		delete filters[event];
-	};
+  // Display prompt on the next turn.
+  if (r) setImmediate(() => r.displayPrompt());
+  return ret;
+};
 
-	// List hooked events
-	add.hookedEvents = function () {
-		const ret = [];
-		for (const name in events) {
-			if ({}.hasOwnProperty.call(events, name)) {
-				ret.push(name);
-			}
-		}
-		return ret;
-	};
+if (process.env.PRYBAR_CODE) {
+  vm.runInThisContext(process.env.PRYBAR_CODE);
+  if (process.env.PRYBAR_INTERACTIVE) {
+    start();
+  }
+} else if (process.env.PRYBAR_EXP) {
+  console.log(vm.runInThisContext(process.env.PRYBAR_EXP));
+  if (process.env.PRYBAR_INTERACTIVE) {
+    start();
+  }
+} else if (process.env.PRYBAR_FILE) {
+  const mainPath = path.resolve(process.env.PRYBAR_FILE);
+  const main = fs.readFileSync(mainPath, "utf-8");
+  const module = new Module(mainPath, null);
 
-	// Add an uncaught exception handler
-	add.uncaughtExceptionHandler = function (hook) {
-		errHooks.push(hook);
+  module.id = ".";
+  module.filename = mainPath;
+  module.paths = Module._nodeModulePaths(path.dirname(mainPath));
 
-		if (errHooks.length === 1) {
-			process.once('uncaughtException', exit.bind(null, true, 1));
-		}
-	};
+  process.mainModule = module;
+  const sandbox = {
+    module,
+    require: module.require.bind(module),
+    __dirname: path.dirname(mainPath),
+    __filename: mainPath,
 
-	// Add an unhandled rejection handler
-	add.unhandledRejectionHandler = function (hook) {
-		errHooks.push(hook);
+    // These are deprecated properties and accessing them will trigger a warning.
+    // We add them manually for backward compat.
+    GLOBAL: global,
+    root: global,
+  };
 
-		if (errHooks.length === 1) {
-			process.once('unhandledRejection', exit.bind(null, true, 1));
-		}
-	};
+  // These properties will show a warning. We can avoid them.
+  for (const prop of Object.getOwnPropertyNames(global)) {
+    if (sandbox.hasOwnProperty(prop)) {
+      continue;
+    }
 
-	// Configure async force exit timeout
-	add.forceExitTimeout = function (ms) {
-		asyncTimeoutMs = ms;
-	};
+    sandbox[prop] = global[prop];
+  }
 
-	// Export
-	return add;
+  console.log(
+    "\u001b[0m\u001b[90mHint: hit control+c anytime to enter REPL.\u001b[0m"
+  );
+  const context = vm.createContext(sandbox);
 
-})();
+  let script;
+  try {
+    script = vm.createScript(main, {
+      filename: mainPath,
+      displayErrors: false,
+    });
+  } catch (e) {
+    handleError(e);
+  }
 
+  if (script) {
+    let res;
+    try {
+      res = script.runInContext(context, {
+        displayErrors: false,
+      });
+    } catch (e) {
+      handleError(e);
+    }
 
-exit((reallyExit) => {
-	let r = repl.start(process.env.NODE_PROMPT || '> ');
-	r.on('exit', reallyExit);
-});
+    module.loaded = true;
+
+    if (typeof res !== "undefined") {
+      console.log(util.inspect(res, { colors: true }));
+    }
+  }
+
+  if (process.env.PRYBAR_INTERACTIVE) {
+    process.once("SIGINT", () => start(context));
+    process.once("beforeExit", () => start(context));
+  }
+} else if (process.env.PRYBAR_INTERACTIVE) {
+  start();
+}
