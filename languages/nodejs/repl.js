@@ -154,9 +154,6 @@ if (process.env.PRYBAR_CODE) {
     sandbox[prop] = global[prop];
   }
 
-  console.log(
-    "\u001b[0m\u001b[90mHint: hit control+c anytime to enter REPL.\u001b[0m"
-  );
   const context = vm.createContext(sandbox);
 
   let script;
@@ -180,6 +177,10 @@ if (process.env.PRYBAR_CODE) {
     }
 
     module.loaded = true;
+
+    console.log(
+      "\u001b[0m\u001b[90mHint: hit control+c anytime to enter REPL.\u001b[0m"
+    );
 
     if (typeof res !== "undefined") {
       console.log(util.inspect(res, { colors: true }));
