@@ -134,6 +134,7 @@ if (process.env.PRYBAR_CODE) {
 
   process.mainModule = module;
   const sandbox = {
+    console,
     module,
     require: module.require.bind(module),
     __dirname: path.dirname(mainPath),
@@ -145,19 +146,22 @@ if (process.env.PRYBAR_CODE) {
     root: global,
   };
 
-  // These properties will show a warning. We can avoid them.
-  for (const prop of Object.getOwnPropertyNames(global)) {
-    if (sandbox.hasOwnProperty(prop)) {
-      continue;
-    }
-
-    sandbox[prop] = global[prop];
-  }
-
   console.log(
     "\u001b[0m\u001b[90mHint: hit control+c anytime to enter REPL.\u001b[0m"
   );
   const context = vm.createContext(sandbox);
+
+  // Adapted from https://bit.ly/2Fc4WjM
+  const globalBuiltins =
+  new Set(vm.runInNewContext('Object.getOwnPropertyNames(globalThis)'));
+  for (const name of Object.getOwnPropertyNames(global)) {
+    // Only set properties that do not already exist as a global builtin.
+    if (!globalBuiltins.has(name)) {
+      Object.defineProperty(context, name,
+                           Object.getOwnPropertyDescriptor(global, name));
+    }
+  }
+  context.global = context;
 
   let script;
   try {
