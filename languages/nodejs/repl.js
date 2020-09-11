@@ -1,4 +1,4 @@
-const util = require('util');
+const util = require("util");
 const repl = require("repl");
 const path = require("path");
 const fs = require("fs");
@@ -139,11 +139,6 @@ if (process.env.PRYBAR_CODE) {
     require: module.require.bind(module),
     __dirname: path.dirname(mainPath),
     __filename: mainPath,
-
-    // These are deprecated properties and accessing them will trigger a warning.
-    // We add them manually for backward compat.
-    GLOBAL: global,
-    root: global,
   };
 
   console.log(
@@ -152,13 +147,18 @@ if (process.env.PRYBAR_CODE) {
   const context = vm.createContext(sandbox);
 
   // Adapted from https://bit.ly/2Fc4WjM
-  const globalBuiltins =
-  new Set(vm.runInNewContext('Object.getOwnPropertyNames(globalThis)'));
+  const globalBuiltins = new Set(
+    vm.runInContext("Object.getOwnPropertyNames(globalThis)", context)
+  );
+
   for (const name of Object.getOwnPropertyNames(global)) {
     // Only set properties that do not already exist as a global builtin.
     if (!globalBuiltins.has(name)) {
-      Object.defineProperty(context, name,
-                           Object.getOwnPropertyDescriptor(global, name));
+      Object.defineProperty(
+        context,
+        name,
+        Object.getOwnPropertyDescriptor(global, name)
+      );
     }
   }
   context.global = context;
