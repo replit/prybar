@@ -1,0 +1,10 @@
+#!/usr/bin/expect -f
+
+set timeout -1
+spawn ./prybar-nodejs ./test_files/global_bug.js
+match_max 100000
+expect -exact "Node v12.18.3 on linux\r
+\u001b\[0m\u001b\[90mHint: hit control+c anytime to enter REPL.\[0m\r
+\u001b\[33mtrue\u001b\[39m\r
+"
+expect eof
