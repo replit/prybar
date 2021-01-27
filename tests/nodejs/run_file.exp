@@ -1,16 +1,19 @@
-#!/usr/bin/expect -d
+#!/usr/bin/expect -f
 
 set timeout -1
 spawn ./prybar-nodejs -i ./test_files/hello.js
 match_max 100000
-expect -exact "Node v12.18.3 on linux\r
-\u001b\[0m\u001b\[90mHint: hit control+c anytime to enter REPL.\[0m\r
+expect -re {Node v\d+\.\d+.\d+ on linux}
+expect -exact "\[0m\[90mHint: hit control+c anytime to enter REPL.\[0m\r
 hello\r
-\u001b\[32m'hello'\u001b\[39m\r
-\u001b\[1G\u001b\[0J--> \u001b\[5G"
-send -- "a\r"
-expect -exact "a\r\r
-\u001b\[32m'hello'\u001b\[39m\r
-\u001b\[1G\u001b\[0J--> \u001b\[5G"
+\[32m'hello'\[39m\r
+\[1G\[0J--> \[5G"
+send -- "a"
+expect -exact "\r
+\[90m'hello'\[39m\[6G\[1A"
+send -- "\r"
+expect -exact "\[1B\[2K\[1A\r\r
+\[32m'hello'\[39m\r
+\[1G\[0J--> \[5G"
 send -- ""
 expect eof

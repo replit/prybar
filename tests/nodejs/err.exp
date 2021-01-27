@@ -6,16 +6,16 @@ match_max 100000
 expect -exact "\[1G\[0J--> \[5G"
 send -- "x\r"
 expect -exact "x\r\r
-\u001b\[0m\u001b\[31mReferenceError: x is not defined\r
-    at repl:1:1\r
-    at Script.runInContext (vm.js:130:18)\r
-    at REPLServer.defaultEval (repl.js:435:29)\r
+\[0m\[31mReferenceError: x is not defined\r
+    at REPL1:1:1\r
+    at Script.runInThisContext (vm.js:120:18)\r
+    at REPLServer.defaultEval (repl.js:442:29)\r
     at bound (domain.js:427:14)\r
     at REPLServer.runBound \[as eval\] (domain.js:440:12)\r
-    at REPLServer.onLine (repl.js:760:10)\r
-    at REPLServer.emit (events.js:315:20)\r
+    at REPLServer.onLine (repl.js:777:10)\r
+    at REPLServer.emit (events.js:314:20)\r
     at REPLServer.EventEmitter.emit (domain.js:483:12)\r
     at REPLServer.Interface._onLine (readline.js:329:10)\r
-    at REPLServer.Interface._line (readline.js:658:8)\u001b\[0m\u001b\[1G\u001b\[0J--> \u001b\[5G"
+    at REPLServer.Interface._line (readline.js:658:8)\[0m\[1G\[0J--> \[5G"
 send -- ""
 expect eof

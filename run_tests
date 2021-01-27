@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 stty cols 80
-stty row 20
+stty rows 20
 
 tests=$(find ./tests -printf '%P\n')
 

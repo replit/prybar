@@ -9,7 +9,6 @@ const rl = require(path.join(
   "nodejs",
   "readline-sync.js"
 ));
-const tty = require("tty");
 const Module = require("module");
 
 let r;
@@ -74,8 +73,8 @@ function handleError(e) {
 function start(context) {
   r = repl.start({
     prompt: process.env.PRYBAR_PS1,
+    useGlobal: true,
   });
-  if (context) r.context = context;
 
   // remove the internal error and ours for red etc.
   r._domain.removeListener("error", r._domain.listeners("error")[0]);
@@ -133,35 +132,15 @@ if (process.env.PRYBAR_CODE) {
   module.paths = Module._nodeModulePaths(path.dirname(mainPath));
 
   process.mainModule = module;
-  const sandbox = {
-    console,
-    module,
-    require: module.require.bind(module),
-    __dirname: path.dirname(mainPath),
-    __filename: mainPath,
-  };
+
+  global.module = module;
+  global.require = module.require.bind(module);
+  global.__dirname = path.dirname(mainPath);
+  global.__filename = mainPath;
 
   console.log(
     "\u001b[0m\u001b[90mHint: hit control+c anytime to enter REPL.\u001b[0m"
   );
-  const context = vm.createContext(sandbox);
-
-  // Adapted from https://bit.ly/2Fc4WjM
-  const globalBuiltins = new Set(
-    vm.runInContext("Object.getOwnPropertyNames(globalThis)", context)
-  );
-
-  for (const name of Object.getOwnPropertyNames(global)) {
-    // Only set properties that do not already exist as a global builtin.
-    if (!globalBuiltins.has(name)) {
-      Object.defineProperty(
-        context,
-        name,
-        Object.getOwnPropertyDescriptor(global, name)
-      );
-    }
-  }
-  context.global = context;
 
   let script;
   try {
@@ -176,7 +155,7 @@ if (process.env.PRYBAR_CODE) {
   if (script) {
     let res;
     try {
-      res = script.runInContext(context, {
+      res = script.runInThisContext({
         displayErrors: false,
       });
     } catch (e) {
@@ -191,8 +170,8 @@ if (process.env.PRYBAR_CODE) {
   }
 
   if (process.env.PRYBAR_INTERACTIVE) {
-    process.once("SIGINT", () => start(context));
-    process.once("beforeExit", () => start(context));
+    process.once("SIGINT", () => start());
+    process.once("beforeExit", () => start());
   }
 } else if (process.env.PRYBAR_INTERACTIVE) {
   start();
