@@ -1,3 +1,20 @@
+// Readline is a pure go implementation for GNU-Readline kind library.
+//
+// example:
+// 	rl, err := readline.New("> ")
+// 	if err != nil {
+// 		panic(err)
+// 	}
+// 	defer rl.Close()
+//
+// 	for {
+// 		line, err := rl.Readline()
+// 		if err != nil { // io.EOF
+// 			break
+// 		}
+// 		println(line)
+// 	}
+//
 package readline
 
 import "io"
@@ -17,6 +34,8 @@ type Config struct {
 	// specify the max length of historys, it's 500 by default, set it to -1 to disable history
 	HistoryLimit           int
 	DisableAutoSaveHistory bool
+	// enable case-insensitive history searching
+	HistorySearchFold bool
 
 	// AutoCompleter will called once user press TAB
 	AutoComplete AutoCompleter
@@ -24,6 +43,8 @@ type Config struct {
 	// Any key press will pass to Listener
 	// NOTE: Listener will be triggered by (nil, 0, 0) immediately
 	Listener Listener
+
+	Painter Painter
 
 	// If VimMode is true, readline will in vim.insert mode by default
 	VimMode bool
@@ -33,9 +54,10 @@ type Config struct {
 
 	FuncGetWidth func() int
 
-	Stdin  io.Reader
-	Stdout io.Writer
-	Stderr io.Writer
+	Stdin       io.ReadCloser
+	StdinWriter io.Writer
+	Stdout      io.Writer
+	Stderr      io.Writer
 
 	EnableMask bool
 	MaskRune   rune
@@ -43,6 +65,10 @@ type Config struct {
 	// erase the editing line after user submited it
 	// it use in IM usually.
 	UniqueEditLine bool
+
+	// filter input runes (may be used to disable CtrlZ or for translating some keys to different actions)
+	// -> output = new (translated) rune and true/false if continue with processing this one
+	FuncFilterInputRune func(rune) (rune, bool)
 
 	// force use interactive even stdout is not a tty
 	FuncIsTerminal      func() bool
@@ -70,8 +96,11 @@ func (c *Config) Init() error {
 	}
 	c.inited = true
 	if c.Stdin == nil {
-		c.Stdin = Stdin
+		c.Stdin = NewCancelableStdin(Stdin)
 	}
+
+	c.Stdin, c.StdinWriter = NewFillableStdin(c.Stdin)
+
 	if c.Stdout == nil {
 		c.Stdout = Stdout
 	}
@@ -93,6 +122,9 @@ func (c *Config) Init() error {
 		c.EOFPrompt = ""
 	}
 
+	if c.AutoComplete == nil {
+		c.AutoComplete = &TabCompleter{}
+	}
 	if c.FuncGetWidth == nil {
 		c.FuncGetWidth = GetScreenWidth
 	}
@@ -123,12 +155,19 @@ func (c *Config) SetListener(f func(line []rune, pos int, key rune) (newLine []r
 	c.Listener = FuncListener(f)
 }
 
+func (c *Config) SetPainter(p Painter) {
+	c.Painter = p
+}
+
 func NewEx(cfg *Config) (*Instance, error) {
 	t, err := NewTerminal(cfg)
 	if err != nil {
 		return nil, err
 	}
 	rl := t.Readline()
+	if cfg.Painter == nil {
+		cfg.Painter = &defaultPainter{}
+	}
 	return &Instance{
 		Config:    cfg,
 		Terminal:  t,
@@ -216,6 +255,11 @@ func (i *Instance) Readline() (string, error) {
 	return i.Operation.String()
 }
 
+func (i *Instance) ReadlineWithDefault(what string) (string, error) {
+	i.Operation.SetBuffer(what)
+	return i.Operation.String()
+}
+
 func (i *Instance) SaveHistory(content string) error {
 	return i.Operation.SaveHistory(content)
 }
@@ -230,6 +274,7 @@ func (i *Instance) Close() error {
 	if err := i.Terminal.Close(); err != nil {
 		return err
 	}
+	i.Config.Stdin.Close()
 	i.Operation.Close()
 	return nil
 }
@@ -239,6 +284,20 @@ func (i *Instance) Clean() {
 
 func (i *Instance) Write(b []byte) (int, error) {
 	return i.Stdout().Write(b)
+}
+
+// WriteStdin prefill the next Stdin fetch
+// Next time you call ReadLine() this value will be writen before the user input
+// ie :
+//  i := readline.New()
+//  i.WriteStdin([]byte("test"))
+//  _, _= i.Readline()
+//
+// gives
+//
+// > test[cursor]
+func (i *Instance) WriteStdin(val []byte) (int, error) {
+	return i.Terminal.WriteStdin(val)
 }
 
 func (i *Instance) SetConfig(cfg *Config) *Config {
@@ -254,4 +313,14 @@ func (i *Instance) SetConfig(cfg *Config) *Config {
 
 func (i *Instance) Refresh() {
 	i.Operation.Refresh()
+}
+
+// HistoryDisable the save of the commands into the history
+func (i *Instance) HistoryDisable() {
+	i.Operation.history.Disable()
+}
+
+// HistoryEnable the save of the commands into the history (default on)
+func (i *Instance) HistoryEnable() {
+	i.Operation.history.Enable()
 }

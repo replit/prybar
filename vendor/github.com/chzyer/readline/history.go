@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"sync"
 )
 
 type hisItem struct {
@@ -25,12 +26,15 @@ type opHistory struct {
 	historyVer int64
 	current    *list.Element
 	fd         *os.File
+	fdLock     sync.Mutex
+	enable     bool
 }
 
 func newOpHistory(cfg *Config) (o *opHistory) {
 	o = &opHistory{
 		cfg:     cfg,
 		history: list.New(),
+		enable:  true,
 	}
 	return o
 }
@@ -41,6 +45,8 @@ func (o *opHistory) Reset() {
 }
 
 func (o *opHistory) IsHistoryClosed() bool {
+	o.fdLock.Lock()
+	defer o.fdLock.Unlock()
 	return o.fd.Fd() == ^(uintptr(0))
 }
 
@@ -58,6 +64,8 @@ func (o *opHistory) initHistory() {
 
 // only called by newOpHistory
 func (o *opHistory) historyUpdatePath(path string) {
+	o.fdLock.Lock()
+	defer o.fdLock.Unlock()
 	f, err := os.OpenFile(path, os.O_APPEND|os.O_CREATE|os.O_RDWR, 0666)
 	if err != nil {
 		return
@@ -79,7 +87,7 @@ func (o *opHistory) historyUpdatePath(path string) {
 		o.Compact()
 	}
 	if total > o.cfg.HistoryLimit {
-		o.Rewrite()
+		o.rewriteLocked()
 	}
 	o.historyVer++
 	o.Push(nil)
@@ -93,6 +101,12 @@ func (o *opHistory) Compact() {
 }
 
 func (o *opHistory) Rewrite() {
+	o.fdLock.Lock()
+	defer o.fdLock.Unlock()
+	o.rewriteLocked()
+}
+
+func (o *opHistory) rewriteLocked() {
 	if o.cfg.HistoryFile == "" {
 		return
 	}
@@ -105,7 +119,7 @@ func (o *opHistory) Rewrite() {
 
 	buf := bufio.NewWriter(fd)
 	for elem := o.history.Front(); elem != nil; elem = elem.Next() {
-		buf.WriteString(string(elem.Value.(*hisItem).Source))
+		buf.WriteString(string(elem.Value.(*hisItem).Source) + "\n")
 	}
 	buf.Flush()
 
@@ -123,6 +137,8 @@ func (o *opHistory) Rewrite() {
 }
 
 func (o *opHistory) Close() {
+	o.fdLock.Lock()
+	defer o.fdLock.Unlock()
 	if o.fd != nil {
 		o.fd.Close()
 	}
@@ -139,7 +155,7 @@ func (o *opHistory) FindBck(isNewSearch bool, rs []rune, start int) (int, *list.
 				item = item[:start]
 			}
 		}
-		idx := runes.IndexAllBck(item, rs)
+		idx := runes.IndexAllBckEx(item, rs, o.cfg.HistorySearchFold)
 		if idx < 0 {
 			continue
 		}
@@ -164,7 +180,7 @@ func (o *opHistory) FindFwd(isNewSearch bool, rs []rune, start int) (int, *list.
 				continue
 			}
 		}
-		idx := runes.IndexAll(item, rs)
+		idx := runes.IndexAllEx(item, rs, o.cfg.HistorySearchFold)
 		if idx < 0 {
 			continue
 		}
@@ -209,6 +225,16 @@ func (o *opHistory) Next() ([]rune, bool) {
 	return runes.Copy(o.showItem(current.Value)), true
 }
 
+// Disable the current history
+func (o *opHistory) Disable() {
+	o.enable = false
+}
+
+// Enable the current history
+func (o *opHistory) Enable() {
+	o.enable = true
+}
+
 func (o *opHistory) debug() {
 	Debug("-------")
 	for item := o.history.Front(); item != nil; item = item.Next() {
@@ -218,6 +244,12 @@ func (o *opHistory) debug() {
 
 // save history
 func (o *opHistory) New(current []rune) (err error) {
+
+	// history deactivated
+	if !o.enable {
+		return nil
+	}
+
 	current = runes.Copy(current)
 
 	// if just use last command without modify
@@ -267,6 +299,8 @@ func (o *opHistory) Revert() {
 }
 
 func (o *opHistory) Update(s []rune, commit bool) (err error) {
+	o.fdLock.Lock()
+	defer o.fdLock.Unlock()
 	s = runes.Copy(s)
 	if o.current == nil {
 		o.Push(s)
