@@ -3,13 +3,11 @@
 { lib, buildGoModule, fetchFromGitHub, bash, pkg-config, runCommand, git, copyPathToStore }:
 
 let
-    src = ./.;
-
-    gitSrc = copyPathToStore ./.;
+    src = copyPathToStore ./.;
     revision = runCommand "get-rev" {
         nativeBuildInputs = [ git ];
         dummy = builtins.currentTime;
-    } "GIT_DIR=${gitSrc}/.git git rev-parse --short HEAD | tr -d '\n' > $out";
+    } "GIT_DIR=${src}/.git git rev-parse --short HEAD | tr -d '\n' > $out";
 in buildGoModule {
     pname = "prybar-${language}";
     version = builtins.readFile revision;
