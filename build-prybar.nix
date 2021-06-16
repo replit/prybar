@@ -1,13 +1,11 @@
 { language, buildInputs ? [] }:
 
-{ lib, buildGoModule, fetchFromGitHub, bash, pkg-config, runCommand, git }:
+{ lib, buildGoModule, fetchFromGitHub, bash, pkg-config, runCommand, git, copyPathToStore }:
 
 let
     src = ./.;
 
-    gitSrc = builtins.filterSource
-                   (path: type: true)
-                   ./.;
+    gitSrc = copyPathToStore ./.;
     revision = runCommand "get-rev" {
         nativeBuildInputs = [ git ];
         dummy = builtins.currentTime;
