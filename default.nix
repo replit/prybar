@@ -1,15 +1,6 @@
 { pkgs ? import <nixpkgs>{} } :
 let
-    callPackage = pkgs.callPackage;
-    python3 = pkgs.python3;
-    python2 = pkgs.python2;
-    lua5_1 = pkgs.lua5_1;
-    readline = pkgs.readline;
-    clojure = pkgs.clojure;
-    tcl = pkgs.tcl;
-in
-let
-  buildPrybar = attrs: callPackage(import ./build-prybar.nix attrs) {};
+  buildPrybar = attrs: pkgs.callPackage(import ./build-prybar.nix attrs) {};
 in
 {
     # TODO: These don't quite work yet
@@ -29,13 +20,13 @@ in
     # Untested, spidermonkey not supported on darwin. Feel free to test on linux.
     # prybar-spidermonkey = buildPrybar { language = "spidermonkey"; buildInputs = [ spidermonkey ]; };
 
-    prybar-python2 = buildPrybar { language = "python2"; buildInputs = [ python2 ]; };
+    prybar-python2 = buildPrybar { language = "python2"; buildInputs = [ pkgs.python2 ]; };
 
-    prybar-python3 = buildPrybar { language = "python3"; buildInputs = [ python3 ]; };
+    prybar-python3 = buildPrybar { language = "python3"; buildInputs = [ pkgs.python3 ]; };
 
-    prybar-lua = buildPrybar { language = "lua"; buildInputs = [ lua5_1 readline ]; };
+    prybar-lua = buildPrybar { language = "lua"; buildInputs = [ pkgs.lua5_1 pkgs.readline ]; };
 
-    prybar-clojure = buildPrybar { language = "clojure"; buildInputs = [ clojure ]; };
+    prybar-clojure = buildPrybar { language = "clojure"; buildInputs = [ pkgs.clojure ]; };
 
     prybar-elisp = buildPrybar { language = "elisp"; };
 
@@ -45,5 +36,5 @@ in
 
     prybar-sqlite = buildPrybar { language = "sqlite"; };
 
-    prybar-tcl = buildPrybar { language = "tcl"; buildInputs = [ tcl ]; };
+    prybar-tcl = buildPrybar { language = "tcl"; buildInputs = [ pkgs.tcl ]; };
 }
