@@ -1,17 +1,22 @@
 { language, buildInputs ? [] }:
 
-{ lib, buildGoModule, fetchFromGitHub, bash, pkg-config }:
+{ lib, buildGoModule, fetchFromGitHub, bash, pkg-config, runCommand, git }:
 
+let
+    gitSrc = builtins.filterSource
+               (path: type: true)
+               ./.;
+in
 buildGoModule rec {
-    name = "prybar-${language}";
-    version = "98148ff";
+    pname = "prybar-${language}";
 
-    src = fetchFromGitHub{
-        owner = "replit";
-        repo = "prybar";
-        rev = "${version}";
-        sha256 = "14l4bhdlssp22wdxx1ycz9wl64z7bf3qwpqqp3npcva969191c48";
-    };
+    revision = runCommand "get-rev" {
+        nativeBuildInputs = [ git ];
+        dummy = builtins.currentTime;
+    } "GIT_DIR=${gitSrc}/.git git rev-parse --short HEAD | tr -d '\n' > $out";
+    version = builtins.readFile revision;
+
+    src = ./.;
 
     inherit buildInputs;
     nativeBuildInputs = [ pkg-config ];

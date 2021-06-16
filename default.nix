@@ -1,4 +1,13 @@
-{ callPackage, python3, python2, lua5_1, readline, clojure, tcl }:
+{ pkgs ? import <nixpkgs>{} } :
+let
+    callPackage = pkgs.callPackage;
+    python3 = pkgs.python3;
+    python2 = pkgs.python2;
+    lua5_1 = pkgs.lua5_1;
+    readline = pkgs.readline;
+    clojure = pkgs.clojure;
+    tcl = pkgs.tcl;
+in
 let
   buildPrybar = attrs: callPackage(import ./build-prybar.nix attrs) {};
 in
