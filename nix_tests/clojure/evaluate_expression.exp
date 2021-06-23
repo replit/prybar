@@ -1,0 +1,11 @@
+#!/usr/bin/expect -f
+
+# ignore ANSI escape sequences
+set _ "(?:.*?)"
+
+set timeout -1
+spawn ./prybar-clojure -e {(str (+ 1 1))}
+match_max 100000
+expect -re "^${_}\"2\"${_}$"
+expect eof
+

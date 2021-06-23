@@ -1,0 +1,7 @@
+#!/usr/bin/expect -f
+
+set timeout -1
+spawn ./prybar-tcl -q -i ./test-files/hi_julia.jl
+match_max 100000
+
+expect -exact "error: invalid command name \"my_number\"\r"

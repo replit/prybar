@@ -1,0 +1,11 @@
+#!/usr/bin/expect -f
+
+set timeout -1
+spawn ./prybar-tcl -q -i ./test_files/hello_tcl.tcl
+match_max 100000
+
+expect -exact "Hello, Tcl!\r"
+
+send "puts \$my_num\r"
+expect -exact "--> puts \$my_num\r"
+expect -exact "1000\r"

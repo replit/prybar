@@ -1,0 +1,7 @@
+#!/usr/bin/expect -f
+
+spawn ./prybar-sqlite -q -i
+expect -- "^--> "
+send "select 1+1;\r"
+expect -exact "2"
+expect -exact "--> "

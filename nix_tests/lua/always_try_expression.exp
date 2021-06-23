@@ -1,0 +1,26 @@
+#!/usr/bin/expect -f
+
+set timeout -1
+spawn ./prybar-lua -q -i
+match_max 100000
+expect -exact "--> "
+send -- "function a() return 123 end\r"
+expect -exact "function a() return 123 end\r
+--> "
+send -- "a()\r"
+expect -exact "a()\r
+123\r
+--> "
+send -- "return a()\r"
+expect -exact "return a()\r
+123\r
+--> "
+send -- "a(\r"
+expect -exact "a(\r
+... "
+send -- ")\r"
+expect -exact ")\r
+123\r
+--> "
+send -- ""
+expect eof

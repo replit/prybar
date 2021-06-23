@@ -1,0 +1,222 @@
+#!/usr/bin/expect -f
+
+spawn ./prybar-python2 -q -i
+match_max 100000
+expect -exact "--> "
+send -- "import sys\r"
+expect -exact "import sys\r
+--> "
+send -- "for i in range(0, 100):\r"
+expect -exact "in range(0, 100):\r
+... "
+send -- "  sys.stderr.write(str(i) + '\\n')\r"
+expect -exact "  sys.stderr.write(str(i) + '\\n')\r
+... "
+send -- "  sys.stdout.write(str(i) + '\\n')\r"
+expect -exact "  sys.stdout.write(str(i) + '\\n')\r
+... "
+send -- "\r"
+expect -exact "\r
+0\r
+0\r
+1\r
+1\r
+2\r
+2\r
+3\r
+3\r
+4\r
+4\r
+5\r
+5\r
+6\r
+6\r
+7\r
+7\r
+8\r
+8\r
+9\r
+9\r
+10\r
+10\r
+11\r
+11\r
+12\r
+12\r
+13\r
+13\r
+14\r
+14\r
+15\r
+15\r
+16\r
+16\r
+17\r
+17\r
+18\r
+18\r
+19\r
+19\r
+20\r
+20\r
+21\r
+21\r
+22\r
+22\r
+23\r
+23\r
+24\r
+24\r
+25\r
+25\r
+26\r
+26\r
+27\r
+27\r
+28\r
+28\r
+29\r
+29\r
+30\r
+30\r
+31\r
+31\r
+32\r
+32\r
+33\r
+33\r
+34\r
+34\r
+35\r
+35\r
+36\r
+36\r
+37\r
+37\r
+38\r
+38\r
+39\r
+39\r
+40\r
+40\r
+41\r
+41\r
+42\r
+42\r
+43\r
+43\r
+44\r
+44\r
+45\r
+45\r
+46\r
+46\r
+47\r
+47\r
+48\r
+48\r
+49\r
+49\r
+50\r
+50\r
+51\r
+51\r
+52\r
+52\r
+53\r
+53\r
+54\r
+54\r
+55\r
+55\r
+56\r
+56\r
+57\r
+57\r
+58\r
+58\r
+59\r
+59\r
+60\r
+60\r
+61\r
+61\r
+62\r
+62\r
+63\r
+63\r
+64\r
+64\r
+65\r
+65\r
+66\r
+66\r
+67\r
+67\r
+68\r
+68\r
+69\r
+69\r
+70\r
+70\r
+71\r
+71\r
+72\r
+72\r
+73\r
+73\r
+74\r
+74\r
+75\r
+75\r
+76\r
+76\r
+77\r
+77\r
+78\r
+78\r
+79\r
+79\r
+80\r
+80\r
+81\r
+81\r
+82\r
+82\r
+83\r
+83\r
+84\r
+84\r
+85\r
+85\r
+86\r
+86\r
+87\r
+87\r
+88\r
+88\r
+89\r
+89\r
+90\r
+90\r
+91\r
+91\r
+92\r
+92\r
+93\r
+93\r
+94\r
+94\r
+95\r
+95\r
+96\r
+96\r
+97\r
+97\r
+98\r
+98\r
+99\r
+99\r
+--> "
+send -- ""
+expect eof

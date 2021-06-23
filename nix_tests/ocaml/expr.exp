@@ -1,0 +1,6 @@
+#!/usr/bin/expect -f
+
+spawn ./prybar-ocaml -q -e 1+1
+match_max 100000
+expect -exact "- : int = 2"
+expect eof

@@ -1,0 +1,12 @@
+#!/usr/bin/expect -f
+
+set timeout -1
+spawn ./prybar-python3 -i -q -ps1 custom
+match_max 100000
+expect -exact "custom"
+send -- "print('hit')\r"
+expect -exact "print('hit')\r
+hit\r
+custom"
+send -- ""
+expect eof

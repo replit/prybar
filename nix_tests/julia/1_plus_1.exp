@@ -1,0 +1,13 @@
+#!/usr/bin/expect -f
+
+set timeout -1
+spawn ./prybar-julia -q -i
+match_max 100000
+expect -exact "\[?2004h\r\[0K\[1m--> \[0m\[0m\r\[4C\r\[4C"
+send -- "1+1\r"
+expect -exact "1+1\r\[0K\[1m--> \[0m\[0m\r\[4C1+1\r\[7C\r
+\[?2004l\[0m\[0m2\r
+\r
+\r\[0K\r\[0K\[1m--> \[0m\[0m\r\[4C\r\[4C\[?2004h\r\[0K\[1m--> \[0m\[0m\r\[4C\r\[4C"
+send -- ""
+expect eof

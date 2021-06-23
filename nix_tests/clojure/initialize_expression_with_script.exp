@@ -1,0 +1,10 @@
+#!/usr/bin/expect -f
+
+# ignore ANSI escape sequences
+set _ "(?:.*?)"
+
+set timeout -1
+spawn ./prybar-clojure -e "(str (inc b))" ./test_files/hello.clj
+match_max 100000
+expect -re "^${_}\"43\"${_}\r$"
+

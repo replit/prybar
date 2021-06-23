@@ -1,0 +1,9 @@
+#!/usr/bin/expect -f
+
+spawn ./prybar-ocaml -e 1+1
+match_max 100000
+
+# OCaml 4.06.0 on Unix
+expect -re "^OCaml (.*) on Unix"
+expect -exact "- : int = 2"
+expect eof

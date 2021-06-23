@@ -1,0 +1,20 @@
+#!/usr/bin/expect -f
+
+set timeout -1
+spawn ./prybar-tcl -q -i
+match_max 100000
+
+send "puts \"hey\"\r"
+expect -exact "puts \"hey\"\r"
+expect -exact "hey\r"
+expect -exact "--> "
+
+send "puts \"hey\"\r"
+expect -exact "puts \"hey\"\r"
+expect -exact "hey\r"
+expect -exact "--> "
+
+send "puts \"hello\"\r"
+expect -exact "puts \"hello\"\r"
+expect -exact "hello\r"
+expect -exact "--> "

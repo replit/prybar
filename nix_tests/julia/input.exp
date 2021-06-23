@@ -1,0 +1,31 @@
+#!/usr/bin/expect -f
+
+set timeout -1
+spawn ./prybar-julia -q -i
+match_max 100000
+expect -exact "\[?2004h\r\[0K\[1m--> \[0m\[0m\r\[4C\r\[4C"
+send -- "n = readline()\r"
+expect -exact "n = readline()\r\[0K\[1m--> \[0m\[0m\r\[4Cn = readline()\r\[18C\r
+\[?2004l\[0m"
+send -- "hello\r"
+expect -exact "hello\r
+\[0m\"hello\"\r
+\r
+\r\[0K\r\[0K\[1m--> \[0m\[0m\r\[4C\r\[4C\[?2004h\r\[0K\[1m--> \[0m\[0m\r\[4C\r\[4C"
+send -- "println(hello"
+expect -exact "\r\[0K\[1m--> \[0m\[0m\r\[4Cprintln(hell\r\[16C"
+send -- ""
+expect -exact "\r\[0K\[1m--> \[0m\[0m\r\[4Cprintln(hel\r\[15C"
+send -- ""
+expect -exact "\r\[0K\[1m--> \[0m\[0m\r\[4Cprintln(he\r\[14C"
+send -- ""
+expect -exact "\r\[0K\[1m--> \[0m\[0m\r\[4Cprintln(h\r\[13C"
+send -- ""
+expect -exact "\r\[0K\[1m--> \[0m\[0m\r\[4Cprintln(\r\[12C"
+send -- "n)\r"
+expect -exact "n)\r\[0K\[1m--> \[0m\[0m\r\[4Cprintln(n)\r\[14C\r
+\[?2004l\[0mhello\r
+\r
+\r\[0K\r\[0K\[1m--> \[0m\[0m\r\[4C\r\[4C\[?2004h\r\[0K\[1m--> \[0m\[0m\r\[4C\r\[4C"
+send -- ""
+expect eof

@@ -1,0 +1,5 @@
+#!/usr/bin/expect -f
+
+spawn ./prybar-sqlite -e "select 1+1;"
+expect ^2
+expect eof

@@ -1,0 +1,14 @@
+#!/usr/bin/expect -f
+
+set timeout -1
+spawn ./prybar-julia -q -i ./test_files/hi_julia.jl
+match_max 100000
+expect -exact "hey from julia\r
+\[?2004h\r\[0K\[1m--> \[0m\[0m\r\[4C\r\[4C"
+send -- "my_number\r"
+expect -exact "my_number\r\[0K\[1m--> \[0m\[0m\r\[4Cmy_number\r\[13C\r
+\[?2004l\[0m\[0m500\r
+\r
+\r\[0K\r\[0K\[1m--> \[0m\[0m\r\[4C\r\[4C\[?2004h\r\[0K\[1m--> \[0m\[0m\r\[4C\r\[4C"
+send -- ""
+expect eof

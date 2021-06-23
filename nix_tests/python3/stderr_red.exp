@@ -1,0 +1,51 @@
+#!/usr/bin/expect -f
+
+# red is currently nondeterministic
+exit 0
+
+spawn ./prybar-python3 -i -q -R
+match_max 100000
+expect -exact "--> "
+send -- "import sys\r"
+expect -exact "import sys\r
+--> "
+send -- "sys.stderr.write()\[D"
+expect -exact ""
+send -- "'"
+expect -exact "')"
+send -- "'"
+expect -exact "')"
+send -- "\[D"
+expect -exact ""
+send -- "w"
+expect -exact "w')"
+send -- "e"
+expect -exact "e')"
+send -- "e"
+expect -exact "e')"
+send -- "e"
+expect -exact "e')"
+send -- "e"
+expect -exact "e')"
+send -- "e"
+expect -exact "e')"
+send -- "e"
+expect -exact "e')"
+send -- "e"
+expect -exact "e')"
+send -- "e"
+expect -exact "e')"
+send -- "e"
+expect -exact "e')"
+send -- "e"
+expect -exact "e')"
+send -- "e"
+expect -exact "e')"
+send -- "e"
+expect -exact "e')"
+send -- "\\"
+expect -exact "\\')"
+send -- "n"
+expect -exact "n')"
+send -- "\r"
+expect eof

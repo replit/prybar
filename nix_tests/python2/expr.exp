@@ -1,0 +1,5 @@
+#!/usr/bin/expect -f
+
+spawn ./prybar-python2 -e 1+1
+match_max 100000
+expect eof

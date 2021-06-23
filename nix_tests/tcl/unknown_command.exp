@@ -1,0 +1,9 @@
+#!/usr/bin/expect -f
+
+set timeout -1
+spawn ./prybar-tcl -q -i
+match_max 100000
+send "hmm\r"
+expect -exact "hmm\r"
+expect -exact "error: invalid command name \"hmm\"\r"
+expect -exact "--> "

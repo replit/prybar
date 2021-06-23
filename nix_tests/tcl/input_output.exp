@@ -1,0 +1,15 @@
+#!/usr/bin/expect -f
+
+set timeout -1
+spawn ./prybar-tcl -q -i
+match_max 100000
+expect -exact "--> "
+send "set inp \[gets stdin\]\r"
+expect -exact "--> set inp \[gets stdin\]\r"
+send "hey\r"
+expect -exact "hey\r"
+expect -exact "--> "
+send "puts \$inp\r"
+expect -exact "--> puts \$inp\r"
+expect -exact "hey\r"
+expect -exact "--> "
