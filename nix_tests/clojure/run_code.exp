@@ -1,7 +1,0 @@
-#!/usr/bin/expect -f
-
-set timeout -1
-spawn ./prybar-clojure -q -c {(do (println "foo") "bar")}
-match_max 100000
-expect -re "^\r\r\u001b\\\[K\rfoo\r\r\n$"
-

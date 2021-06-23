@@ -4,7 +4,7 @@ stty cols 80
 stty rows 20
 
 language=$1
-tests=$(find "./nix_tests/${language}" -printf '%P\n')
+tests=$(find "./tests/${language}" -printf '%P\n')
 
 for t in ${tests}; do
   if [[ $t != *.exp ]]; then
@@ -16,7 +16,7 @@ for t in ${tests}; do
 
   echo -n "...    ${language} $name"
 
-  test_out=$(timeout 15 "./nix_tests/${language}/$t" 2>&1)
+  test_out=$(timeout 15 "./tests/${language}/$t" 2>&1)
   if [[ $? != 0 ]]; then
     echo -e "\n========== \"$t\" failed =========="
     echo "$test_out"

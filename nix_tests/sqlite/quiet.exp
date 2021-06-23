@@ -1,6 +1,0 @@
-#!/usr/bin/expect -f
-
-spawn ./prybar-sqlite -q -i
-expect "^--> "
-send ".quit \r"
-expect eof

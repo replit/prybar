@@ -1,5 +1,0 @@
-#!/usr/bin/expect -f
-
-spawn ./prybar-sqlite -q -i ./test_files/hello.sql
-expect -- "^hey there\r
---> "
