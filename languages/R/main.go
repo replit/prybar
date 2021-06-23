@@ -6,7 +6,7 @@ package main
 #cgo pkg-config: libR
 #include <stdlib.h>
 #include <Rembedded.h>
-#include <RVersion.h>
+#include <Rversion.h>
 #include <Rinternals.h>
 #include <R_ext/Parse.h>
 #include <Rembedded.h>
