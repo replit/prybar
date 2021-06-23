@@ -1,6 +1,6 @@
 package main
 
-//go:generate bash ../../scripts/gofiles.sh generated_files.go
+//go:generate ../../scripts/gofiles.sh generated_files.go
 
 import (
 	"io/ioutil"

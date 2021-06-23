@@ -1,14 +1,13 @@
 // OCaml main
 package main
 
-//go:generate bash ../../scripts/gofiles.sh generated_files.go
+//go:generate ../../scripts/gofiles.sh generated_files.go
 
 import (
 	"github.com/replit/prybar/utils"
 	"io/ioutil"
 	"os"
 	"os/exec"
-	"strings"
 	"syscall"
 )
 
@@ -41,16 +40,8 @@ func Execute(config *utils.Config) {
 		panic(err)
 	}
 
-	args := []string{"ocaml"}
-	// Fix for getting the various libs added to prybar when running through nix
-	if value, ok := os.LookupEnv("OCAMLPATH"); ok {
-		for _, val := range strings.Split(value, ":") {
-			args = append(args, "-I", val)
-		}
-	}
-
 	env := os.Environ()
-	args = append(args, findHelper("repl"), "-s", "ml")
+	args := []string{"ocaml", findHelper("repl"), "-s", "ml"}
 
 	if config.Quiet {
 		args = append(args, "-q")

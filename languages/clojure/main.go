@@ -1,6 +1,6 @@
 package main
 
-//go:generate bash ../../scripts/gofiles.sh generated_files.go
+//go:generate ../../scripts/gofiles.sh generated_files.go
 
 import (
 	"fmt"
@@ -35,14 +35,14 @@ func findHelper(path string) string {
 }
 
 func Execute(config *utils.Config) {
-	path, err := exec.LookPath("clojure")
+	path, err := exec.LookPath("clj")
 
 	if err != nil {
 		panic(err)
 	}
 
 	env := os.Environ()
-	args := []string{"clojure"}
+	args := []string{"clj"}
 
 	hasOption := config.Code != "" || config.Exp != "" ||
 		config.Interactive || config.OurInteractive

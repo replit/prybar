@@ -3,7 +3,7 @@ package main
 // USING_CGO
 
 /*
-#cgo CGO_LDFLAGS_ALLOW="-Wl,--compress-debug-sections=zlib" pkg-config: --libs --cflags ruby-2.7
+#cgo pkg-config: ruby-2.5
 #include "pry_ruby.h"
 */
 import "C"
