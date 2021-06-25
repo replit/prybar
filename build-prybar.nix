@@ -32,6 +32,7 @@ in buildGoModule {
     # If a language requires this, it MUST expost a ${pkgName}.pc file in its `lib/pkg-config`
     # for pkg-config to detect it. Otherwise, we can't find the required flags.
     preBuild = ''
+        export CGO_LDFLAGS_ALLOW="-Wl,--compress-debug-sections=zlib"
         ${if setFlags then ''
             NIX_CFLAGS_COMPILE="$(pkg-config --cflags ${pkgName}) $NIX_CFLAGS_COMPILE"
             NIX_LDFLAGS="$(pkg-config --libs-only-L  ${pkgName}) $(pkg-config --libs-only-l  ${pkgName}) $NIX_LDFLAGS"

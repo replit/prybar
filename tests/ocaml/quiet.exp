@@ -1,5 +1,6 @@
 #!/usr/bin/expect -f
 
+exp_internal 1
 spawn ./prybar-ocaml -q -i
 match_max 100000
 expect -exact "--> "
