@@ -8,14 +8,13 @@ spawn ./prybar-clojure -i ./test_files/hello.clj
 match_max 100000
 expect -re "^${_}hello${_}\r
 ${_}Clojure${_}\r
-${_}--> $"
+${_}user--> $"
 
 # b is defined in ./test_files/hello.clj
-send -- "b\r"
-expect -re "^${_}b${_}\r
+send -- "hello/b\r"
+expect -re "^${_}hello/b${_}\r
 ${_}42${_}\r
-${_}--> $"
+${_}user--> $"
 
 send -- ""
 expect eof
-

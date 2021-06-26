@@ -1,3 +1,5 @@
+(require 'clojure.main)
+
 (def prybar-ps1 (System/getProperty "PRYBAR_PS1" "--> "))
 (def prybar-quiet? (System/getProperty "PRYBAR_QUIET" "false"))
 
@@ -5,7 +7,5 @@
   (println "Clojure" (clojure-version)))
 
 (clojure.main/repl :init #(apply require clojure.main/repl-requires)
-                   :prompt #(print prybar-ps1))
-(prn)
-(System/exit 0)
+                   :prompt #(printf "%s%s" (ns-name *ns*) prybar-ps1))
 

@@ -8,11 +8,11 @@ cd /tmp
 packages="
 
 # languages
-default-jre-headless
 emacs-nox
 liblua5.1-dev
 nodejs
 ocaml
+openjdk-11-jre-headless
 python-dev
 ruby-dev
 sqlite3
@@ -51,10 +51,17 @@ curl -sL https://deb.nodesource.com/setup_12.x | bash -
 apt-get install -y $(grep -v "^#" <<< "$packages")
 rm -rf /var/lib/apt/lists/*
 
-clojure_version=1.10.1.478
-wget "https://download.clojure.org/install/linux-install-${clojure_version}.sh"
-chmod +x "linux-install-${clojure_version}.sh"
-"./linux-install-${clojure_version}.sh"
+clj_cli_version=1.10.1.536
+wget "https://download.clojure.org/install/linux-install-${clj_cli_version}.sh"
+chmod +x "linux-install-${clj_cli_version}.sh"
+"./linux-install-${clj_cli_version}.sh"
+rm "linux-install-${clj_cli_version}.sh"
+# Trigger downloading of Clojure JARs now to avoid downloading them at runtime.
+clojure \
+    -Sdeps '{:deps {org.clojure/tools.namespace {:mvn/version "1.0.0"}} :paths ["src" "."]}' \
+    -Sforce \
+    -Sverbose \
+    --eval ''
 
 # The version in the Disco repos is out of date (1.0 series) and does
 # not expose the API we need.
