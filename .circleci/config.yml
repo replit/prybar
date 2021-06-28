@@ -21,7 +21,7 @@ jobs:
       - checkout
       - restore_cache:
           key: nix-store
-      - run: nix-build
+      - run: sudo nix-build
       - save_cache:
           key: nix-store
           when: always
