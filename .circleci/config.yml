@@ -17,14 +17,15 @@ jobs:
   nix_build:
     docker:
       - image: nixos/nix
-    environment:
-      NIX_STORE_DIR: $HOME/nix/store
-      NIX_STATE_DIR: $HOME/nix/var/nix
-      NIX_LOG_DIR: $HOME/nix/var/log/nix
     steps:
       - checkout
       - restore_cache:
           key: nix-store
+      - name: Setup Environment Variables
+          command: |
+            echo "export NIX_STORE_DIR=$HOME/nix/store" >> $BASH_ENV
+            echo "export NIX_STATE_DIR=$HOME/nix/var/nix" >> $BASH_ENV
+            echo "export NIX_LOG_DIR=$HOME/nix/var/log/nix" >> $BASH_ENV
       - run: nix-build
       - save_cache:
           key: nix-store
