@@ -14,6 +14,12 @@ jobs:
       - checkout
       - setup_remote_docker
       - run: make test-image
+  nix_build:
+    docker:
+      - image: nixos/nix
+    steps:
+      - checkout
+      - run: nix-build
   build_test_and_deploy:
     docker:
       - image: docker:18.09
@@ -40,6 +46,10 @@ workflows:
   ci:
     jobs:
       - build_and_test:
+          filters:
+            branches:
+              ignore: master
+      - nix_build:
           filters:
             branches:
               ignore: master
