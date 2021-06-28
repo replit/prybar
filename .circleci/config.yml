@@ -21,7 +21,8 @@ jobs:
       - checkout
       - restore_cache:
           key: nix-store
-      - name: Setup Environment Variables
+      - run:
+          name: Setup Environment Variables
           command: |
             echo "export NIX_STORE_DIR=$HOME/nix/store" >> $BASH_ENV
             echo "export NIX_STATE_DIR=$HOME/nix/var/nix" >> $BASH_ENV
