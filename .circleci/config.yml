@@ -22,7 +22,7 @@ jobs:
       - restore_cache:
           key: nix-store
       # Skip the julia tests since they break in CI
-      - run: mv ./tests/julia ./tests/julia_skip && nix-build
+      - run: chown -R $USER:$USER / && mv ./tests/julia ./tests/julia_skip && nix-build
       - save_cache:
           key: nix-store
           when: always
