@@ -21,14 +21,16 @@ jobs:
       - checkout
       - restore_cache:
           key: nix-store
-      - run:
-          name: Setup Environment Variables
-          command: |
-            echo "export NIX_STORE_DIR=$HOME/nix/store" >> $BASH_ENV
-            echo "export NIX_STATE_DIR=$HOME/nix/var/nix" >> $BASH_ENV
-            echo "export NIX_LOG_DIR=$HOME/nix/var/log/nix" >> $BASH_ENV
       # Skip the julia tests since they break in CI due to permission errors
-      - run: echo $NIX_STORE_DIR && mv ./tests/julia ./tests/julia_skip && nix-build
+      - run:
+          name: Run nix-build with env vars
+          command: |
+            export NIX_STORE_DIR=$HOME/nix/store
+            export NIX_STATE_DIR=$HOME/nix/var/nix
+            export NIX_LOG_DIR=$HOME/nix/var/log/nix
+            echo $NIX_STORE_DIR
+            mv ./tests/julia ./tests/julia_skip
+            nix-build
       - save_cache:
           key: nix-store
           when: always
