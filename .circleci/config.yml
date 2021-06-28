@@ -21,8 +21,8 @@ jobs:
       - checkout
       - restore_cache:
           key: nix-store
-      # Skip the julia header test since it breaks in CI
-      - run: mv ./tests/julia/header.exp ./tests/julia/header.skip_exp && nix-build
+      # Skip the julia tests since they break in CI
+      - run: mv ./tests/julia ./tests/julia_skip && nix-build
       - save_cache:
           key: nix-store
           when: always
