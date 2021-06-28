@@ -13,8 +13,10 @@ emacs-nox
 liblua5.1-dev
 nodejs
 ocaml
+ocaml-findlib
+opam
 python-dev
-ruby-dev
+ruby2.7-dev
 sqlite3
 tcl-dev
 
@@ -26,14 +28,9 @@ python3.8-dev
 bsdmainutils
 build-essential
 expect
-golang
 
 # things we link against
 libreadline-dev
-
-# needed for the version of libmozjs that we download
-libffi-dev
-libnspr4-dev
 
 # used during installation
 git
@@ -47,9 +44,16 @@ rlwrap
 export DEBIAN_FRONTEND=noninteractive
 apt-get update
 apt-get install -y curl
-curl -sL https://deb.nodesource.com/setup_12.x | bash -
+curl -sL https://deb.nodesource.com/setup_14.x | bash -
 apt-get install -y $(grep -v "^#" <<< "$packages")
 rm -rf /var/lib/apt/lists/*
+
+go_version=1.16.5
+wget "https://dl.google.com/go/go${go_version}.linux-amd64.tar.gz"
+tar -xvf "go${go_version}.linux-amd64.tar.gz"
+mv go /usr/local
+rm -f "go${go_version}.linux-amd64.tar.gz"
+rm -rf go
 
 clojure_version=1.10.1.478
 wget "https://download.clojure.org/install/linux-install-${clojure_version}.sh"
@@ -58,20 +62,13 @@ chmod +x "linux-install-${clojure_version}.sh"
 
 # The version in the Disco repos is out of date (1.0 series) and does
 # not expose the API we need.
-wget -nv https://julialang-s3.julialang.org/bin/linux/x64/1.4/julia-1.4.1-linux-x86_64.tar.gz
+wget -nv https://julialang-s3.julialang.org/bin/linux/x64/1.5/julia-1.5.4-linux-x86_64.tar.gz
 tar -xf *.tar.gz
 cp -R   julia-*/bin/*     /usr/bin/
 cp -R   julia-*/include/* /usr/include/
 cp -R   julia-*/lib/*     /usr/lib/
 cp -R   julia-*/share/*   /usr/share/
 rm -rf  julia-*
-
-# The version in the Disco repos is not compatible with cgo ("invalid
-# flag in pkg-config --cflags: -include").
-wget -nv https://launchpadlibrarian.net/309343863/libmozjs185-1.0_1.8.5-1.0.0+dfsg-7_amd64.deb
-wget -nv https://launchpadlibrarian.net/309343864/libmozjs185-dev_1.8.5-1.0.0+dfsg-7_amd64.deb
-dpkg -i *.deb
-rm *.deb
 
 wget -nv https://downloads.lightbend.com/scala/2.13.1/scala-2.13.1.tgz
 tar -xf *.tgz

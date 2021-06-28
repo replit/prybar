@@ -3,7 +3,7 @@ package main
 // USING_CGO
 
 /*
-#cgo pkg-config: ruby-2.5
+#cgo pkg-config: ruby-2.7
 #include "pry_ruby.h"
 */
 import "C"
