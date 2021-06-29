@@ -16,7 +16,7 @@ jobs:
       - run: make test-image
   nix_build:
     docker:
-      - image: nixpkgs/nix
+      - image: nixos/nix
     steps:
       - checkout
       - run: nix-build --store $HOME/nix
