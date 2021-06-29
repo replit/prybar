@@ -19,7 +19,7 @@ jobs:
       - image: nixos/nix
     steps:
       - checkout
-      - run: nix-build --store $HOME/nix
+      - run: nix-build
   build_test_and_deploy:
     docker:
       - image: docker:18.09
