@@ -16,7 +16,7 @@ jobs:
       - run: make test-image
   nix_build:
     docker:
-      - image: lnl7/nix:2.2.2
+      - image: nixorg/nix:circleci
     steps:
       - checkout
       - restore_cache:
