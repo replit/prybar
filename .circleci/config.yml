@@ -24,6 +24,7 @@ jobs:
       - run:
           name: Set-up env vars
           command: |
+            echo 'export $USER=nix' >> $BASH_ENV
             echo 'export NIX_STORE_DIR="$HOME/nix/store"' >> $BASH_ENV
             echo 'export NIX_STATE_DIR="$HOME/nix/var/nix"' >> $BASH_ENV
             echo 'export NIX_LOG_DIR="$HOME/nix/var/log/nix"' >> $BASH_ENV
