@@ -16,17 +16,26 @@ jobs:
       - run: make test-image
   nix_build:
     docker:
-      - image: nixos/nix
+      - image: nixpkgs/bash
     steps:
       - checkout
       - restore_cache:
           key: nix-store
-      - run: nix-build --store $HOME/nix-store
+      - run:
+          name: Set-up env vars
+          command: |
+            echo 'export NIX_STORE_DIR="$HOME/nix/store"' >> $BASH_ENV
+            echo 'export NIX_STATE_DIR="$HOME/nix/var/nix"' >> $BASH_ENV
+            echo 'export NIX_LOG_DIR="$HOME/nix/var/log/nix"' >> $BASH_ENV
+      - run:
+          name: Install Nix
+          command: curl -L https://nixos.org/nix/install | sh
+      - run: nix-build
       - save_cache:
           key: nix-store
           when: always
           paths:
-            - /nix
+            - $HOME/nix
   build_test_and_deploy:
     docker:
       - image: docker:18.09
