@@ -25,7 +25,7 @@ jobs:
           # Skipping the julia and closure tests for now since they break in CI
           name: Run nix build
           command: |
-            mv ./tests/julia/header.exp ./tests/julia/header.skip_exp
+            mv ./tests/julia ./tests/julia_skip
             mv ./tests/clojure ./tests/clojure_skip
             nix-build
       - save_cache:
