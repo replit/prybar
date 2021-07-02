@@ -55,7 +55,7 @@ in buildGoModule {
     checkPhase = ''
         runHook preCheck
 
-        ${bash}/bin/bash ./run_tests_language ${language} ${expect}/bin
+        "${bash}/bin/bash" "./run_tests_language" "${language}" "${expect}/bin"
 
         runHook postCheck
     '';
