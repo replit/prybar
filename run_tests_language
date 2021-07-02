@@ -4,6 +4,7 @@ stty cols 80
 stty rows 20
 
 language=$1
+expect_path=$2
 tests=$(find "./tests/${language}" -printf '%P\n')
 
 for t in ${tests}; do
@@ -16,6 +17,7 @@ for t in ${tests}; do
 
   echo -n "...    ${language} $name"
 
+  sed -i "s;#!/usr/bin/expect;#!${expect_path}/expect;" "./tests/${language}/$t"
   test_out=$(timeout 15 "./tests/${language}/$t" 2>&1)
   if [[ $? != 0 ]]; then
     echo -e "\n========== \"$t\" failed =========="

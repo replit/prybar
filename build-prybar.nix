@@ -45,7 +45,6 @@ in buildGoModule {
     # The test file expect the binary to be in the current directory rather than bin
     preCheck = ''
         cp $GOPATH/bin/${language} ./prybar-${language}
-        ln -s ${expect} /usr
     '';
 
     # Add all the dependencies to the check. Binaries should include the language interpreter/binaries
@@ -56,7 +55,7 @@ in buildGoModule {
     checkPhase = ''
         runHook preCheck
 
-        ${bash}/bin/bash ./run_tests_language ${language}
+        "${bash}/bin/bash" "./run_tests_language" "${language}" "${expect}/bin"
 
         runHook postCheck
     '';

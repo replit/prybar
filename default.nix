@@ -19,6 +19,7 @@ in
         buildInputs = [ julia ];
         versionArg = versionArg;
         setFlags = true;
+        binaries = [ pkgs.zlib ];
     };
 
     prybar-nodejs = buildPrybar { language = "nodejs"; binaries = [ pkgs.nodejs ]; versionArg = versionArg;  };

@@ -14,6 +14,25 @@ jobs:
       - checkout
       - setup_remote_docker
       - run: make test-image
+  nix_build:
+    docker:
+      - image: nixos/nix
+    steps:
+      - checkout
+      - restore_cache:
+          key: nix-store
+      - run:
+          # Skipping the julia and closure tests for now since they break in CI
+          name: Run nix build
+          command: |
+            mv ./tests/julia ./tests/julia_skip
+            mv ./tests/clojure ./tests/clojure_skip
+            nix-build
+      - save_cache:
+          key: nix-store
+          when: always
+          paths:
+            - /nix
   build_test_and_deploy:
     docker:
       - image: docker:18.09
@@ -40,6 +59,10 @@ workflows:
   ci:
     jobs:
       - build_and_test:
+          filters:
+            branches:
+              ignore: master
+      - nix_build:
           filters:
             branches:
               ignore: master
