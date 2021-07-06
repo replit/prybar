@@ -1,4 +1,4 @@
-#!/usr/bin/env expect
+#!/usr/bin/env -S expect -f
 
 spawn ./prybar-python2 -i -ps2 continuation
 match_max 100000
