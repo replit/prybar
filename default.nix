@@ -1,6 +1,14 @@
-# flake-compat makes Nix flakes compatible with the old Nix cli commands, like nix-build and nix-shell.
-(import (fetchTarball {
-  url =
-    "https://github.com/edolstra/flake-compat/archive/99f1c2157fba4bfe6211a321fd0ee43199025dbf.tar.gz";
-  sha256 = "0x2jn3vrawwv9xp15674wjz9pixwjyj3j771izayl962zziivbx2";
-}) { src = ./.; }).defaultNix
+{ system ? builtins.currentSystem }:
+
+let
+
+  # flake-compat makes Nix flakes compatible with the old Nix cli commands, like nix-build and nix-shell.
+  default = (import (fetchTarball {
+    url =
+      "https://github.com/edolstra/flake-compat/archive/99f1c2157fba4bfe6211a321fd0ee43199025dbf.tar.gz";
+    sha256 = "0x2jn3vrawwv9xp15674wjz9pixwjyj3j771izayl962zziivbx2";
+  }) { src = ./.; }).defaultNix;
+
+in
+
+builtins.getAttr system default.packages

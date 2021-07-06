@@ -2,7 +2,7 @@
   description = "A universal interpreter front-end";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs";
+    nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
     flake-utils.url = "github:numtide/flake-utils";
   };
 
@@ -33,24 +33,9 @@
             setFlags = true;
           };
 
-          prybar-julia = buildPrybar {
-            language = "julia";
-            buildInputs = [ julia ];
-            setFlags = true;
-            binaries = [ pkgs.zlib ];
-          };
-
           prybar-nodejs = buildPrybar {
             language = "nodejs";
             binaries = [ pkgs.nodejs ];
-          };
-
-          # The official Ruby packages is running ruby 2.7
-          prybar-ruby = buildPrybar {
-            language = "ruby";
-            buildInputs = [ pkgs.ruby ];
-            pkgName = "ruby-2.7";
-            setFlags = true;
           };
 
           prybar-python2 = buildPrybar {
@@ -100,7 +85,26 @@
             language = "tcl";
             buildInputs = [ pkgs.tcl ];
           };
-        };
+        }
+        # These packages have issues on macOS
+          // nixpkgs.lib.optionalAttrs (!pkgs.stdenv.isDarwin) {
+            prybar-julia = buildPrybar {
+              language = "julia";
+              buildInputs = [ julia ];
+              setFlags = true;
+              binaries = [ pkgs.zlib ];
+            };
+
+            # The official Ruby packages is running ruby 2.7
+            prybar-ruby = buildPrybar {
+              language = "ruby";
+              buildInputs = [ pkgs.ruby ];
+              pkgName = "ruby-2.7";
+              setFlags = true;
+            };
+
+          };
+
       });
 }
 

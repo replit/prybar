@@ -45,6 +45,10 @@ buildGoModule {
   checkPhase = ''
     runHook preCheck
 
+    # Nix unsets HOME but some tests rely on it, let's set it to whatever tmp dir the check
+    # is running in.
+    export HOME=$(echo pwd)
+
     "${bash}/bin/bash" "./run_tests_language" "${language}" "${expect}/bin"
 
     runHook postCheck

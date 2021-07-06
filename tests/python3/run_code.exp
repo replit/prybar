@@ -1,4 +1,4 @@
-#!/usr/bin/expect -f
+#!/usr/bin/env expect -f
 
 set timeout -1
 spawn ./prybar-python3 -c print('hello')
