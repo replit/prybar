@@ -1,4 +1,4 @@
-#!/usr/bin/env expect -f
+#!/usr/bin/env expect
 
 # red is currently nondeterministic
 exit 0

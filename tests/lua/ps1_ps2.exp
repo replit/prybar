@@ -1,4 +1,4 @@
-#!/usr/bin/env expect -f
+#!/usr/bin/env expect
 
 set timeout -1
 spawn ./prybar-lua -i -ps1 ps1 -ps2 ps2

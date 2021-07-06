@@ -1,4 +1,4 @@
-#!/usr/bin/env expect -f
+#!/usr/bin/env expect
 
 spawn ./prybar-clojure ./test_files/hello.clj
 expect eof
