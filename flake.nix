@@ -55,8 +55,7 @@
 
           prybar-clojure = buildPrybar {
             language = "clojure";
-            buildInputs = [ clojureWithCP ];
-            binaries = [ pkgs.jdk11_headless ];
+            binaries = [ clojureWithCP pkgs.jdk11_headless ];
           };
 
           prybar-elisp = buildPrybar { language = "elisp"; };
