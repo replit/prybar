@@ -1,9 +1,9 @@
-#!/usr/bin/expect -f
+#!/usr/bin/env -S expect -f
 
 set timeout -1
 spawn ./prybar-nodejs -i ./test_files/global_bug.js
 match_max 100000
-expect -re {Node v\d+\.\d+.\d+ on linux}
+expect -re {Node v\d+\.\d+.\d+ on (linux|darwin)}
 expect -exact "\[0m\[90mHint: hit control+c anytime to enter REPL.\[0m\r
 \[1G\[0J--> \[5G"
 send -- ""

@@ -21,13 +21,8 @@ jobs:
       - checkout
       - restore_cache:
           key: nix-store
-      - run:
-          # Skipping the julia and closure tests for now since they break in CI
-          name: Run nix build
-          command: |
-            mv ./tests/julia ./tests/julia_skip
-            mv ./tests/clojure ./tests/clojure_skip
-            nix-build
+      - run: apk add coreutils git
+      - run: nix-build
       - save_cache:
           key: nix-store
           when: always

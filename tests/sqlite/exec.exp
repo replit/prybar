@@ -1,4 +1,4 @@
-#!/usr/bin/expect -f
+#!/usr/bin/env -S expect -f
 
 spawn ./prybar-sqlite -c "select 1+1;"
 expect ^eof
