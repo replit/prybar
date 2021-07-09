@@ -10,7 +10,7 @@ buildGoModule {
 
   src = ./.;
 
-  inherit buildInputs;
+  buildInputs = buildInputs ++ binaries;
   nativeBuildInputs = [ pkg-config ];
 
   subPackages = [ "languages/${language}" ];
@@ -59,7 +59,12 @@ buildGoModule {
     rm -f ./prybar-${language}
   '';
 
-  postInstall = ''
+  postInstall = let
+    runtimePath = lib.makeBinPath binaries;
+  in ''
     mv $out/bin/${language} $out/bin/prybar-${language}
+
+    wrapProgram "$out/bin/prybar-${language}" \
+      --prefix PATH : ${runtimePath}
   '';
 }

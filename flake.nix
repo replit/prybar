@@ -28,7 +28,7 @@
         packages = {
           prybar-R = buildPrybar {
             language = "R";
-            buildInputs = [ pkgs.R ];
+            binaries = [ pkgs.R ];
             pkgName = "libR";
             setFlags = true;
           };
@@ -40,17 +40,17 @@
 
           prybar-python2 = buildPrybar {
             language = "python2";
-            buildInputs = [ pkgs.python2 ];
+            binaries = [ pkgs.python2 ];
           };
 
           prybar-python3 = buildPrybar {
             language = "python3";
-            buildInputs = [ pkgs.python3 ];
+            binaries = [ pkgs.python3 ];
           };
 
           prybar-lua = buildPrybar {
             language = "lua";
-            buildInputs = [ pkgs.lua5_1 pkgs.readline ];
+            binaries = [ pkgs.lua5_1 pkgs.readline ];
           };
 
           prybar-clojure = buildPrybar {
@@ -65,7 +65,7 @@
             language = "ocaml";
             # This has to be in the build inputs so it set-ups the library paths before the check phase
             # It will not be copied over to the final package.
-            buildInputs = [
+            binaries = [
               pkgs.opam
               pkgs.ocaml
               pkgs.ocamlPackages.findlib
@@ -83,7 +83,7 @@
 
           prybar-tcl = buildPrybar {
             language = "tcl";
-            buildInputs = [ pkgs.tcl ];
+            binaries = [ pkgs.tcl ];
           };
         }
         # These packages have issues on macOS
@@ -98,7 +98,7 @@
             # The official Ruby packages is running ruby 2.7
             prybar-ruby = buildPrybar {
               language = "ruby";
-              buildInputs = [ pkgs.ruby ];
+              binaries = [ pkgs.ruby ];
               pkgName = "ruby-2.7";
               setFlags = true;
             };
