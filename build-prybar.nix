@@ -11,7 +11,7 @@ buildGoModule {
   src = ./.;
 
   buildInputs = buildInputs ++ binaries;
-  nativeBuildInputs = [ pkg-config, wrapProgram ];
+  nativeBuildInputs = [ pkg-config wrapProgram ];
 
   subPackages = [ "languages/${language}" ];
 
