@@ -2,7 +2,7 @@
 , pkgName ? language }:
 
 { lib, buildGoModule, fetchFromGitHub, bash, expect, pkg-config, runCommand, git
-, python3, copyPathToStore, rev }:
+, python3, copyPathToStore, rev, wrapProgram }:
 
 buildGoModule {
   pname = "prybar-${language}";
@@ -11,7 +11,7 @@ buildGoModule {
   src = ./.;
 
   buildInputs = buildInputs ++ binaries;
-  nativeBuildInputs = [ pkg-config ];
+  nativeBuildInputs = [ pkg-config, wrapProgram ];
 
   subPackages = [ "languages/${language}" ];
 
