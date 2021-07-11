@@ -42,6 +42,7 @@ written in the host language which starts a Prybar-compatible REPL.
 | Javascript (spidermonkey) | ✔    | ✗               | ✗         | ✗    | ✗              | -          |
 | Julia                     | ✔    | ✗               | ✔         | ✔    | ✗              | ✔          |
 | Lua 5.1                   | ✔    | ✗               | ✔         | ✔    | ✗              | ✔          |
+| Lua 5.3                   | ✔    | ✗               | ✔         | ✔    | ✗              | ✔          |
 | OCaml                     | ✔    | ✔               | ✔         | ✔    | ✗              | ✔          |
 | Python 2.7                | ✔    | ✔               | ✔         | ✔    | ✔              | ✔          |
 | Python 3.x                | ✔    | ✔               | ✔         | ✔    | ✔              | ✔          |

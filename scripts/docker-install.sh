@@ -11,6 +11,7 @@ packages="
 default-jre-headless
 emacs-nox
 liblua5.1-dev
+liblua5.3-dev
 nodejs
 ocaml
 ocaml-findlib

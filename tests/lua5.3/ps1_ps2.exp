@@ -1,0 +1,18 @@
+#!/usr/bin/expect -f
+
+set timeout -1
+spawn ./prybar-lua5.3 -i -ps1 ps1 -ps2 ps2
+match_max 100000
+expect -exact "Lua 5.3.3  Copyright (C) 1994-2016 Lua.org, PUC-Rio\r
+ps1"
+send -- "a(\r"
+expect -exact "a(\r
+ps2"
+send -- ")\r"
+expect -exact ")\r
+stdin:1: attempt to call a nil value (global 'a')\r
+stack traceback:\r
+	stdin:1: in main chunk\r
+ps1"
+send -- ""
+expect eof
