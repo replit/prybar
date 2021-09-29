@@ -1,0 +1,13 @@
+#!/usr/bin/env -S expect -f
+set timeout -1
+set stty_init raw
+spawn ./run_no_pty ./prybar-nodejs -q -i
+match_max 100000
+expect -exact "--> "
+
+send -- "prompt('abc')\n"
+expect -exact "abc> "
+send -- "hello\n" 
+expect -exact "'hello'\n"
+send -- ".exit\n"
+expect eof

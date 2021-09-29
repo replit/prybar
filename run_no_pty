@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+stdin="/tmp/prybar_stdin"
+stdout="/tmp/prybar_stdout"
+stderr="/tmp/prybar_stderr"
+stdio=( $stdin $stdout $stderr )
+
+rm ${stdio[*]} 2>/dev/null
+mkfifo ${stdio[*]}
+
+cat <&0 >$stdin &
+cat $stdout >&1 &
+cat $stderr >&2 &
+sh -c "${*}" <$stdin 1>$stdout 2>$stderr
+
+rm ${stdio[*]}
