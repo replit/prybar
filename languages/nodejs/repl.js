@@ -3,6 +3,7 @@ const repl = require("repl");
 const path = require("path");
 const fs = require("fs");
 const vm = require("vm");
+const { isatty } = require('tty');
 const rl = require(path.join(
   process.cwd(),
   "prybar_assets",
@@ -16,7 +17,7 @@ if (!process.env.PRYBAR_QUIET) {
   console.log("Node " + process.version + " on " + process.platform);
 }
 
-const isTTY = process.stdin.isTTY;
+const isTTY = isatty(process.stdin.fd);
 
 // Red errors (if stdout is a TTY)
 function logError(msg) {

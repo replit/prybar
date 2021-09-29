@@ -58,13 +58,16 @@ function ensureRawMode(cb) {
 
   const previousRawMode = process.stdin.isRaw;
 
+  let ret;
+
   try {
     process.stdin.setRawMode(true);
-
-    return cb();
+    ret = cb();
   } finally {
     process.stdin.setRawMode(previousRawMode);
   }
+
+  return ret;
 }
 
 const delChar = "\x7f";
