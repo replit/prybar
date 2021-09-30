@@ -1,0 +1,18 @@
+#!/usr/bin/env -S expect -f
+
+set timeout -1
+spawn ./prybar-nodejs -i -q
+match_max 100000
+expect -exact "\[1G\[0J--> \[5G"
+
+send -- "confirm('abc')\r"
+expect -exact "confirm('abc')"
+expect -exact "abc \[y/n\]: "
+send -- "helo"
+send -- "y"
+expect -exact "y"
+expect -exact "true"
+
+# end of transmission
+send -- "\x04" 
+expect eof

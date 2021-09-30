@@ -3,11 +3,12 @@ const repl = require("repl");
 const path = require("path");
 const fs = require("fs");
 const vm = require("vm");
+const { isatty } = require('tty');
 const rl = require(path.join(
   process.cwd(),
   "prybar_assets",
   "nodejs",
-  "readline-sync.js"
+  "input-sync.js"
 ));
 const Module = require("module");
 
@@ -16,9 +17,15 @@ if (!process.env.PRYBAR_QUIET) {
   console.log("Node " + process.version + " on " + process.platform);
 }
 
-// Red errors.
+const isTTY = isatty(process.stdin.fd);
+
+// Red errors (if stdout is a TTY)
 function logError(msg) {
-  process.stdout.write("\u001b[0m\u001b[31m" + msg + "\u001b[0m");
+  if (isTTY) {
+    process.stdout.write(`\u001b[0m\u001b[31m${msg}\u001b[0m`);
+  } else {
+    process.stdout.write(msg);
+  }
 }
 
 // The nodejs repl operates in raw mode and does some funky stuff to
@@ -27,20 +34,17 @@ function pauseRepl() {
   if (!r) return;
 
   r.pause();
-  process.stdin.setRawMode(false);
 }
 
 // Forces raw mode and resumes the repl.
 function resumeRepl() {
   if (!r) return;
-
-  process.stdin.setRawMode(true);
   r.resume();
 }
 
 // Clear the line if it has anything on it.
 function clearLine() {
-  if (r && r.line) r.clearLine();
+  if (isTTY && r && r.line) r.clearLine();
 }
 
 // Adapted from the internal node repl code just a lot simpler and adds
@@ -87,9 +91,7 @@ global.prompt = (p) => {
   pauseRepl();
   clearLine();
 
-  let ret = rl.question(`${p}> `, {
-    hideEchoBack: false,
-  });
+  let ret = rl.question(`${p}> `);
 
   resumeRepl();
 
@@ -138,9 +140,11 @@ if (process.env.PRYBAR_CODE) {
   global.__dirname = path.dirname(mainPath);
   global.__filename = mainPath;
 
-  console.log(
-    "\u001b[0m\u001b[90mHint: hit control+c anytime to enter REPL.\u001b[0m"
-  );
+  if (isTTY) {
+    console.log(
+      "\u001b[0m\u001b[90mHint: hit control+c anytime to enter REPL.\u001b[0m"
+    );
+  }
 
   let script;
   try {

@@ -1,0 +1,23 @@
+#!/usr/bin/env -S expect -f
+
+set timeout -1
+spawn ./prybar-nodejs -i -q
+match_max 100000
+expect -exact "\[1G\[0J--> \[5G"
+
+send -- "prompt('abc')\r"
+expect -exact "prompt('abc')"
+expect -exact "abc> "
+send -- "helo"
+expect -exact "helo"
+# delete
+send -- "\x7f" 
+expect -exact "\b\[K"
+send -- "lo"
+expect -exact "lo"
+send -- "\r"
+expect -exact "\r\n"
+expect -exact "'hello'"
+# end of transmission
+send -- "\x04" 
+expect eof
