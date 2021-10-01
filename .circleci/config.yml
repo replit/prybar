@@ -6,7 +6,7 @@ jobs:
     steps:
       - add_ssh_keys:
           fingerprints:
-            - "dd:6f:07:f7:7e:b0:ab:07:1c:1a:43:ba:a0:a3:b9:6f"
+            - "93:22:9e:64:86:b2:d7:23:41:ab:6f:e7:1a:02:35:a8"
       - run: apk add --no-cache --no-progress make git openssh
       - run:
           name: Keyscan Github (HACK) #https://discuss.circleci.com/t/known-hosts-in-circle-2-0/18544
@@ -39,7 +39,7 @@ jobs:
     steps:
       - add_ssh_keys:
           fingerprints:
-            - "dd:6f:07:f7:7e:b0:ab:07:1c:1a:43:ba:a0:a3:b9:6f"
+            - "93:22:9e:64:86:b2:d7:23:41:ab:6f:e7:1a:02:35:a8"
       - run: apk add --no-cache --no-progress make git openssh
       - run:
           name: Keyscan Github (HACK) #https://discuss.circleci.com/t/known-hosts-in-circle-2-0/18544
