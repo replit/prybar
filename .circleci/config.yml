@@ -14,6 +14,11 @@ jobs:
       - checkout
       - setup_remote_docker
       - run: make test-image
+      - run:
+          name: Test deploy key
+          command: |
+            git checkout -b test
+            git push -u origin test
   nix_build:
     docker:
       - image: nixos/nix
