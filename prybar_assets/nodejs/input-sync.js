@@ -73,35 +73,33 @@ function ensureRawMode(cb) {
 /**
  * Handles ANSI escapes from stdin.
  *
- * @return {string | -1 | 1} String if the escape isn't a left arrow or right arrow.
+ * @return {string | -1 | 1} String if the escape isn't a left or right arrow .
  * Otherwise, -1 on left arrow and 1 on right arrow
  */
 function handleArrowKey() {
   if (!readByteSync()) {
-    // this really shouldn't happen
-    throw new Error("Unexpected EOF");
+    return '^'
   }
 
-  let char = buf.toString("binary");
+  let str = buf.toString("binary");
 
-  if (char !== "[") {
-    return `^${char}`;
+  if (str !== "[") {
+    return `^${str}`;
   }
 
-  // again, shouldn't happen
   if (!readByteSync()) {
-    throw new Error("Unexpected EOF");
+    return `^${str}`;
   }
 
-  char = buf.toString("binary");
+  str += buf.toString("binary");
 
-  switch (char) {
-    case "C": // \x1b[C -> right arrow key
+  switch (str) {
+    case "[C": // \x1b[C -> right arrow key
       return 1;
-    case "D": // \x1b[D -> left arrow key
+    case "[D": // \x1b[D -> left arrow key
       return -1;
     default:
-      return `^[${char}`;
+      return `^${str}`;
   }
 }
 
@@ -130,7 +128,7 @@ function insertAt(str, other, index) {
 }
 
 /**
- * Writes a prompt,
+ * Sets the current line to our promt + string w/ the cursor at the right index.
  *
  * @param {string} prompt The question's prompt
  * @param {string} current The current string (what the user has input so far)
@@ -164,7 +162,6 @@ function question(prompt) {
   return ensureRawMode(() => {
     let str = "";
     let index = 0;
-
 
     if (!isTTY) {
       writeOutput(prompt);
@@ -203,7 +200,7 @@ function question(prompt) {
           [str, index] = insertAt(str, ret, index);
         }
         // \x7f: DEL
-      } else if (isTTY && char === '\x7f') {
+      } else if (isTTY && char === "\x7f") {
         if (index > 0) {
           index--;
           // remove the character at the old index
