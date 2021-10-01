@@ -17,8 +17,8 @@ jobs:
       - run:
           name: Test deploy key
           command: |
-            git checkout -b test
-            git push -u origin test
+            git checkout -b "test_<< pipeline.number >>"
+            git push -u origin "test_<< pipeline.number >>"
   nix_build:
     docker:
       - image: nixos/nix
