@@ -4,6 +4,33 @@ const buf = Buffer.alloc(1);
 const isTTY = isatty(process.stdin.fd);
 
 /**
+ * The escape (excluding \x1b) to move the cursur right one.
+ *
+ * This is what the right arrow key translates to in raw mode.
+ */
+const cursorLeft = "[C";
+/**
+ * The escape (excluding \x1b) to move the cursur left one.
+ *
+ * This is what the left arrow key translates to in raw mode.
+ */
+const cursorRight = "[D";
+
+/**
+ * The ASCII character sent when the tty is in raw mode and backspace is pressed.
+ */
+const del = "\x7f";
+
+/**
+ * The ASCII characcter sent when the tty is in raw mode and Ctrl+C is pressed.
+ */
+const endOfText = "\x03";
+/**
+ * The ASCII character sent when the tty is in raw mode and Ctrl+D is pressed.
+ */
+const endOfTransmission = "\x04";
+
+/**
  * Reads a single byte from stdin to buf.
  * @return {boolean} Whether a byte was read or not (false on EOF)
  */
@@ -78,7 +105,7 @@ function ensureRawMode(cb) {
  */
 function handleArrowKey() {
   if (!readByteSync()) {
-    return '^'
+    return "^";
   }
 
   let str = buf.toString("binary");
@@ -94,9 +121,9 @@ function handleArrowKey() {
   str += buf.toString("binary");
 
   switch (str) {
-    case "[C": // \x1b[C -> right arrow key
+    case cursorRight:
       return 1;
-    case "[D": // \x1b[D -> left arrow key
+    case cursorLeft:
       return -1;
     default:
       return `^${str}`;
@@ -110,7 +137,7 @@ function handleArrowKey() {
  * @param {string} char The character read.
  */
 function checkForSigs(char) {
-  if (isTTY && (char === "\x03" || char === "\x04")) {
+  if (isTTY && (char === endOfText || char === endOfTransmission)) {
     process.exit();
   }
 }
@@ -128,6 +155,22 @@ function insertAt(str, other, index) {
 }
 
 /**
+ * The ANSI escape code used to clear the contents of the current line to the right
+ * of the cursor.
+ */
+const escapeClearLineRight = "\x1b[K";
+
+/**
+ * The escape used to move the cursor to a specific position in-line.
+ *
+ * @param {number} columnNum The position (starting at 1) in the current line which the cursor should be moved to.
+ *
+ */
+function escapeMoveCursorToColumn(columnNum) {
+  return `\x1b[${columnNum}G`;
+}
+
+/**
  * Sets the current line to our promt + string w/ the cursor at the right index.
  *
  * @param {string} prompt The question's prompt
@@ -141,14 +184,12 @@ function displayPromptAndStr(prompt, current, index) {
       // clear the rest of the line
       // EL (Erase in Line ): in this case, as no number is speciifed,
       // erases everything to the right of the cursor.
-      "\x1b[K" +
+      escapeClearLineRight +
       // write the prompt
       prompt +
       // write the string
       current +
-      // CHA (Cursor Horizontal Absolute): move cursor to column
-      // (starts at 1 for some reason)
-      `\x1b[${prompt.length + index + 1}G`
+      escapeMoveCursorToColumn(prompt.length + index + 1)
   );
 }
 
@@ -199,8 +240,7 @@ function question(prompt) {
         } else {
           [str, index] = insertAt(str, ret, index);
         }
-        // \x7f: DEL
-      } else if (isTTY && char === "\x7f") {
+      } else if (isTTY && char === del) {
         if (index > 0) {
           index--;
           // remove the character at the old index
