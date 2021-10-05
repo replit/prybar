@@ -8,13 +8,13 @@ const isTTY = isatty(process.stdin.fd);
  *
  * This is what the right arrow key translates to in raw mode.
  */
-const cursorLeft = "[C";
+const cursorRight = "[C";
 /**
  * The escape (excluding \x1b) to move the cursur left one.
  *
  * This is what the left arrow key translates to in raw mode.
  */
-const cursorRight = "[D";
+const cursorLeft = "[D";
 
 /**
  * The ASCII character sent when the tty is in raw mode and backspace is pressed.
