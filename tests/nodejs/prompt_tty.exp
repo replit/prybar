@@ -8,16 +8,28 @@ expect -exact "\[1G\[0J--> \[5G"
 send -- "prompt('abc')\r"
 expect -exact "prompt('abc')"
 expect -exact "abc> "
-send -- "helo"
-expect -exact "helo"
+send -- "makr"
+expect -exact "makr"
+
+# left arrow key
+send -- "\x1b\[D"
+expect -exact "makr"
+
 # delete
-send -- "\x7f" 
-expect -exact "\b\[K"
-send -- "lo"
-expect -exact "lo"
+send -- "\x7f"
+expect -exact "mar"
+
+# right arrow key
+send -- "\x1b\[C"
+expect -exact "mar"
+
+send -- "k"
+expect -exact "mark"
+
 send -- "\r"
 expect -exact "\r\n"
-expect -exact "'hello'"
+
+expect -exact "'mark'"
 # end of transmission
 send -- "\x04" 
 expect eof

@@ -1,0 +1,34 @@
+#!/usr/bin/env -S expect -f
+
+set timeout -1
+spawn ./prybar-nodejs -i -q
+match_max 100000
+expect -exact "\[1G\[0J--> \[5G"
+
+send -- "prompt('abc')\r"
+expect -exact "prompt('abc')"
+expect -exact "abc> "
+send -- "ab"
+
+# left arrow key (index 2/2)
+send -- "\x1b\[D"
+expect -exact "abc> ab"
+
+# up arrow key (should be escaped) (index 1/2)
+send -- "\x1b\[A"
+expect -exact "abc> a^\[Ab"
+
+# right arrow key + a few deletes to clear the prompt (index 6/6)
+send -- "\x1b\[C\x7f\x7f\x7f\x7f\x7f\x7f"
+
+# random escape that doesn't exist (should be escaped)
+send -- "\x1bfake escape"
+expect -exact "abc> ^fake escape"
+
+send -- "\r"
+expect -exact "\r\n"
+expect -exact "'^fake escape'"
+
+# end of transmission
+send -- "\x04" 
+expect eof

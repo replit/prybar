@@ -4,6 +4,33 @@ const buf = Buffer.alloc(1);
 const isTTY = isatty(process.stdin.fd);
 
 /**
+ * The escape (excluding \x1b) to move the cursur right one.
+ *
+ * This is what the right arrow key translates to in raw mode.
+ */
+const cursorRight = "[C";
+/**
+ * The escape (excluding \x1b) to move the cursur left one.
+ *
+ * This is what the left arrow key translates to in raw mode.
+ */
+const cursorLeft = "[D";
+
+/**
+ * The ASCII character sent when the tty is in raw mode and backspace is pressed.
+ */
+const del = "\x7f";
+
+/**
+ * The ASCII characcter sent when the tty is in raw mode and Ctrl+C is pressed.
+ */
+const endOfText = "\x03";
+/**
+ * The ASCII character sent when the tty is in raw mode and Ctrl+D is pressed.
+ */
+const endOfTransmission = "\x04";
+
+/**
  * Reads a single byte from stdin to buf.
  * @return {boolean} Whether a byte was read or not (false on EOF)
  */
@@ -70,8 +97,38 @@ function ensureRawMode(cb) {
   return ret;
 }
 
-const delChar = "\x7f";
-const escapeClearLineRight = "\x1b[K";
+/**
+ * Handles ANSI escapes from stdin.
+ *
+ * @return {string | -1 | 1} String if the escape isn't a left or right arrow .
+ * Otherwise, -1 on left arrow and 1 on right arrow
+ */
+function handleArrowKey() {
+  if (!readByteSync()) {
+    return "^";
+  }
+
+  let str = buf.toString("binary");
+
+  if (str !== "[") {
+    return `^${str}`;
+  }
+
+  if (!readByteSync()) {
+    return `^${str}`;
+  }
+
+  str += buf.toString("binary");
+
+  switch (str) {
+    case cursorRight:
+      return 1;
+    case cursorLeft:
+      return -1;
+    default:
+      return `^${str}`;
+  }
+}
 
 /**
  * Checks to see if the input character is what we get in raw mode for
@@ -80,9 +137,60 @@ const escapeClearLineRight = "\x1b[K";
  * @param {string} char The character read.
  */
 function checkForSigs(char) {
-  if (isTTY && (char === "\x03" || char === "\x04")) {
+  if (isTTY && (char === endOfText || char === endOfTransmission)) {
     process.exit();
   }
+}
+
+/**
+ * Writes a string at an index of another string, appending as needed.
+ *
+ * @param {string} str The base string
+ * @param {string} other The new string which is being written
+ * @param {number} index The index at which the new string should start at.
+ * @return {string} str with other written at index.
+ */
+function insertAt(str, other, index) {
+  return [str.slice(0, index) + other + str.slice(index), index + other.length];
+}
+
+/**
+ * The ANSI escape code used to clear the contents of the current line to the right
+ * of the cursor.
+ */
+const escapeClearLineRight = "\x1b[K";
+
+/**
+ * The escape used to move the cursor to a specific position in-line.
+ *
+ * @param {number} columnNum The position (starting at 1) in the current line which the cursor should be moved to.
+ *
+ */
+function escapeMoveCursorToColumn(columnNum) {
+  return `\x1b[${columnNum}G`;
+}
+
+/**
+ * Sets the current line to our promt + string w/ the cursor at the right index.
+ *
+ * @param {string} prompt The question's prompt
+ * @param {string} current The current string (what the user has input so far)
+ * @param {number} index The index that
+ */
+function displayPromptAndStr(prompt, current, index) {
+  writeTTYOutput(
+    // reset cursor position
+    "\r" +
+      // clear the rest of the line
+      // EL (Erase in Line ): in this case, as no number is speciifed,
+      // erases everything to the right of the cursor.
+      escapeClearLineRight +
+      // write the prompt
+      prompt +
+      // write the string
+      current +
+      escapeMoveCursorToColumn(prompt.length + index + 1)
+  );
 }
 
 /**
@@ -94,10 +202,14 @@ function checkForSigs(char) {
 function question(prompt) {
   return ensureRawMode(() => {
     let str = "";
+    let index = 0;
 
-    writeOutput(prompt);
+    if (!isTTY) {
+      writeOutput(prompt);
+    }
 
     for (;;) {
+      displayPromptAndStr(prompt, str, index);
       const didRead = readByteSync();
 
       if (!didRead) {
@@ -111,14 +223,31 @@ function question(prompt) {
         writeTTYOutput("\r\n");
 
         return str;
-      } else if (isTTY && char === delChar) {
-        if (str.length > 0) {
-          writeOutput("\b" + escapeClearLineRight);
-          str = str.slice(0, str.length - 1);
+      } else if (isTTY && char === "\x1b") {
+        const ret = handleArrowKey();
+
+        // if ret is a number, its the difference for the index
+        if (typeof ret === "number") {
+          // Only move the cursor if it will be in a valid position.
+          const newIndex = index + ret;
+          // the index can be equal to the strs length, if that's the case we're appending to the string.
+          if (newIndex >= 0 && newIndex <= str.length) {
+            index = newIndex;
+          }
+
+          // otherwise, the escape wasn't a left or right arrow key,
+          // meaning we got an escaped version of the code.
+        } else {
+          [str, index] = insertAt(str, ret, index);
+        }
+      } else if (isTTY && char === del) {
+        if (index > 0) {
+          index--;
+          // remove the character at the old index
+          str = str.slice(0, index) + str.slice(index + 1);
         }
       } else {
-        writeTTYOutput(buf);
-        str += char;
+        [str, index] = insertAt(str, char, index);
       }
     }
   });
