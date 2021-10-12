@@ -3,13 +3,10 @@ const repl = require("repl");
 const path = require("path");
 const fs = require("fs");
 const vm = require("vm");
-const { isatty } = require('tty');
-const rl = require(path.join(
-  process.cwd(),
-  "prybar_assets",
-  "nodejs",
-  "input-sync.js"
-));
+const { isatty } = require("tty");
+const assets_dir =
+  process.env.PRYBAR_ASSETS_DIR || path.join(process.cwd(), "prybar_assets");
+const rl = require(path.join(assets_dir, "nodejs", "input-sync.js"));
 const Module = require("module");
 
 let r;
