@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 stdin="/tmp/prybar_stdin"
 stdout="/tmp/prybar_stdout"
 stderr="/tmp/prybar_stderr"
