@@ -1,17 +1,16 @@
-const util = require("util");
-const repl = require("repl");
-const path = require("path");
-const fs = require("fs");
-const vm = require("vm");
-const { isatty } = require("tty");
-const assets_dir =
-  process.env.PRYBAR_ASSETS_DIR || path.join(process.cwd(), "prybar_assets");
-const rl = require(path.join(assets_dir, "nodejs", "input-sync.js"));
-const Module = require("module");
+const util = require('util');
+const repl = require('repl');
+const path = require('path');
+const fs = require('fs');
+const vm = require('vm');
+const { isatty } = require('tty');
+const assets_dir = process.env.PRYBAR_ASSETS_DIR || path.join(process.cwd(), 'prybar_assets');
+const rl = require(path.join(assets_dir, 'nodejs', 'input-sync.js'));
+const Module = require('module');
 
 let r;
 if (!process.env.PRYBAR_QUIET) {
-  console.log("Node " + process.version + " on " + process.platform);
+  console.log('Node ' + process.version + ' on ' + process.platform);
 }
 
 const isTTY = isatty(process.stdin.fd);
@@ -51,17 +50,15 @@ function handleError(e) {
     r.lastError = e;
   }
 
-  if (e && typeof e === "object" && e.stack && e.name) {
-    if (e.name === "SyntaxError") {
-      e.stack = e.stack
-        .replace(/^repl:\d+\r?\n/, "")
-        .replace(/^\s+at\s.*\n?/gm, "");
+  if (e && typeof e === 'object' && e.stack && e.name) {
+    if (e.name === 'SyntaxError') {
+      e.stack = e.stack.replace(/^repl:\d+\r?\n/, '').replace(/^\s+at\s.*\n?/gm, '');
     }
 
     logError(e.stack);
   } else {
     // For some reason needs a newline to flush.
-    logError("Thrown: " + r.writer(e) + "\n");
+    logError('Thrown: ' + r.writer(e) + '\n');
   }
 
   if (r) {
@@ -78,9 +75,9 @@ function start(context) {
   });
 
   // remove the internal error and ours for red etc.
-  r._domain.removeListener("error", r._domain.listeners("error")[0]);
-  r._domain.on("error", handleError);
-  process.on("uncaughtException", handleError);
+  r._domain.removeListener('error', r._domain.listeners('error')[0]);
+  r._domain.on('error', handleError);
+  process.on('uncaughtException', handleError);
 }
 
 global.alert = console.log;
@@ -123,10 +120,10 @@ if (process.env.PRYBAR_CODE) {
   }
 } else if (process.env.PRYBAR_FILE) {
   const mainPath = path.resolve(process.env.PRYBAR_FILE);
-  const main = fs.readFileSync(mainPath, "utf-8");
+  const main = fs.readFileSync(mainPath, 'utf-8');
   const module = new Module(mainPath, null);
 
-  module.id = ".";
+  module.id = '.';
   module.filename = mainPath;
   module.paths = Module._nodeModulePaths(path.dirname(mainPath));
 
@@ -138,9 +135,7 @@ if (process.env.PRYBAR_CODE) {
   global.__filename = mainPath;
 
   if (isTTY) {
-    console.log(
-      "\u001b[0m\u001b[90mHint: hit control+c anytime to enter REPL.\u001b[0m"
-    );
+    console.log('\u001b[0m\u001b[90mHint: hit control+c anytime to enter REPL.\u001b[0m');
   }
 
   let script;
@@ -165,14 +160,14 @@ if (process.env.PRYBAR_CODE) {
 
     module.loaded = true;
 
-    if (typeof res !== "undefined") {
+    if (typeof res !== 'undefined') {
       console.log(util.inspect(res, { colors: true }));
     }
   }
 
   if (process.env.PRYBAR_INTERACTIVE) {
-    process.once("SIGINT", () => start());
-    process.once("beforeExit", () => start());
+    process.once('SIGINT', () => start());
+    process.once('beforeExit', () => start());
   }
 } else if (process.env.PRYBAR_INTERACTIVE) {
   start();
