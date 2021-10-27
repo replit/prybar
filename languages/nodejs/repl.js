@@ -68,7 +68,7 @@ function handleError(e) {
   }
 }
 
-function start(context) {
+function startRepl() {
   r = repl.start({
     prompt: process.env.PRYBAR_PS1,
     useGlobal: true,
@@ -108,17 +108,7 @@ global.confirm = (q) => {
   return ret;
 };
 
-if (process.env.PRYBAR_CODE) {
-  vm.runInThisContext(process.env.PRYBAR_CODE);
-  if (process.env.PRYBAR_INTERACTIVE) {
-    start();
-  }
-} else if (process.env.PRYBAR_EXP) {
-  console.log(vm.runInThisContext(process.env.PRYBAR_EXP));
-  if (process.env.PRYBAR_INTERACTIVE) {
-    start();
-  }
-} else if (process.env.PRYBAR_FILE) {
+if (process.env.PRYBAR_FILE) {
   const mainPath = path.resolve(process.env.PRYBAR_FILE);
   const main = fs.readFileSync(mainPath, 'utf-8');
   const module = new Module(mainPath, null);
@@ -166,9 +156,20 @@ if (process.env.PRYBAR_CODE) {
   }
 
   if (process.env.PRYBAR_INTERACTIVE) {
-    process.once('SIGINT', () => start());
-    process.once('beforeExit', () => start());
+    process.once('SIGINT', () => startRepl());
+    process.once('beforeExit', () => startRepl());
   }
-} else if (process.env.PRYBAR_INTERACTIVE) {
-  start();
+} else {
+  const code = process.env.PRYBAR_CODE || process.env.PRYBAR_EXP;
+
+  if (code) {
+    const result = vm.runInThisContext(code);
+    if (process.env.PRYBAR_EXP) {
+      console.log(result);
+    }
+  }
+
+  if (process.env.PRYBAR_INTERACTIVE) {
+    startRepl();
+  }
 }
