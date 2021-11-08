@@ -1,3 +1,4 @@
+// Make sure that the module has the right values
 console.assert(module.id === '.')
 console.assert(Object.keys(module.exports).length === 0)
 console.assert(module.parent === null)

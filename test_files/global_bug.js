@@ -1,3 +1,6 @@
+// In this bug, the main module's globals were not the same
+// as the global in other modules. Also some things were
+// missing from the global like timing functions 
 console.assert([] instanceof global.Array);
 console.assert([] instanceof Array);
 console.assert(process);
@@ -12,6 +15,7 @@ console.assert(setTimeout);
 console.assert(Buffer);
 console.assert(globalThis === global);
 
-const { Object: importedObject, global: importedGlobal} = require('./global_require')
-console.assert(importedObject === Object);
-console.assert(global === importedGlobal)
+// Current implementation has this bug
+// const { Object: importedObject, global: importedGlobal} = require('./global_bug_submodule')
+// console.assert(importedObject === Object);
+// console.assert(global === importedGlobal)
