@@ -16,7 +16,20 @@ import (
 	"golang.org/x/sys/unix"
 )
 
-// parts of this will probably break when we upgrade node
+// There's a good chance parts of this break if we upgrade node.
+// This is probably just a slight change to escape codes which human eyes won't see.
+// If it does happen, all you need to do to fix it is:
+//
+// 1. open a repl the same way that the test would.
+// 2. simulate the  test.  Make sure everything looks like it's suppposed to.
+// 3. If everything looks OK, it's probably fine to just copy + paste the output from "Received: "
+//    directly into the test's expected output.
+//
+// Some of the particular things to check are:
+// - prompt / tab suggestions (though this isn't currently tested, it hopefully will be in the future)
+// - preview (should evaluate any expression which can't possibly have any side effects and display a truncated version of it below the prompt)
+// - results of expressions - every line should be evaulated, with the result of that line being printed to stdout
+// - any errors should be displayed in red.
 
 var prybarAssetsPath string
 
@@ -45,17 +58,10 @@ func getBasicArgs(isQuiet, isInteractive bool) []string {
 
 func getCodeArgs(
 	isQuiet,
-	isInteractive,
-	shouldPrintResults bool,
+	isInteractive bool,
 	code string,
 ) []string {
-	args := getBasicArgs(isQuiet, isInteractive)
-
-	if shouldPrintResults {
-		return append(args, "-e", code)
-	} else {
-		return append(args, "-c", code)
-	}
+	return append(getBasicArgs(isQuiet, isInteractive), "-c", code)
 }
 
 func getFileArgs(t *testing.T, isQuiet, isInteractive bool, fileContent string) []string {
@@ -495,7 +501,7 @@ a + b + c
 	}
 }
 
-func TestSimple(t *testing.T) {
+func TestREPL(t *testing.T) {
 	const code = `
 const str = 'Hello, World!';
 const a = 5;
@@ -507,7 +513,7 @@ class MyClass {}
 	for _, info := range [...]testInfo{
 		{
 			name: "string",
-			args: getCodeArgs(true, true, false, code),
+			args: getCodeArgs(true, true, code),
 		},
 		{
 			name:   "file",
@@ -535,8 +541,3 @@ class MyClass {}
 	}
 
 }
-
-// TO TEST:
-// local variables + interracting with existing ones
-// preview logic, results should be displayed properly if possible
-//
