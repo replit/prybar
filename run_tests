@@ -25,3 +25,6 @@ for t in ${tests}; do
   echo -ne '\r'
   echo -e "      \e[32m✓\e[0m $name"
 done
+
+go test ./tests/nodejs
+

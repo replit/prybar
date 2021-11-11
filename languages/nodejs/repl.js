@@ -1,13 +1,60 @@
-const util = require("util");
 const repl = require("repl");
 const path = require("path");
-const fs = require("fs");
-const vm = require("vm");
 const { isatty } = require("tty");
 const assets_dir =
   process.env.PRYBAR_ASSETS_DIR || path.join(process.cwd(), "prybar_assets");
+/**
+ * @type {import("../../prybar_assets/nodejs/input-sync")}
+ */
 const rl = require(path.join(assets_dir, "nodejs", "input-sync.js"));
-const Module = require("module");
+/**
+ * @type {import("../../prybar_assets/nodejs/module-context-hook")}
+ */
+const { runCode, runModule, getRepl, getEvalFunc } = require(path.join(
+  assets_dir,
+  "nodejs",
+  "module-context-hook.js"
+));
+
+let isInReplDomain = false;
+
+// imports to builtin modules don't get added to require.cache.
+const prybarFilenames = Object.keys(require.cache);
+
+for (const filename of prybarFilenames) {
+  delete require.cache[filename];
+}
+
+Error.prepareStackTrace = function prepareStackTrace(error, callSites) {
+  if (isInReplDomain) {
+    isInReplDomain = false;
+    // this snippet is copied from the default handler of errors in the nodejs repl.
+
+    // Search from the bottom of the call stack to
+    // find the first frame with a null function name
+    callSites.reverse();
+
+    const idx = callSites.findIndex(
+      (frame) => frame.getFunctionName() === null
+    );
+    // If found, get rid of it and everything below it
+    callSites = callSites.slice(idx + 1);
+
+    callSites.reverse();
+  }
+
+  const firstInternalFileIndex = callSites.findIndex((site) =>
+    prybarFilenames.includes(site.getFileName())
+  );
+
+  callSites = callSites.slice(0, firstInternalFileIndex);
+
+  return callSites.length > 0
+    ? `${error.toString()}\n    at ${callSites.join("\n    at ")}`
+    : error.toString();
+};
+
+const isInterractive = Boolean(process.env.PRYBAR_INTERACTIVE);
 
 let r;
 if (!process.env.PRYBAR_QUIET) {
@@ -18,10 +65,15 @@ const isTTY = isatty(process.stdin.fd);
 
 // Red errors (if stdout is a TTY)
 function logError(msg) {
+  
   if (isTTY) {
     process.stdout.write(`\u001b[0m\u001b[31m${msg}\u001b[0m`);
   } else {
     process.stdout.write(msg);
+  }
+
+  if (!msg.endsWith("\n")) {
+    process.stdout.write('\n');
   }
 }
 
@@ -47,6 +99,7 @@ function clearLine() {
 // Adapted from the internal node repl code just a lot simpler and adds
 // red errors (see https://bit.ly/2FRM86S)
 function handleError(e) {
+  isInReplDomain = true;
   if (r) {
     r.lastError = e;
   }
@@ -61,7 +114,7 @@ function handleError(e) {
     logError(e.stack);
   } else {
     // For some reason needs a newline to flush.
-    logError("Thrown: " + r.writer(e) + "\n");
+    logError("Thrown: " + r.writer(e));
   }
 
   if (r) {
@@ -71,14 +124,18 @@ function handleError(e) {
   }
 }
 
-function start(context) {
-  r = repl.start({
-    prompt: process.env.PRYBAR_PS1,
-    useGlobal: true,
-  });
+function start() {
+  /** @type { repl.REPLServer} */
+  r =
+    getRepl() ||
+    repl.start({
+      useGlobal: true,
+      prompt: process.env.PRYBAR_PS1,
+    });
 
   // remove the internal error and ours for red etc.
   r._domain.removeListener("error", r._domain.listeners("error")[0]);
+
   r._domain.on("error", handleError);
   process.on("uncaughtException", handleError);
 }
@@ -112,68 +169,31 @@ global.confirm = (q) => {
 };
 
 if (process.env.PRYBAR_CODE) {
-  vm.runInThisContext(process.env.PRYBAR_CODE);
-  if (process.env.PRYBAR_INTERACTIVE) {
+  try {
+    runCode(process.env.PRYBAR_CODE, isInterractive);
+  } catch (err) {
+    handleError(err);
+  }
+
+  if (isInterractive) {
     start();
   }
 } else if (process.env.PRYBAR_EXP) {
-  console.log(vm.runInThisContext(process.env.PRYBAR_EXP));
-  if (process.env.PRYBAR_INTERACTIVE) {
-    start();
+  try {
+    console.log(runCode(process.env.PRYBAR_EXP, false));
+  } catch (err) {
+    handleError(err);
   }
 } else if (process.env.PRYBAR_FILE) {
-  const mainPath = path.resolve(process.env.PRYBAR_FILE);
-  const main = fs.readFileSync(mainPath, "utf-8");
-  const module = new Module(mainPath, null);
-
-  module.id = ".";
-  module.filename = mainPath;
-  module.paths = Module._nodeModulePaths(path.dirname(mainPath));
-
-  process.mainModule = module;
-
-  global.module = module;
-  global.require = module.require.bind(module);
-  global.__dirname = path.dirname(mainPath);
-  global.__filename = mainPath;
-
-  if (isTTY) {
-    console.log(
-      "\u001b[0m\u001b[90mHint: hit control+c anytime to enter REPL.\u001b[0m"
-    );
-  }
-
-  let script;
   try {
-    script = vm.createScript(main, {
-      filename: mainPath,
-      displayErrors: false,
-    });
-  } catch (e) {
-    handleError(e);
+    runModule(process.env.PRYBAR_FILE, isInterractive);
+  } catch (err) {
+    handleError(err);
   }
 
-  if (script) {
-    let res;
-    try {
-      res = script.runInThisContext({
-        displayErrors: false,
-      });
-    } catch (e) {
-      handleError(e);
-    }
-
-    module.loaded = true;
-
-    if (typeof res !== "undefined") {
-      console.log(util.inspect(res, { colors: true }));
-    }
+  if (isInterractive) {
+    start();
   }
-
-  if (process.env.PRYBAR_INTERACTIVE) {
-    process.once("SIGINT", () => start());
-    process.once("beforeExit", () => start());
-  }
-} else if (process.env.PRYBAR_INTERACTIVE) {
+} else if (isInterractive) {
   start();
 }
