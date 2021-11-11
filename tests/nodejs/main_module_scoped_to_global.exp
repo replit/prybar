@@ -1,11 +1,10 @@
 #!/usr/bin/expect -f
 
 set timeout -1
-spawn ./prybar-nodejs -i ./test_files/hello.js
+spawn ./prybar-nodejs -i ./test_files/main_module_scoped_to_global.js
 match_max 100000
 expect -re {Node v\d+\.\d+.\d+ on (linux|darwin)}
-expect -exact "hello\r
-\[32m'hello'\[39m\r
+expect -exact "{}\r
 \[0m\[90mHint: hit control+c anytime to enter REPL.\[0m\r
 \[1G\[0J--> \[5G"
 send -- ""
