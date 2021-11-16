@@ -16,8 +16,6 @@ const { runCode, runModule, getRepl, getEvalFunc } = require(path.join(
   "module-context-hook.js"
 ));
 
-let isInReplDomain = false;
-
 // imports to builtin modules don't get added to require.cache.
 const prybarFilenames = Object.keys(require.cache);
 
@@ -26,28 +24,37 @@ for (const filename of prybarFilenames) {
 }
 
 Error.prepareStackTrace = function prepareStackTrace(error, callSites) {
-  if (isInReplDomain) {
-    isInReplDomain = false;
-    // this snippet is copied from the default handler of errors in the nodejs repl.
+  // this logic is sourced from the internal repl error handler
 
-    // Search from the bottom of the call stack to
-    // find the first frame with a null function name
-    callSites.reverse();
+  // Search from the bottom of the call stack to
+  // find the first frame with a null function name
+  callSites.reverse();
 
-    const idx = callSites.findIndex(
-      (frame) => frame.getFunctionName() === null
-    );
+  const idx = callSites.findIndex((frame) => frame.getFunctionName() === null);
+  const domainIndex = callSites.findIndex(
+    (site) => site.getFileName() === "domain.js"
+  );
+
+  if (domainIndex !== -1 && domainIndex < idx) {
     // If found, get rid of it and everything below it
-    callSites = callSites.slice(idx + 1);
-
-    callSites.reverse();
+    callSites = callSites.slice(idx);
   }
 
-  const firstInternalFileIndex = callSites.findIndex((site) =>
+  callSites.reverse();
+
+  const lowestPrybarFileIndex = callSites.findIndex((site) =>
     prybarFilenames.includes(site.getFileName())
   );
 
-  callSites = callSites.slice(0, firstInternalFileIndex);
+  callSites = callSites.slice(0, lowestPrybarFileIndex);
+
+  if (!(error instanceof Error)) {
+    const tmp = new Error();
+
+    tmp.message = error.message;
+    tmp.name = error.name;
+    error = tmp;
+  }
 
   return callSites.length > 0
     ? `${error.toString()}\n    at ${callSites.join("\n    at ")}`
@@ -65,7 +72,6 @@ const isTTY = isatty(process.stdin.fd);
 
 // Red errors (if stdout is a TTY)
 function logError(msg) {
-  
   if (isTTY) {
     process.stdout.write(`\u001b[0m\u001b[31m${msg}\u001b[0m`);
   } else {
@@ -73,7 +79,7 @@ function logError(msg) {
   }
 
   if (!msg.endsWith("\n")) {
-    process.stdout.write('\n');
+    process.stdout.write("\n");
   }
 }
 
@@ -99,7 +105,6 @@ function clearLine() {
 // Adapted from the internal node repl code just a lot simpler and adds
 // red errors (see https://bit.ly/2FRM86S)
 function handleError(e) {
-  isInReplDomain = true;
   if (r) {
     r.lastError = e;
   }
@@ -186,6 +191,12 @@ if (process.env.PRYBAR_CODE) {
   }
 } else if (process.env.PRYBAR_FILE) {
   try {
+    if (isTTY && process.env.PRYBAR_INTERACTIVE) {
+      console.log(
+        "\u001b[0m\u001b[90mHint: hit control+c anytime to enter REPL.\u001b[0m"
+      );
+    }
+
     runModule(process.env.PRYBAR_FILE, isInterractive);
   } catch (err) {
     handleError(err);

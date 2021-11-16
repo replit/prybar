@@ -5,6 +5,6 @@ spawn ./prybar-nodejs -i -q
 match_max 100000
 expect -exact "\[1G\[0J--> \[5G"
 send -- "x\r"
-expect -re "ReferenceError: x is not defined\r"
+expect -e "\[31mReferenceError: x is not defined\[0m\r"
 send -- ""
 expect eof

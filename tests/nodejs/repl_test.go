@@ -493,6 +493,21 @@ a + b + c
 \x1b[1G\x1b[0J--> \x1b[5G
 `),
 		},
+		{
+			name:  "direct console.trace",
+			input: "console.trace('Hello')\n",
+
+			// (prompt) `obj = 23`
+			// (trace) `Trace: Hello`
+			// (result) `23`
+			// (prompt)
+			expected: unescapeExpectedOutput(`
+\x1b[1G\x1b[0J--> \x1b[5Gconsole.trace('Hello')
+Trace: Hello
+\x1b[90mundefined\x1b[39m
+\x1b[1G\x1b[0J--> \x1b[5G
+`),
+		},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			tc.run(t, info)

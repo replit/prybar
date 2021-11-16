@@ -5,7 +5,7 @@ stty rows 20
 
 language=$1
 expect_path=$2
-tests=$(find "./tests/${language}" -printf '%P\n')
+tests=$(find "./tests/${language}" ! -name '*.go' -printf '%P\n')
 
 for t in ${tests}; do
   if [[ $t != *.exp ]]; then
@@ -22,9 +22,16 @@ for t in ${tests}; do
   if [[ $? != 0 ]]; then
     echo -e "\n========== \"$t\" failed =========="
     echo "$test_out"
-    exit 1;
+    exit 1
   fi
 
   echo -ne '\r'
   echo -e "      \e[32m✓\e[0m $name"
 done
+
+
+
+if [[ $language == 'nodejs' ]]; then 
+  echo running go tests
+  go test ./tests/nodejs
+fi
