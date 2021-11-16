@@ -337,6 +337,23 @@ a + b + c
 			// (prompt) `obj = 23`
 			expected: "\x1b[1G\x1b[0J--> \x1b[5Gobj = 23",
 		},
+		{
+			name: "displays the cached value of a local variable",
+			input: trimNewlines(`
+setValue(2);
+value
+`),
+			// (prompt) `setValue(2);`
+			// (result) `undefined`
+			// (prompt) `value`
+			// (preview) `1`
+			expected: unescapeExpectedOutput(`
+\x1b[1G\x1b[0J--> \x1b[5GsetValue(2);
+\x1b[90mundefined\x1b[39m
+\x1b[1G\x1b[0J--> \x1b[5Gvalue
+\x1b[90m1\x1b[39m\x1b[10G\x1b[1A
+`),
+		},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			tc.run(t, info)
@@ -508,6 +525,27 @@ Trace: Hello
 \x1b[1G\x1b[0J--> \x1b[5G
 `),
 		},
+
+		{
+			name: "gets the latest value of a variable",
+			input: trimNewlines(`
+setValue(2);
+value
+
+`),
+			// (prompt) `setValue(2);`
+			// (result) `undefined`
+			// (prompt) `value`
+			// (result) `2`
+			// (prompt)
+			expected: unescapeExpectedOutput(`
+\x1b[1G\x1b[0J--> \x1b[5GsetValue(2);
+\x1b[90mundefined\x1b[39m
+\x1b[1G\x1b[0J--> \x1b[5Gvalue
+\x1b[33m2\x1b[39m
+\x1b[1G\x1b[0J--> \x1b[5G
+`),
+		},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			tc.run(t, info)
@@ -523,6 +561,12 @@ const a = 5;
 global.b = 32;
 let obj = { abc: 'def' };
 class MyClass {}
+
+let value = 1;
+
+function setValue(newValue) {
+	value = 2;
+}
 `
 
 	for _, info := range [...]testInfo{

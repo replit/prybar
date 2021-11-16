@@ -143,6 +143,7 @@ function start() {
 
   r._domain.on("error", handleError);
   process.on("uncaughtException", handleError);
+  return false;
 }
 
 global.alert = console.log;

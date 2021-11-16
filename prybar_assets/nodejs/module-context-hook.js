@@ -95,6 +95,8 @@ function hasOwnProperty(obj, prop) {
   return Object.hasOwnProperty.call(obj, prop);
 }
 
+let isPreview = false;
+
 /**
  * The source of the file which require appended the init hook too, if any.
  * @type {string | null}
@@ -220,234 +222,242 @@ function runCode(code, isInterractive) {
   return require("./runCode");
 }
 
+const kWriteToConsole = Object.getOwnPropertySymbols(console).find(
+  (v) => v.description === "kWriteToConsole"
+);
+const kColorMode = Object.getOwnPropertySymbols(console).find(
+  (v) => v.description === "kColorMode"
+);
+function hookConsole(fn) {
+  const old = [console[kWriteToConsole], console[kColorMode]];
+  console[kWriteToConsole] = (_, str) => {
+    require("fs").appendFileSync("logs.txt", str + "\n");
+  };
+
+  console[kColorMode] = false;
+
+  try {
+    fn();
+  } finally {
+    [console[kWriteToConsole], console[kColorMode]] = old;
+  }
+}
+
 /**
  * If available, returns a repl in the context of executed code or module.
  *
  * @returns {nodeRepl.REPLServer | null} A vm context if the repl init function was called; otherwise null.
  */
 function getRepl() {
-  
   if (doEval === null) {
-    return null
+    return null;
   }
 
   /**
    * A list of variables referenced from the hooked module.  This should include all locals, and
    * will also end up including any referenced globals.
    */
-   const locals = {};
+  let locals = {};
 
-   const variableMatches = hookedFileSource.match(variableLikeRegex);
-   if (variableMatches) {
-     for (const maybeVariable of variableMatches) {
-       let value;
- 
-       try {
-         value = doEval(maybeVariable);
- 
-         try {
-           // asserts that the variable isn't a constant
-           doEval(`${maybeVariable}=${maybeVariable}`);
- 
-           Reflect.defineProperty(locals, maybeVariable, {
-             value,
-             writeable: true,
-             enumerable: true,
-             configurable: false,
-           });
-         } catch (err) {
-           // can't write to constants
-           if (err instanceof TypeError) {
-             Reflect.defineProperty(locals, maybeVariable, {
-               value,
-               writeable: false,
-               enumerable: true,
-               configurable: false,
-             });
-             continue;
-           }
- 
-           throw err;
-         }
-       } catch (err) {
-         if (err instanceof ReferenceError || err instanceof SyntaxError) {
-           continue;
-         }
- 
-         throw err;
-       }
-     }
-   }
- 
-   for (const moduleVariable of moduleVariables) {
-     if (!hasOwnProperty(locals, moduleVariable)) {
-       Object.defineProperty(locals, moduleVariable, {
-         writable: true,
-         configurable: true,
-         value: doEval(moduleVariable),
-       });
-     }
-   }
- 
-   repl = nodeRepl.start({
-     prompt: process.env.PRYBAR_PS1,
-   });
- 
-   const replContext = new Proxy(
-     repl.context,
-     {
-       // Returns a list of all properties of the proxy (enumerable or not).
-       // https://tc39.es/ecma262/multipage/ordinary-and-exotic-objects-behaviours.html#sec-proxy-object-internal-methods-and-internal-slots-ownpropertykeys
-       ownKeys(ctx) {
-         return Array.from(
-           new Set(
-             Reflect.ownKeys(global).concat(
-               Reflect.ownKeys(locals),
-               Reflect.ownKeys(ctx)
-             )
-           )
-         );
-       },
-       // Trap for the [[GetOwnProperty]] (used by the Object.getOwnPropertyDescriptor) function
-       // Returns the descriptor for any variable.
-       // https://tc39.es/ecma262/multipage/ordinary-and-exotic-objects-behaviours.html#sec-proxy-object-internal-methods-and-internal-slots-getownproperty-p
-       getOwnPropertyDescriptor(ctx, variable) {
-         if (hasOwnProperty(ctx, variable)) {
-           return Reflect.getOwnPropertyDescriptor(ctx, variable);
-         }
- 
-         // If the variable exists locally, prioritize it over global.
-         if (hasOwnProperty(locals, variable)) {
-           return {
-             enumerable: true,
-             configurable: true,
-             get() {
-               return locals[variable];
-             },
-             set(value) {
-               // if the variable is a constant, this will throw
-               replContext[variable] = value;
-             },
-           };
-         }
- 
-         if (hasOwnProperty(global, variable)) {
-           const descriptor = Reflect.getOwnPropertyDescriptor(global);
- 
-           return {
-             ...descriptor,
-             configurable: true,
-           };
-         }
- 
-         return undefined;
-       },
- 
-       // Trap for determining if the proxy has a key or not.
-       // https://tc39.es/ecma262/multipage/ordinary-and-exotic-objects-behaviours.html#sec-proxy-object-internal-methods-and-internal-slots-hasproperty-p
-       has(ctx, variable) {
-         return (
-           hasOwnProperty(locals, variable) ||
-           hasOwnProperty(global, variable) ||
-           hasOwnProperty(ctx, variable)
-         );
-       },
- 
-       // Trap for getting a property from the proxy.
-       // https://tc39.es/ecma262/multipage/ordinary-and-exotic-objects-behaviours.html#sec-proxy-object-internal-methods-and-internal-slots-get-p-receiver
-       get(ctx, variable) {
-         if (hasOwnProperty(ctx, variable)) {
-           return ctx[variable];
-         }
- 
-         if (hasOwnProperty(locals, variable)) {
-           return locals[variable];
-         }
- 
-         if (hasOwnProperty(global, variable)) {
-           return global[variable];
-         }
- 
-         throw new ReferenceError(`${variable} is not defined`);
-       },
- 
-       // trap for setting a value in the proxy.
-       // https://tc39.es/ecma262/multipage/ordinary-and-exotic-objects-behaviours.html#sec-proxy-object-internal-methods-and-internal-slots-set-p-v-receiver
-       set: withoutStack((ctx, variable, value) => {
-         if (hasOwnProperty(locals, variable)) {
-           // To avoid running into potential name clashes of module variables and
-           // variables owned by this REPL logic, we'll evaluate a callback which sets the variable
-           // to its first argument, with an argument that has a different name.
- 
-           doEval(`_${variable}=>${variable}=_${variable}`)(value);
- 
-           locals[variable] = value;
-         } else if (hasOwnProperty(global, variable)) {
-           global[variable] = value;
-         } else {
-           ctx[variable] = value;
-         }
- 
-         return true;
-       }),
-     }
-   );
- 
-   repl.context = vm.createContext(replContext);
- 
-   for (const moduleVariable of moduleVariables) {
-     delete repl.context[moduleVariable];
-   }
- 
-   const kContextId = Object.getOwnPropertySymbols(repl).find(
-     (v) => v.description === "contextId"
-   );
- 
-   repl.context.repl = repl;
- 
-   // this should be 100% seafe since JS is synchronous.
-   // we aren't using the repl's original context, but we create the new context directly after
-   // repl.start creates one, so the ID of our context is the ID of the repl's context id + 1.
-   const replContextId = ++repl[kContextId];
- 
-   // The nodejs inspector doesn't properly handle the proxy & scope magic,
-   // so we need to mock its eval function if we want commodities such as preview and
-   // tab-completion to work as intended.
- 
-   const post = Session.prototype.post;
-   Session.prototype.post = function (method, params, callback) {
-     if (method !== "Runtime.evaluate" || params.contextId !== replContextId) {
-       return post.apply(this, arguments);
-     }
- 
-     return post.call(this, method, params, (err, preview) => {
-       const { result } = preview;
-       if (preview.exceptionDetails && result.className === "EvalError") {
-         return callback(err, preview);
-       }
- 
-       if (
-         (preview.exceptionDetails && result.className === "ReferenceError") ||
-         !hasOwnProperty(result, "value")
-       ) {
-         try {
-           const value = vm.runInContext(params.expression, repl.context, {
-             displayErrors: false,
-           });
- 
-           const newResult = { type: typeof value, value };
- 
-           return callback(null, { result: newResult });
-         } catch {
-           callback(err, preview);
-         }
-       }
-       
-       return callback(err, preview);
-     });
-   };
+  const variableMatches = hookedFileSource.match(variableLikeRegex);
+  if (variableMatches) {
+    for (const maybeVariable of variableMatches) {
+      let value;
 
-   return repl;
+      try {
+        value = doEval(maybeVariable);
+
+        try {
+          // asserts that the variable isn't a constant
+          doEval(`${maybeVariable}=${maybeVariable}`);
+
+          Reflect.defineProperty(locals, maybeVariable, {
+            value,
+            writable: true,
+            enumerable: true,
+            configurable: false,
+          });
+        } catch (err) {
+          // can't write to constants
+          if (err instanceof TypeError) {
+            Reflect.defineProperty(locals, maybeVariable, {
+              value,
+              writeable: false,
+              enumerable: true,
+              configurable: false,
+            });
+            continue;
+          }
+
+          throw err;
+        }
+      } catch (err) {
+        if (err instanceof ReferenceError || err instanceof SyntaxError) {
+          continue;
+        }
+
+        throw err;
+      }
+    }
+  }
+
+  for (const moduleVariable of moduleVariables) {
+    if (!hasOwnProperty(locals, moduleVariable)) {
+      Object.defineProperty(locals, moduleVariable, {
+        writable: true,
+        configurable: true,
+        value: doEval(moduleVariable),
+      });
+    }
+  }
+
+  repl = nodeRepl.start({
+    prompt: process.env.PRYBAR_PS1,
+  });
+  let isPreview = false;
+
+  const replContext = new Proxy(repl.context, {
+    // Returns a list of all properties of the proxy (enumerable or not).
+    // https://tc39.es/ecma262/multipage/ordinary-and-exotic-objects-behaviours.html#sec-proxy-object-internal-methods-and-internal-slots-ownpropertykeys
+    ownKeys(ctx) {
+      return Array.from(
+        new Set(
+          Reflect.ownKeys(global).concat(
+            Reflect.ownKeys(locals),
+            Reflect.ownKeys(ctx)
+          )
+        )
+      );
+    },
+    // Trap for the [[GetOwnProperty]] (used by the Object.getOwnPropertyDescriptor) function
+    // Returns the descriptor for any variable.
+    // https://tc39.es/ecma262/multipage/ordinary-and-exotic-objects-behaviours.html#sec-proxy-object-internal-methods-and-internal-slots-getownproperty-p
+    getOwnPropertyDescriptor(ctx, variable) {
+      if (hasOwnProperty(ctx, variable)) {
+        return Reflect.getOwnPropertyDescriptor(ctx, variable);
+      }
+
+      // If the variable exists locally, prioritize it over global.
+      if (hasOwnProperty(locals, variable)) {
+        return {
+          enumerable: true,
+          configurable: true,
+          get() {
+            return locals[variable];
+          },
+          set(value) {
+            // if the variable is a constant, this will throw
+            replContext[variable] = value;
+          },
+        };
+      }
+
+      if (hasOwnProperty(global, variable)) {
+        const descriptor = Reflect.getOwnPropertyDescriptor(global);
+
+        return {
+          ...descriptor,
+          configurable: true,
+        };
+      }
+
+      return undefined;
+    },
+
+    // Trap for determining if the proxy has a key or not.
+    // https://tc39.es/ecma262/multipage/ordinary-and-exotic-objects-behaviours.html#sec-proxy-object-internal-methods-and-internal-slots-hasproperty-p
+    has(ctx, variable) {
+      return (
+        hasOwnProperty(locals, variable) ||
+        hasOwnProperty(global, variable) ||
+        hasOwnProperty(ctx, variable)
+      );
+    },
+
+    // Trap for getting a property from the proxy.
+    // https://tc39.es/ecma262/multipage/ordinary-and-exotic-objects-behaviours.html#sec-proxy-object-internal-methods-and-internal-slots-get-p-receiver
+    get(ctx, variable) {
+      if (hasOwnProperty(ctx, variable)) {
+        return ctx[variable];
+      }
+
+      if (hasOwnProperty(locals, variable)) {
+        // the inspector treats all calls to ``eval` as having side effects,
+        // so we can't directly call `eval` if we want preview to work.
+        if (!isPreview) {
+          // locals may change since we last checked their values. 
+          // we should make sure to grab the most recent value if we're not getting the preview.
+          locals[variable] = doEval(variable);
+        }
+
+        return locals[variable];
+      }
+
+      if (hasOwnProperty(global, variable)) {
+        return global[variable];
+      }
+
+      throw new ReferenceError(`${variable} is not defined`);
+    },
+
+    // trap for setting a value in the proxy.
+    // https://tc39.es/ecma262/multipage/ordinary-and-exotic-objects-behaviours.html#sec-proxy-object-internal-methods-and-internal-slots-set-p-v-receiver
+    set: withoutStack((ctx, variable, value) => {
+      if (hasOwnProperty(locals, variable)) {
+        // To avoid running into potential name clashes of module variables and
+        // variables owned by this REPL logic, we'll evaluate a callback which sets the variable
+        // to its first argument, with an argument that has a different name.
+
+        doEval(`_${variable}=>${variable}=_${variable}`)(value);
+
+        locals[variable] = value;
+      } else if (hasOwnProperty(global, variable)) {
+        global[variable] = value;
+      } else {
+        ctx[variable] = value;
+      }
+
+      return true;
+    }),
+  });
+
+  repl.context = vm.createContext(replContext);
+
+  for (const moduleVariable of moduleVariables) {
+    delete repl.context[moduleVariable];
+  }
+
+  const kContextId = Object.getOwnPropertySymbols(repl).find(
+    (v) => v.description === "contextId"
+  );
+
+  repl.context.repl = repl;
+
+  // this should be 100% seafe since JS is synchronous.
+  // we aren't using the repl's original context, but we create the new context directly after
+  // repl.start creates one, so the ID of our context is the ID of the repl's context id + 1.
+  const replContextId = ++repl[kContextId];
+
+  // The nodejs inspector doesn't properly handle the proxy & scope magic,
+  // so we need to mock its eval function if we want commodities such as preview and
+  // tab-completion to work as intended.
+
+  const post = Session.prototype.post;
+  Session.prototype.post = function (method, params, callback) {
+    if (method !== "Runtime.evaluate" || params.contextId !== replContextId) {
+      return post.apply(this, arguments);
+    }
+
+    isPreview = true;
+    // this is synchronous, despite the callback.
+    return post.call(this, method, params, (err, preview) => {
+      isPreview = false;
+
+      return callback(err, preview);
+    });
+  };
+
+  return repl;
 }
 
 module.exports = {
