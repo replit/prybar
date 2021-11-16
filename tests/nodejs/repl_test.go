@@ -30,6 +30,12 @@ import (
 // - preview (should evaluate any expression which can't possibly have any side effects and display a truncated version of it below the prompt)
 // - results of expressions - every line should be evaulated, with the result of that line being printed to stdout
 // - any errors should be displayed in red.
+//
+// If you're adding new tests, the process is pretty similar:
+// 1. Verfiy that the test case you have works as expected outside of tests.
+// 2. Create the test entry, you can leave the output as `tbd` or similar
+// 3. Double check that the test case works normally, run tests, then copy the received output as the expected output.
+// 4. Write some comments above that test describing what the expected value looks like (see existing tests for examples)
 
 var prybarAssetsPath string
 
