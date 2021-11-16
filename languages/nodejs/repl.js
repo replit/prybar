@@ -181,7 +181,7 @@ if (process.env.PRYBAR_CODE) {
   }
 
   if (isInterractive) {
-    start();
+    process.once("beforeExit", start);
   }
 } else if (process.env.PRYBAR_EXP) {
   try {
@@ -191,19 +191,20 @@ if (process.env.PRYBAR_CODE) {
   }
 } else if (process.env.PRYBAR_FILE) {
   try {
-    if (isTTY && process.env.PRYBAR_INTERACTIVE) {
-      console.log(
-        "\u001b[0m\u001b[90mHint: hit control+c anytime to enter REPL.\u001b[0m"
-      );
-    }
-
     runModule(process.env.PRYBAR_FILE, isInterractive);
   } catch (err) {
     handleError(err);
   }
 
   if (isInterractive) {
-    start();
+    if (isTTY) {
+      console.log(
+        "\u001b[0m\u001b[90mHint: hit control+c anytime to enter REPL.\u001b[0m"
+      );
+    }
+
+    process.once("beforeExit", start);
+    process.once("SIGINT", start);
   }
 } else if (isInterractive) {
   start();
