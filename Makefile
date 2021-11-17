@@ -26,7 +26,7 @@ test: ## Run integration tests
 
 .PHONY: test-image
 test-image: image ## Test Docker image for distribution
-	docker run -t --rm prybar ./run_tests_language nodejs
+	docker run -t --rm prybar ./run_tests
 
 .PHONY: clean
 clean: ## Remove build artifacts
