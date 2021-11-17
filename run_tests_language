@@ -29,8 +29,6 @@ for t in ${tests}; do
   echo -e "      \e[32m✓\e[0m $name"
 done
 
-
-
 if [[ $language == 'nodejs' ]]; then 
   echo running go tests
   go test ./tests/nodejs
