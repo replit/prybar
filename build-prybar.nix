@@ -30,6 +30,11 @@ buildGoModule {
 
     ${bash}/bin/bash ./scripts/inject.sh ${language}
     go generate ./languages/${language}/main.go
+
+    if [[ -f "languages/${language}/compile" ]]; then
+      patchShebangs languages/${language}/compile
+      languages/${language}/compile;
+    fi
   '';
 
   # The test file expect the binary to be in the current directory rather than bin
