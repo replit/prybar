@@ -42,7 +42,12 @@ func preloadQuietLib(env []string) []string {
 		panic(err)
 	}
 	runDir := filepath.Dir(execPath)
-	libPath := filepath.Join(runDir, "prybar_assets", "sqlite", "patch.so")
+
+	prybarAssetDir := os.Getenv("PRYBAR_ASSETS_DIR")
+	if prybarAssetDir == "" {
+		prybarAssetDir = filepath.Join(runDir, "prybar_assets")
+	}
+	libPath := filepath.Join(prybarAssetDir, "sqlite", "patch.so")
 	return append(env, []string{"LD_PRELOAD=" + libPath, "PRYBAR_QUIET=1"}...)
 }
 
