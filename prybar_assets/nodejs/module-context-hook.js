@@ -1,14 +1,14 @@
-const path = require("path");
-const BuiltinModule = require("module");
-const vm = require("vm");
-const { Session } = require("inspector");
+const path = require('path');
+const BuiltinModule = require('module');
+const vm = require('vm');
+const { Session } = require('inspector');
 const Module =
   module.constructor.length > 1 ? module.constructor : BuiltinModule;
-const nodeRepl = require("repl");
+const nodeRepl = require('repl');
 
-const kReplitPrybarInit = Symbol.for("replit.prybar.init");
-const kReplitPrybarEvalCode = Symbol.for("replit.prybar.eval.code");
-const kReplitPrybarEvalFile = Symbol.for("replit.prybar.eval.file");
+const kReplitPrybarInit = Symbol.for('replit.prybar.init');
+const kReplitPrybarEvalCode = Symbol.for('replit.prybar.eval.code');
+const kReplitPrybarEvalFile = Symbol.for('replit.prybar.eval.file');
 
 /**
  * The footer we append at the end of files to run the code we want in the scope of the module its appended to.
@@ -24,11 +24,11 @@ global[Symbol.for('${kReplitPrybarInit.description}')](() =>
 const moduleVariables = [
   // these are all added as arguments of the function modules are wrapped in.
   // function (exports, require, module, __filename, __dirname)
-  "exports",
-  "require",
-  "module",
-  "__filename",
-  "__dirname",
+  'exports',
+  'require',
+  'module',
+  '__filename',
+  '__dirname',
 ];
 
 /**
@@ -121,14 +121,14 @@ let doEval = null;
  *  ) => any} fn The compile function to be used instead of _compile on its next call.
  */
 function mockCompileOnce(fn) {
-  const defaultCompiler = Module._extensions[".js"];
+  const defaultCompiler = Module._extensions['.js'];
 
-  Module._extensions[".js"] = (mod, fileName) => {
+  Module._extensions['.js'] = (mod, fileName) => {
     // Only the first import should have interp appended to it.
-    Module._extensions[".js"] = defaultCompiler;
+    Module._extensions['.js'] = defaultCompiler;
 
     const oldCompile = mod._compile;
-    mod.id = ".";
+    mod.id = '.';
     mod.parent = null;
 
     mod._compile = (code) => {
@@ -178,9 +178,9 @@ function runModule(moduleName, isInteractive) {
 
         // If we've gotten here something's up w/ interp, not the module itself.
         console.warn(
-          "running without interp",
+          'running without interp',
           err,
-          "please submit a bug report."
+          'please submit a bug report.',
         );
       }
 
@@ -200,7 +200,7 @@ function runModule(moduleName, isInteractive) {
  */
 function runCode(code, isInterractive) {
   mockCompileOnce((fileSource, __, compile) => {
-    const fakeFileName = path.join(process.cwd(), "__replit_exec.js");
+    const fakeFileName = path.join(process.cwd(), '__replit_exec.js');
     global[kReplitPrybarEvalFile] = fakeFileName;
 
     hookedFileSource = code;
@@ -214,12 +214,12 @@ function runCode(code, isInterractive) {
       fileSource,
       // lie to the `compile` function about the file we're compiling
       // so calls to `require` will be resolved from the current directory.
-      fakeFileName
+      fakeFileName,
     );
   });
 
-  delete require.cache[require.resolve("./runCode")];
-  return require("./runCode");
+  delete require.cache[require.resolve('./runCode')];
+  return require('./runCode');
 }
 
 /**
@@ -303,9 +303,9 @@ function getRepl() {
         new Set(
           Reflect.ownKeys(global).concat(
             Reflect.ownKeys(locals),
-            Reflect.ownKeys(ctx)
-          )
-        )
+            Reflect.ownKeys(ctx),
+          ),
+        ),
       );
     },
     // Trap for the [[GetOwnProperty]] (used by the Object.getOwnPropertyDescriptor) function
@@ -364,7 +364,7 @@ function getRepl() {
         // the inspector treats all calls to ``eval` as having side effects,
         // so we can't directly call `eval` if we want preview to work.
         if (!isPreview) {
-          // locals may change since we last checked their values. 
+          // locals may change since we last checked their values.
           // we should make sure to grab the most recent value if we're not getting the preview.
           locals[variable] = doEval(variable);
         }
@@ -407,7 +407,7 @@ function getRepl() {
   }
 
   const kContextId = Object.getOwnPropertySymbols(repl).find(
-    (v) => v.description === "contextId"
+    (v) => v.description === 'contextId',
   );
 
   repl.context.repl = repl;
@@ -423,7 +423,7 @@ function getRepl() {
 
   const post = Session.prototype.post;
   Session.prototype.post = function (method, params, callback) {
-    if (method !== "Runtime.evaluate" || params.contextId !== replContextId) {
+    if (method !== 'Runtime.evaluate' || params.contextId !== replContextId) {
       return post.apply(this, arguments);
     }
 

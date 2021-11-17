@@ -1,19 +1,19 @@
-const repl = require("repl");
-const path = require("path");
-const { isatty } = require("tty");
+const repl = require('repl');
+const path = require('path');
+const { isatty } = require('tty');
 const assets_dir =
-  process.env.PRYBAR_ASSETS_DIR || path.join(process.cwd(), "prybar_assets");
+  process.env.PRYBAR_ASSETS_DIR || path.join(process.cwd(), 'prybar_assets');
 /**
  * @type {import("../../prybar_assets/nodejs/input-sync")}
  */
-const rl = require(path.join(assets_dir, "nodejs", "input-sync.js"));
+const rl = require(path.join(assets_dir, 'nodejs', 'input-sync.js'));
 /**
  * @type {import("../../prybar_assets/nodejs/module-context-hook")}
  */
 const { runCode, runModule, getRepl, getEvalFunc } = require(path.join(
   assets_dir,
-  "nodejs",
-  "module-context-hook.js"
+  'nodejs',
+  'module-context-hook.js',
 ));
 
 // imports to builtin modules don't get added to require.cache.
@@ -32,7 +32,7 @@ Error.prepareStackTrace = function prepareStackTrace(error, callSites) {
 
   const idx = callSites.findIndex((frame) => frame.getFunctionName() === null);
   const domainIndex = callSites.findIndex(
-    (site) => site.getFileName() === "domain.js"
+    (site) => site.getFileName() === 'domain.js',
   );
 
   if (domainIndex !== -1 && domainIndex < idx) {
@@ -43,7 +43,7 @@ Error.prepareStackTrace = function prepareStackTrace(error, callSites) {
   callSites.reverse();
 
   const lowestPrybarFileIndex = callSites.findIndex((site) =>
-    prybarFilenames.includes(site.getFileName())
+    prybarFilenames.includes(site.getFileName()),
   );
 
   callSites = callSites.slice(0, lowestPrybarFileIndex);
@@ -57,7 +57,7 @@ Error.prepareStackTrace = function prepareStackTrace(error, callSites) {
   }
 
   return callSites.length > 0
-    ? `${error.toString()}\n    at ${callSites.join("\n    at ")}`
+    ? `${error.toString()}\n    at ${callSites.join('\n    at ')}`
     : error.toString();
 };
 
@@ -65,7 +65,7 @@ const isInterractive = Boolean(process.env.PRYBAR_INTERACTIVE);
 
 let r;
 if (!process.env.PRYBAR_QUIET) {
-  console.log("Node " + process.version + " on " + process.platform);
+  console.log('Node ' + process.version + ' on ' + process.platform);
 }
 
 const isTTY = isatty(process.stdin.fd);
@@ -78,8 +78,8 @@ function logError(msg) {
     process.stdout.write(msg);
   }
 
-  if (!msg.endsWith("\n")) {
-    process.stdout.write("\n");
+  if (!msg.endsWith('\n')) {
+    process.stdout.write('\n');
   }
 }
 
@@ -109,17 +109,17 @@ function handleError(e) {
     r.lastError = e;
   }
 
-  if (e && typeof e === "object" && e.stack && e.name) {
-    if (e.name === "SyntaxError") {
+  if (e && typeof e === 'object' && e.stack && e.name) {
+    if (e.name === 'SyntaxError') {
       e.stack = e.stack
-        .replace(/^repl:\d+\r?\n/, "")
-        .replace(/^\s+at\s.*\n?/gm, "");
+        .replace(/^repl:\d+\r?\n/, '')
+        .replace(/^\s+at\s.*\n?/gm, '');
     }
 
     logError(e.stack);
   } else {
     // For some reason needs a newline to flush.
-    logError("Thrown: " + r.writer(e));
+    logError('Thrown: ' + r.writer(e));
   }
 
   if (r) {
@@ -139,10 +139,10 @@ function start() {
     });
 
   // remove the internal error and ours for red etc.
-  r._domain.removeListener("error", r._domain.listeners("error")[0]);
+  r._domain.removeListener('error', r._domain.listeners('error')[0]);
 
-  r._domain.on("error", handleError);
-  process.on("uncaughtException", handleError);
+  r._domain.on('error', handleError);
+  process.on('uncaughtException', handleError);
   return false;
 }
 
@@ -182,7 +182,7 @@ if (process.env.PRYBAR_CODE) {
   }
 
   if (isInterractive) {
-    process.once("beforeExit", start);
+    process.once('beforeExit', start);
   }
 } else if (process.env.PRYBAR_EXP) {
   try {
@@ -200,12 +200,12 @@ if (process.env.PRYBAR_CODE) {
   if (isInterractive) {
     if (isTTY) {
       console.log(
-        "\u001b[0m\u001b[90mHint: hit control+c anytime to enter REPL.\u001b[0m"
+        '\u001b[0m\u001b[90mHint: hit control+c anytime to enter REPL.\u001b[0m',
       );
     }
 
-    process.once("beforeExit", start);
-    process.once("SIGINT", start);
+    process.once('beforeExit', start);
+    process.once('SIGINT', start);
   }
 } else if (isInterractive) {
   start();
