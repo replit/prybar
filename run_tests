@@ -9,9 +9,9 @@ for t in ${tests}; do
   if [[ $t != *.exp ]]; then
     echo "$t:"
 
-    # if [[ $t == 'nodejs' ]]; then 
-    #   go test ./tests/nodejs
-    # fi
+    if [[ $t == 'nodejs' ]]; then 
+      go test ./tests/nodejs
+    fi
 
     continue
   fi
