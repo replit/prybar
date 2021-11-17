@@ -29,7 +29,7 @@ for t in ${tests}; do
   echo -e "      \e[32m✓\e[0m $name"
 done
 
-if [[ $language == 'nodejs' ]]; then 
+if [[ $language == 'nodejs' && $DISABLE_GO_TESTS != 1 ]]; then 
   echo running go tests
   go test ./tests/nodejs
 fi

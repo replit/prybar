@@ -2,7 +2,7 @@
 , pkgName ? language }:
 
 { lib, buildGoModule, fetchFromGitHub, bash, expect, pkg-config, runCommand, git
-, python3, copyPathToStore, rev, makeWrapper }:
+, python3, copyPathToStore, rev, makeWrapper, gnugrep }:
 
 buildGoModule {
   pname = "prybar-${language}";
@@ -11,7 +11,7 @@ buildGoModule {
   src = ./.;
 
   inherit buildInputs;
-  nativeBuildInputs = [ pkg-config makeWrapper ];
+  nativeBuildInputs = [ pkg-config makeWrapper gnugrep ];
 
   subPackages = [ "languages/${language}" ];
 
@@ -51,7 +51,8 @@ buildGoModule {
 
     patchShebangs run_no_pty ./tests/${language}/*.exp
 
-    "${bash}/bin/bash" "./run_tests_language" "${language}" "${expect}/bin"
+    # Currently the go tests won't work in nix because of how they create ttys.
+    DISABLE_GO_TESTS=1 "${bash}/bin/bash" "./run_tests_language" "${language}" "${expect}/bin"
 
     runHook postCheck
   '';
