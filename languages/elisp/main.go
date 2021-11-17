@@ -25,7 +25,12 @@ func Execute(config *utils.Config) {
 	}
 
 	runDir := filepath.Dir(execPath)
-	replPath := filepath.Join(runDir, "prybar_assets", "elisp", "repl.el")
+
+	prybarAssetDir := os.Getenv("PRYBAR_ASSETS_DIR")
+	if prybarAssetDir == "" {
+		prybarAssetDir = filepath.Join(runDir, "prybar_assets")
+	}
+	replPath := filepath.Join(prybarAssetDir, "elisp", "repl.el")
 
 	args = append(
 		args, "emacs", "-nw", "-Q", "--load", replPath,
