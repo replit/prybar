@@ -222,27 +222,6 @@ function runCode(code, isInterractive) {
   return require("./runCode");
 }
 
-const kWriteToConsole = Object.getOwnPropertySymbols(console).find(
-  (v) => v.description === "kWriteToConsole"
-);
-const kColorMode = Object.getOwnPropertySymbols(console).find(
-  (v) => v.description === "kColorMode"
-);
-function hookConsole(fn) {
-  const old = [console[kWriteToConsole], console[kColorMode]];
-  console[kWriteToConsole] = (_, str) => {
-    require("fs").appendFileSync("logs.txt", str + "\n");
-  };
-
-  console[kColorMode] = false;
-
-  try {
-    fn();
-  } finally {
-    [console[kWriteToConsole], console[kColorMode]] = old;
-  }
-}
-
 /**
  * If available, returns a repl in the context of executed code or module.
  *
