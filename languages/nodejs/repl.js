@@ -10,7 +10,7 @@ const rl = require(path.join(assets_dir, 'nodejs', 'input-sync.js'));
 /**
  * @type {import("../../prybar_assets/nodejs/module-context-hook")}
  */
-const { runCode, runModule, getRepl, getEvalFunc } = require(path.join(
+const { runCode, runModule, getRepl } = require(path.join(
   assets_dir,
   'nodejs',
   'module-context-hook.js',
