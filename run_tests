@@ -3,11 +3,16 @@
 stty cols 80
 stty rows 20
 
-tests=$(find ./tests -printf '%P\n')
+tests=$(find ./tests ! -name '*.go' -printf '%P\n')
 
 for t in ${tests}; do
   if [[ $t != *.exp ]]; then
     echo "$t:"
+
+    if [[ $t == 'nodejs' ]]; then 
+      go test ./tests/nodejs
+    fi
+
     continue
   fi
 

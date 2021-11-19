@@ -1,13 +1,67 @@
-const util = require('util');
 const repl = require('repl');
 const path = require('path');
-const fs = require('fs');
-const vm = require('vm');
 const { isatty } = require('tty');
 const assets_dir =
   process.env.PRYBAR_ASSETS_DIR || path.join(process.cwd(), 'prybar_assets');
+/**
+ * @type {import("../../prybar_assets/nodejs/input-sync")}
+ */
 const rl = require(path.join(assets_dir, 'nodejs', 'input-sync.js'));
-const Module = require('module');
+/**
+ * @type {import("../../prybar_assets/nodejs/module-context-hook")}
+ */
+const { runCode, runModule, getRepl } = require(path.join(
+  assets_dir,
+  'nodejs',
+  'module-context-hook.js',
+));
+
+// imports to builtin modules don't get added to require.cache.
+const prybarFilenames = Object.keys(require.cache);
+
+for (const filename of prybarFilenames) {
+  delete require.cache[filename];
+}
+
+Error.prepareStackTrace = function prepareStackTrace(error, callSites) {
+  // this logic is sourced from the internal repl error handler
+
+  // Search from the bottom of the call stack to
+  // find the first frame with a null function name
+  callSites.reverse();
+
+  const idx = callSites.findIndex((frame) => frame.getFunctionName() === null);
+  const domainIndex = callSites.findIndex(
+    (site) => site.getFileName() === 'domain.js',
+  );
+
+  if (domainIndex !== -1 && domainIndex < idx) {
+    // If found, get rid of it and everything below it
+    callSites = callSites.slice(idx);
+  }
+
+  callSites.reverse();
+
+  const lowestPrybarFileIndex = callSites.findIndex((site) =>
+    prybarFilenames.includes(site.getFileName()),
+  );
+
+  callSites = callSites.slice(0, lowestPrybarFileIndex);
+
+  if (!(error instanceof Error)) {
+    const tmp = new Error();
+
+    tmp.message = error.message;
+    tmp.name = error.name;
+    error = tmp;
+  }
+
+  return callSites.length > 0
+    ? `${error.toString()}\n    at ${callSites.join('\n    at ')}`
+    : error.toString();
+};
+
+const isInterractive = Boolean(process.env.PRYBAR_INTERACTIVE);
 
 let r;
 if (!process.env.PRYBAR_QUIET) {
@@ -22,6 +76,10 @@ function logError(msg) {
     process.stdout.write(`\u001b[0m\u001b[31m${msg}\u001b[0m`);
   } else {
     process.stdout.write(msg);
+  }
+
+  if (!msg.endsWith('\n')) {
+    process.stdout.write('\n');
   }
 }
 
@@ -61,7 +119,7 @@ function handleError(e) {
     logError(e.stack);
   } else {
     // For some reason needs a newline to flush.
-    logError('Thrown: ' + r.writer(e) + '\n');
+    logError('Thrown: ' + r.writer(e));
   }
 
   if (r) {
@@ -71,207 +129,84 @@ function handleError(e) {
   }
 }
 
-const sandbox = {
-  // The console in the context doesn't bind to our stdout
-  console,
-  // Browser stdio polyfills
-  alert: console.log,
-  prompt: (p) => {
-    pauseRepl();
-    clearLine();
-
-    let ret = rl.question(`${p}> `);
-
-    resumeRepl();
-
-    // Display prompt on the next turn.
-    if (r) setImmediate(() => r.displayPrompt());
-
-    return ret;
-  },
-  confirm: (q) => {
-    pauseRepl();
-    clearLine();
-
-    const ret = rl.keyInYNStrict(q);
-
-    resumeRepl();
-
-    // Display prompt on the next turn.
-    if (r) setImmediate(() => r.displayPrompt());
-    return ret;
-  },
-};
-
-const mainPath = process.env.PRYBAR_FILE
-  ? path.resolve(process.env.PRYBAR_FILE)
-  : null;
-
-if (mainPath) {
-  // Make module resolution stuff work as if we're running
-  // `node mainPath`
-  const module = new Module(mainPath, null);
-  module.id = '.';
-  module.filename = mainPath;
-  module.paths = Module._nodeModulePaths(path.dirname(mainPath));
-
-  process.mainModule = module;
-
-  sandbox.module = module;
-  sandbox.require = module.require.bind(module);
-  sandbox.__dirname = path.dirname(mainPath);
-  sandbox.__filename = mainPath;
-}
-
-const context = vm.createContext(sandbox);
-// VM context doesn't have a built-in "global", so we
-// have to tell it to point to itself
-Object.defineProperties(context, {
-  global: {
-    ...Object.getOwnPropertyDescriptor(global, 'global'),
-    value: context,
-  },
-  globalThis: {
-    ...Object.getOwnPropertyDescriptor(global, 'globalThis'),
-    value: context,
-  },
-  GLOBAL: {
-    ...Object.getOwnPropertyDescriptor(global, 'GLOBAL'),
-    get: util.deprecate(
-      () => context,
-      `'GLOBAL' is deprecated, use 'global'`,
-      'DEP0016',
-    ),
-    set: util.deprecate(
-      (value) => {
-        Object.defineProperty(context, 'GLOBAL', {
-          configurable: true,
-          writable: true,
-          enumerable: true,
-          value: value,
-        });
-      },
-      `'GLOBAL' is deprecated, use 'global'`,
-      'DEP0016',
-    ),
-  },
-  root: {
-    ...Object.getOwnPropertyDescriptor(global, 'root'),
-    get: util.deprecate(
-      () => context,
-      `'root' is deprecated, use 'global'`,
-      'DEP0016',
-    ),
-    set: util.deprecate(
-      (value) => {
-        Object.defineProperty(context, 'root', {
-          configurable: true,
-          writable: true,
-          enumerable: true,
-          value: value,
-        });
-      },
-      `'root' is deprecated, use 'global'`,
-      'DEP0016',
-    ),
-  },
-});
-
-// Fill in all the missing globals in the context.
-// We have to activate the runtime to actually get
-// a list of globals available on this context
-const contextGlobals = vm.runInContext(
-  'Object.getOwnPropertyNames(global)',
-  context,
-);
-const localGlobals = Object.getOwnPropertyNames(global);
-for (let prop of localGlobals) {
-  if (contextGlobals.includes(prop)) {
-    continue;
-  }
-
-  Object.defineProperty(
-    context,
-    prop,
-    Object.getOwnPropertyDescriptor(global, prop),
-  );
-}
-
-function startRepl() {
-  r = repl.start({
-    prompt: process.env.PRYBAR_PS1,
-  });
-
-  const replContext = r.context;
-  r.context = context;
-
-  if (!mainPath) {
-    // Since we don't have a mainpath, we will use
-    // module resolution that's built into the repl
-    r.context.require = replContext.require;
-    r.context.module = replContext.module;
-  }
+function start() {
+  /** @type { repl.REPLServer} */
+  r =
+    getRepl() ||
+    repl.start({
+      useGlobal: true,
+      prompt: process.env.PRYBAR_PS1,
+    });
 
   // remove the internal error and ours for red etc.
   r._domain.removeListener('error', r._domain.listeners('error')[0]);
+
   r._domain.on('error', handleError);
   process.on('uncaughtException', handleError);
+  return false;
 }
 
-if (mainPath) {
-  const main = fs.readFileSync(mainPath, 'utf-8');
+global.alert = console.log;
+global.prompt = (p) => {
+  pauseRepl();
+  clearLine();
 
-  let script;
+  let ret = rl.question(`${p}> `);
+
+  resumeRepl();
+
+  // Display prompt on the next turn.
+  if (r) setImmediate(() => r.displayPrompt());
+
+  return ret;
+};
+
+global.confirm = (q) => {
+  pauseRepl();
+  clearLine();
+
+  const ret = rl.keyInYNStrict(q);
+
+  resumeRepl();
+
+  // Display prompt on the next turn.
+  if (r) setImmediate(() => r.displayPrompt());
+  return ret;
+};
+
+if (process.env.PRYBAR_CODE) {
   try {
-    script = new vm.Script(main, {
-      filename: mainPath,
-      displayErrors: false,
-    });
-  } catch (e) {
-    handleError(e);
+    runCode(process.env.PRYBAR_CODE, isInterractive);
+  } catch (err) {
+    handleError(err);
   }
 
-  if (script) {
-    let res;
-    try {
-      res = script.runInContext(context, {
-        displayErrors: false,
-      });
-    } catch (e) {
-      handleError(e);
+  if (isInterractive) {
+    process.once('beforeExit', start);
+  }
+} else if (process.env.PRYBAR_EXP) {
+  try {
+    console.log(runCode(process.env.PRYBAR_EXP, false));
+  } catch (err) {
+    handleError(err);
+  }
+} else if (process.env.PRYBAR_FILE) {
+  try {
+    runModule(process.env.PRYBAR_FILE, isInterractive);
+  } catch (err) {
+    handleError(err);
+  }
+
+  if (isInterractive) {
+    if (isTTY) {
+      console.log(
+        '\u001b[0m\u001b[90mHint: hit control+c anytime to enter REPL.\u001b[0m',
+      );
     }
 
-    module.loaded = true;
-
-    if (typeof res !== 'undefined') {
-      console.log(util.inspect(res, { colors: true }));
-    }
+    process.once('beforeExit', start);
+    process.once('SIGINT', start);
   }
-
-  if (isTTY && process.env.PRYBAR_INTERACTIVE) {
-    console.log(
-      '\u001b[0m\u001b[90mHint: hit control+c anytime to enter REPL.\u001b[0m',
-    );
-  }
-
-  if (process.env.PRYBAR_INTERACTIVE) {
-    process.once('SIGINT', () => startRepl());
-    process.once('beforeExit', () => startRepl());
-  }
-} else {
-  const code = process.env.PRYBAR_CODE || process.env.PRYBAR_EXP;
-
-  if (code) {
-    const result = vm.runInContext(code, context, {
-      breakOnSigint: isTTY || process.env.PRYBAR_INTERACTIVE,
-    });
-
-    if (process.env.PRYBAR_EXP) {
-      console.log(result);
-    }
-  }
-
-  if (process.env.PRYBAR_INTERACTIVE) {
-    startRepl();
-  }
+} else if (isInterractive) {
+  start();
 }

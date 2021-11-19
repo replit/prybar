@@ -4,8 +4,7 @@ set timeout -1
 spawn ./prybar-nodejs -i ./test_files/main_module_scoped_to_global.js
 match_max 100000
 expect -re {Node v\d+\.\d+.\d+ on (linux|darwin)}
-expect -exact "{}\r
-\[0m\[90mHint: hit control+c anytime to enter REPL.\[0m\r
+expect -exact "\[0m\[90mHint: hit control+c anytime to enter REPL.\[0m\r
 \[1G\[0J--> \[5G"
 send -- ""
 expect eof
