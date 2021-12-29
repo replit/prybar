@@ -58,12 +58,17 @@ func DoCli(p PluginBase) {
 	if config.Exp != "" {
 		lang.EvalAndTryToPrint(config.Exp)
 	}
+
 	if len(config.Args) > 0 {
 		if _, err := os.Stat(config.Args[0]); os.IsNotExist(err) {
 			fmt.Println("No such file:", config.Args[0])
 			os.Exit(2)
 		} else {
-			lang.EvalFile(config.Args[0], config.Args[1:])
+			exitCode := lang.EvalFile(config.Args[0], config.Args[1:])
+			// TODO: Maybe log if exitCode is non-zero and interractive is true?
+			if exitCode != 0 && !(config.Interactive || config.OurInteractive) {
+				os.Exit(exitCode)
+			}
 		}
 	}
 
@@ -71,6 +76,7 @@ func DoCli(p PluginBase) {
 		lang.SetPrompts(config.Ps1, config.Ps2)
 		lang.REPL()
 	} else if config.OurInteractive {
+		fmt.Println("interactive")
 		lang.InternalREPL()
 	}
 }

@@ -36,7 +36,7 @@ char *pry_eval(const char *code)
     }
 }
 
-void pry_eval_file(const char *file)
+int pry_eval_file(const char *file)
 {
     char *options[] = {"ruby", file};
     void *node = ruby_options(2, options);
@@ -46,4 +46,6 @@ void pry_eval_file(const char *file)
     {
         state = ruby_exec_node(node);
     }
+
+    return state;
 }

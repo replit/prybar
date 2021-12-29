@@ -107,7 +107,7 @@ void cleanup() { jl_atexit_hook(0); }
 
 void eval(const char *str) { jl_eval_string(str); }
 
-void eval_file(const char *path) { exec_program(path); }
+int eval_file(const char *path) { return exec_program(path); }
 
 void run_repl() { fancy_repl(); }
 

@@ -1,6 +1,6 @@
 #include "pry_python2.h"
 
-void pry_eval_file(FILE *f, const char *file, int argn, const char *argv)
+int pry_eval_file(FILE *f, const char *file, int argn, const char *argv)
 {
     const char *xargv[argn + 1];
     const char *ptr = argv;
@@ -11,7 +11,7 @@ void pry_eval_file(FILE *f, const char *file, int argn, const char *argv)
     }
     xargv[argn] = NULL;
     PySys_SetArgvEx(argn, xargv, 1);
-    PyRun_AnyFile(f, file);
+    return PyRun_AnyFile(f, file);
 }
 
 const char *pry_eval(const char *code, int start)

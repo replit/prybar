@@ -25,7 +25,7 @@ type PluginEvalExpression interface {
 
 type PluginEvalFile interface {
 	PluginBase
-	EvalFile(file string, args []string)
+	EvalFile(file string, args []string) int
 }
 
 type PluginREPL interface {
@@ -80,16 +80,17 @@ func (lang Language) REPLLikeEval(code string) {
 	}
 }
 
-func (lang Language) EvalFile(file string, args []string) {
+func (lang Language) EvalFile(file string, args []string) int {
 	pef, ok := lang.ptr.(PluginEvalFile)
 	if ok {
-		pef.EvalFile(file, args)
+		return pef.EvalFile(file, args)
 	} else {
 		dat, err := ioutil.ReadFile(file)
 		if err != nil {
 			panic(err)
 		}
 		lang.Eval(string(dat))
+		return 0
 	}
 }
 

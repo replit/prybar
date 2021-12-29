@@ -73,7 +73,7 @@ func (p Python) EvalExpression(code string) string {
 	return C.GoString(C.pry_eval(ccode, C.Py_eval_input))
 }
 
-func (p Python) EvalFile(file string, args []string) {
+func (p Python) EvalFile(file string, args []string) int {
 	handle := C.stdin
 	cfile := C.CString(file)
 	defer C.free(unsafe.Pointer(cfile))
@@ -88,7 +88,15 @@ func (p Python) EvalFile(file string, args []string) {
 
 	argv := C.CString(file + "\x00" + strings.Join(args, "\x00"))
 	defer C.free(unsafe.Pointer(argv))
-	C.pry_eval_file(handle, cfile, C.int(len(args)+1), argv)
+
+	status := (C.pry_eval_file(handle, cfile, C.int(len(args)+1), argv))
+
+	// status is a negative number if an error occured
+	if status != 0 {
+		return 1
+	}
+
+	return 0
 }
 
 func (p Python) REPLLikeEval(code string) {
@@ -104,7 +112,9 @@ func (p Python) loadModule(mod string) {
 }
 
 func (p Python) REPL() {
-	C.pymain_run_interactive_hook()
+	if exitCode := new(C.int); C.pymain_run_interactive_hook(exitCode) != 0 {
+		os.Exit(1)
+	}
 
 	fn := C.CString("<stdin>")
 	defer C.free(unsafe.Pointer(fn))

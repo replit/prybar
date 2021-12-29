@@ -73,9 +73,13 @@ const isTTY = isatty(process.stdin.fd);
 // Red errors (if stdout is a TTY)
 function logError(msg) {
   if (isTTY) {
-    process.stdout.write(`\u001b[0m\u001b[31m${msg}\u001b[0m`);
+    process.stderr.write(`\u001b[0m\u001b[31m${msg}\u001b[0m`);
   } else {
-    process.stdout.write(msg);
+    process.stderr.write(msg);
+  }
+
+  if (!msg.endsWith('\n')) {
+    process.stderr.write('\n');
   }
 
   if (!msg.endsWith('\n')) {
@@ -179,6 +183,10 @@ if (process.env.PRYBAR_CODE) {
     runCode(process.env.PRYBAR_CODE, isInterractive);
   } catch (err) {
     handleError(err);
+
+    if (!isInterractive) {
+      process.exit(1)
+    }
   }
 
   if (isInterractive) {
@@ -189,12 +197,20 @@ if (process.env.PRYBAR_CODE) {
     console.log(runCode(process.env.PRYBAR_EXP, false));
   } catch (err) {
     handleError(err);
+
+    if (!isInterractive) {
+      process.exit(1)
+    }
   }
 } else if (process.env.PRYBAR_FILE) {
   try {
     runModule(process.env.PRYBAR_FILE, isInterractive);
   } catch (err) {
     handleError(err);
+
+    if (!isInterractive) {
+      process.exit(1)
+    }
   }
 
   if (isInterractive) {
