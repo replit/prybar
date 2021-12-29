@@ -91,7 +91,7 @@ func (p Python) EvalFile(file string, args []string) int {
 
 	status := (C.pry_eval_file(handle, cfile, C.int(len(args)+1), argv))
 
-	// status is a negative number if an error occured
+	// if status is non-zero an error occured.
 	if status != 0 {
 		return 1
 	}
@@ -112,7 +112,7 @@ func (p Python) loadModule(mod string) {
 }
 
 func (p Python) REPL() {
-	if exitCode := new(C.int); C.pymain_run_interactive_hook(exitCode) != 0 {
+	if C.pymain_run_interactive_hook(new(C.int)) != 0 {
 		os.Exit(1)
 	}
 

@@ -55,7 +55,7 @@ func (p Python) EvalFile(file string, args []string) int {
 	defer C.free(unsafe.Pointer(argv))
 	status := C.pry_eval_file(handle, cfile, C.int(len(args)+1), argv)
 
-	// exitCode is a negative number if an error occured
+	// if status is non-zero an error occured.
 	if status != 0 {
 		return 1
 	}

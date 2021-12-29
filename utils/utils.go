@@ -76,7 +76,6 @@ func DoCli(p PluginBase) {
 		lang.SetPrompts(config.Ps1, config.Ps2)
 		lang.REPL()
 	} else if config.OurInteractive {
-		fmt.Println("interactive")
 		lang.InternalREPL()
 	}
 }
