@@ -66,7 +66,7 @@ func DoCli(p PluginBase) {
 		} else {
 			exitCode := lang.EvalFile(config.Args[0], config.Args[1:])
 			// TODO: Maybe log if exitCode is non-zero and interractive is true?
-			if exitCode != 0 && !(config.Interactive || config.OurInteractive) {
+			if exitCode != 0 && !config.Interactive && !config.OurInteractive {
 				os.Exit(exitCode)
 			}
 		}
