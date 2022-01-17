@@ -39,9 +39,9 @@ func (p Julia) Eval(code string) {
 
 func (p Julia) EvalFile(file string, args []string) int {
 	cstr := C.CString(file)
-	code := C.eval_file(cstr)
-	C.free(unsafe.Pointer(cstr))
-	return int(code)
+	defer C.free(unsafe.Pointer(cstr))
+
+	return int(C.eval_file(cstr))
 }
 
 func (p Julia) REPL() {

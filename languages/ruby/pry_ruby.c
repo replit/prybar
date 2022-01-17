@@ -41,7 +41,7 @@ int pry_eval_file(const char *file)
     char *options[] = {"ruby", file};
     void *node = ruby_options(2, options);
 
-    int state;
+    int state = 0;
     if (ruby_executable_node(node, &state))
     {
         state = ruby_exec_node(node);

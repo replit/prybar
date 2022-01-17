@@ -1,6 +1,5 @@
 const repl = require('repl');
 const path = require('path');
-const { isatty } = require('tty');
 const assets_dir =
   process.env.PRYBAR_ASSETS_DIR || path.join(process.cwd(), 'prybar_assets');
 /**
@@ -13,7 +12,7 @@ const rl = require(path.join(assets_dir, 'nodejs', 'input-sync.js'));
 const { runCode, runModule, getRepl } = require(path.join(
   assets_dir,
   'nodejs',
-  'module-context-hook.js',
+  'module-context-hook.js'
 ));
 
 // imports to builtin modules don't get added to require.cache.
@@ -32,7 +31,7 @@ Error.prepareStackTrace = function prepareStackTrace(error, callSites) {
 
   const idx = callSites.findIndex((frame) => frame.getFunctionName() === null);
   const domainIndex = callSites.findIndex(
-    (site) => site.getFileName() === 'domain.js',
+    (site) => site.getFileName() === 'domain.js'
   );
 
   if (domainIndex !== -1 && domainIndex < idx) {
@@ -43,7 +42,7 @@ Error.prepareStackTrace = function prepareStackTrace(error, callSites) {
   callSites.reverse();
 
   const lowestPrybarFileIndex = callSites.findIndex((site) =>
-    prybarFilenames.includes(site.getFileName()),
+    prybarFilenames.includes(site.getFileName())
   );
 
   callSites = callSites.slice(0, lowestPrybarFileIndex);
@@ -68,11 +67,9 @@ if (!process.env.PRYBAR_QUIET) {
   console.log('Node ' + process.version + ' on ' + process.platform);
 }
 
-const isTTY = isatty(process.stdin.fd);
-
-// Red errors (if stdout is a TTY)
+// Red errors (if stderr is a TTY)
 function logError(msg) {
-  if (isTTY) {
+  if (process.stderr.isTTY) {
     process.stderr.write(`\u001b[0m\u001b[31m${msg}\u001b[0m`);
   } else {
     process.stderr.write(msg);
@@ -80,10 +77,6 @@ function logError(msg) {
 
   if (!msg.endsWith('\n')) {
     process.stderr.write('\n');
-  }
-
-  if (!msg.endsWith('\n')) {
-    process.stdout.write('\n');
   }
 }
 
@@ -103,7 +96,7 @@ function resumeRepl() {
 
 // Clear the line if it has anything on it.
 function clearLine() {
-  if (isTTY && r && r.line) r.clearLine();
+  if (process.stdout.isTTY && r && r.line) r.clearLine();
 }
 
 // Adapted from the internal node repl code just a lot simpler and adds
@@ -185,7 +178,7 @@ if (process.env.PRYBAR_CODE) {
     handleError(err);
 
     if (!isInterractive) {
-      process.exit(1)
+      process.exit(1);
     }
   }
 
@@ -199,7 +192,7 @@ if (process.env.PRYBAR_CODE) {
     handleError(err);
 
     if (!isInterractive) {
-      process.exit(1)
+      process.exit(1);
     }
   }
 } else if (process.env.PRYBAR_FILE) {
@@ -209,14 +202,14 @@ if (process.env.PRYBAR_CODE) {
     handleError(err);
 
     if (!isInterractive) {
-      process.exit(1)
+      process.exit(1);
     }
   }
 
   if (isInterractive) {
-    if (isTTY) {
+    if (process.stdout.isTTY && process.stdin.isTTY) {
       console.log(
-        '\u001b[0m\u001b[90mHint: hit control+c anytime to enter REPL.\u001b[0m',
+        '\u001b[0m\u001b[90mHint: hit control+c anytime to enter REPL.\u001b[0m'
       );
     }
 

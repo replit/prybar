@@ -112,8 +112,9 @@ func (p Python) loadModule(mod string) {
 }
 
 func (p Python) REPL() {
-	if C.pymain_run_interactive_hook(new(C.int)) != 0 {
-		os.Exit(1)
+	var exitCode C.int
+	if C.pymain_run_interactive_hook(&exitCode) != 0 {
+		os.Exit(int(exitCode))
 	}
 
 	fn := C.CString("<stdin>")
