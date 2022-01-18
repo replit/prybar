@@ -49,11 +49,11 @@ func (p Lua) Eval(code string) {
 	C.pry_eval(ccode)
 }
 
-func (p Lua) EvalFile(file string) {
+func (p Lua) EvalFile(file string, args []string) int {
 	cfile := C.CString(file)
 	defer C.free(unsafe.Pointer(cfile))
 
-	C.pry_eval_file(cfile)
+	return int(C.pry_eval_file(cfile))
 }
 
 func (p Lua) REPL() {

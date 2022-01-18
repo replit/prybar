@@ -34,10 +34,10 @@ func (p Ruby) EvalExpression(code string) string {
 	return C.GoString(res)
 }
 
-func (p Ruby) EvalFile(file string, args []string) {
+func (p Ruby) EvalFile(file string, args []string) int {
 	cfile := C.CString(file)
 	defer C.free(unsafe.Pointer(cfile))
-	C.pry_eval_file(cfile)
+	return int(C.pry_eval_file(cfile))
 }
 
 func (p Ruby) REPL() {

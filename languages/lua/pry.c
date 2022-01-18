@@ -13,4 +13,4 @@ void pry_eval(const char *code) { dostring(pry_L, code, "<eval>"); }
 
 void pry_do_repl(void) { dotty(pry_L); }
 
-void pry_eval_file(char *file) { handle_script(pry_L, &file, 0); }
+int pry_eval_file(char *file) { return handle_script(pry_L, &file, 0); }

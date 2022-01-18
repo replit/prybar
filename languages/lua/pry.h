@@ -4,7 +4,7 @@ extern lua_State *pry_L;
 
 const char *pry_get_version(void);
 void pry_eval(const char *code);
-void pry_eval_file(char *file);
+int pry_eval_file(char *file);
 void pry_do_repl(void);
 
 // from the lua repl lib (lua.c)

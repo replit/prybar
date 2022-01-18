@@ -1,6 +1,6 @@
 #include "pry_python3.h"
 
-void pry_eval_file(FILE *f, const char *file, int argn, const char *argv)
+int pry_eval_file(FILE *f, const char *file, int argn, const char *argv)
 {
     wchar_t *xargv[argn + 1];
     const char *ptr = argv;
@@ -11,8 +11,8 @@ void pry_eval_file(FILE *f, const char *file, int argn, const char *argv)
     }
     xargv[argn] = NULL;
     PySys_SetArgvEx(argn, xargv, 1);
-    PyRun_AnyFile(f, file);
 
+    return PyRun_AnyFile(f, file);
 }
 
 const char *pry_eval(const char *code, int start)
@@ -71,34 +71,49 @@ void pry_set_prompts(const char *ps1, const char *ps2)
 }
 
 //From python3 sourcecode
-void pymain_run_interactive_hook(void)
+int
+pymain_run_interactive_hook(int *exitcode)
 {
     PyObject *sys, *hook, *result;
     sys = PyImport_ImportModule("sys");
-    if (sys == NULL)
-    {
+    if (sys == NULL) {
         goto error;
     }
 
     hook = PyObject_GetAttrString(sys, "__interactivehook__");
     Py_DECREF(sys);
-    if (hook == NULL)
-    {
+    if (hook == NULL) {
         PyErr_Clear();
-        return;
+        return 0;
+    }
+
+    if (PySys_Audit("cpython.run_interactivehook", "O", hook) < 0) {
+        goto error;
     }
 
     result = _PyObject_CallNoArg(hook);
     Py_DECREF(hook);
-    if (result == NULL)
-    {
+    if (result == NULL) {
         goto error;
     }
     Py_DECREF(result);
 
-    return;
+    return 0;
 
 error:
     PySys_WriteStderr("Failed calling sys.__interactivehook__\n");
+    return pymain_err_print(exitcode);
+}
+
+int
+pymain_err_print(int *exitcode_p)
+{
+    int exitcode;
+    if (_Py_HandleSystemExit(&exitcode)) {
+        *exitcode_p = exitcode;
+        return 1;
+    }
+
     PyErr_Print();
+    return 0;
 }

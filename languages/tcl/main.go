@@ -63,7 +63,7 @@ func (p *Tcl) eval(code string) string {
 	return ""
 }
 
-func (p *Tcl) EvalFile(file string, args []string) {
+func (p *Tcl) EvalFile(file string, args []string) int {
 	cfile := C.CString(file)
 	defer C.free(unsafe.Pointer(cfile))
 
@@ -72,7 +72,10 @@ func (p *Tcl) EvalFile(file string, args []string) {
 	if status != C.TCL_OK {
 		errstr := C.GoString(C.Tcl_GetStringResult(p.interp))
 		fmt.Fprintf(os.Stderr, "error: %s\n", errstr)
+		return int(status)
 	}
+
+	return 0
 }
 
 func (p *Tcl) Eval(code string) {
@@ -86,4 +89,5 @@ func (p *Tcl) EvalExpression(code string) string {
 func (p *Tcl) Close() {
 	C.Tcl_Finalize()
 }
+
 var Instance = &Tcl{}
