@@ -45,7 +45,7 @@
 
           prybar-python3 = buildPrybar {
             language = "python3";
-            buildInputs = [ pkgs.python38 ];
+            buildInputs = [ pkgs.python38Full ];
           };
 
           prybar-lua = buildPrybar {
