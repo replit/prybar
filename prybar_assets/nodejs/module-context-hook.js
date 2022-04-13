@@ -166,8 +166,8 @@ function runModule(moduleName, isInteractive) {
       let compiled;
 
       try {
-        hookedFileSource = code;
-        compiled = compile(code + interactiveFooterSnippet, fileName);
+        // validate that the module has valid syntax without executing the code
+        vm.compileFunction(code, moduleVariables);
       } catch (err) {
         // this error is probably unrelated to our added code
         // and should fail to compile again.
@@ -180,9 +180,14 @@ function runModule(moduleName, isInteractive) {
         console.warn(
           'running without interp',
           err,
-          'please submit a bug report.',
+          'please submit a bug report.'
         );
+
+        return compiled;
       }
+
+      hookedFileSource = code;
+      compiled = compile(code + interactiveFooterSnippet, fileName);
 
       return compiled;
     });
@@ -214,7 +219,7 @@ function runCode(code, isInterractive) {
       fileSource,
       // lie to the `compile` function about the file we're compiling
       // so calls to `require` will be resolved from the current directory.
-      fakeFileName,
+      fakeFileName
     );
   });
 
@@ -303,9 +308,9 @@ function getRepl() {
         new Set(
           Reflect.ownKeys(global).concat(
             Reflect.ownKeys(locals),
-            Reflect.ownKeys(ctx),
-          ),
-        ),
+            Reflect.ownKeys(ctx)
+          )
+        )
       );
     },
     // Trap for the [[GetOwnProperty]] (used by the Object.getOwnPropertyDescriptor) function
@@ -407,7 +412,7 @@ function getRepl() {
   }
 
   const kContextId = Object.getOwnPropertySymbols(repl).find(
-    (v) => v.description === 'contextId',
+    (v) => v.description === 'contextId'
   );
 
   repl.context.repl = repl;
