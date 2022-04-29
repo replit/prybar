@@ -193,7 +193,15 @@ function runModule(moduleName, isInteractive) {
     });
   }
 
-  require(absPath);
+  try {
+    require(absPath);
+  } catch (e) {
+    if (e.code === 'ERR_REQUIRE_ESM') {
+      import(absPath);
+    } else {
+      throw e;
+    }
+  }
 }
 
 /**
