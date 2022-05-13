@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../sourcemaps.ts"],
+  "sourcesContent": ["/*! Generated from https://replit.com/@AllAwesome497/WorseMiserlyGenericsoftware#sourcemaps.ts */\nimport assert from 'assert';\nimport { assertEqual, getCallSite } from './util'\nimport path from 'path';\n\n/*! line 8 in src */\nconst callSite = getCallSite(); \n\nif (process.env.ENABLE_SOURCE_MAPS) {\n  assertEqual(\n    callSite.line,\n    7,\n    'maps to original line number',\n  );\n  assertEqual(\n    callSite.column,\n    18,\n    \"resolves correct column number\",\n  );\n  assertEqual(\n    callSite.file,\n    path.join(__dirname, '../sourcemaps.ts'),\n    'maps to original file'\n  )\n} else {\n  assertEqual(\n    callSite.line,\n    23,\n    'maps to interim line number',\n  );\n  assertEqual(\n    callSite.column,\n    46,\n    \"resolves interim column number\",\n  );\n  assertEqual(\n    callSite.file,\n    __filename,\n    'maps to interim file name'\n  )\n}\n"],
+  "mappings": ";;;;;;;;;;;;;;;;;;AAEA,kBAAyC;AACzC,kBAAiB;AAHjB;AAKA;AACA,MAAM,WAAW;AAEjB,IAAI,QAAQ,IAAI,oBAAoB;AAClC,+BACE,SAAS,MACT,GACA;AAEF,+BACE,SAAS,QACT,IACA;AAEF,+BACE,SAAS,MACT,oBAAK,KAAK,WAAW,qBACrB;AAAA,OAEG;AACL,+BACE,SAAS,MACT,IACA;AAEF,+BACE,SAAS,QACT,IACA;AAEF,+BACE,SAAS,MACT,YACA;AAAA;",
+  "names": []
+}

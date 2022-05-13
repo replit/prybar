@@ -193,15 +193,7 @@ function runModule(moduleName, isInteractive) {
     });
   }
 
-  try {
-    require(absPath);
-  } catch (e) {
-    if (e.code === 'ERR_REQUIRE_ESM') {
-      import(absPath);
-    } else {
-      throw e;
-    }
-  }
+  require(absPath);
 }
 
 /**
@@ -425,7 +417,7 @@ function getRepl() {
 
   repl.context.repl = repl;
 
-  // this should be 100% seafe since JS is synchronous.
+  // this should be 100% safe since JS is synchronous.
   // we aren't using the repl's original context, but we create the new context directly after
   // repl.start creates one, so the ID of our context is the ID of the repl's context id + 1.
   const replContextId = ++repl[kContextId];

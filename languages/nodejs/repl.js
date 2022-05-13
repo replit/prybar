@@ -15,50 +15,7 @@ const { runCode, runModule, getRepl } = require(path.join(
   'module-context-hook.js'
 ));
 
-// imports to builtin modules don't get added to require.cache.
-const prybarFilenames = Object.keys(require.cache);
-
-for (const filename of prybarFilenames) {
-  delete require.cache[filename];
-}
-
-Error.prepareStackTrace = function prepareStackTrace(error, callSites) {
-  // this logic is sourced from the internal repl error handler
-
-  // Search from the bottom of the call stack to
-  // find the first frame with a null function name
-  callSites.reverse();
-
-  const idx = callSites.findIndex((frame) => frame.getFunctionName() === null);
-  const domainIndex = callSites.findIndex(
-    (site) => site.getFileName() === 'domain.js'
-  );
-
-  if (domainIndex !== -1 && domainIndex < idx) {
-    // If found, get rid of it and everything below it
-    callSites = callSites.slice(idx);
-  }
-
-  callSites.reverse();
-
-  const lowestPrybarFileIndex = callSites.findIndex((site) =>
-    prybarFilenames.includes(site.getFileName())
-  );
-
-  callSites = callSites.slice(0, lowestPrybarFileIndex);
-
-  if (!(error instanceof Error)) {
-    const tmp = new Error();
-
-    tmp.message = error.message;
-    tmp.name = error.name;
-    error = tmp;
-  }
-
-  return callSites.length > 0
-    ? `${error.toString()}\n    at ${callSites.join('\n    at ')}`
-    : error.toString();
-};
+require(path.join(assets_dir, 'nodejs', 'esm-loader'));
 
 const isInterractive = Boolean(process.env.PRYBAR_INTERACTIVE);
 
