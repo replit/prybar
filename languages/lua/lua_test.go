@@ -10,9 +10,6 @@ func TestLuaStuff(t *testing.T) {
 	lua.Open()
 	lua.Version()
 	for i := 0; i < 100; i++ {
-		// wrap in goroutine for instant fun crashing behavior!
-		// go func() {
 		lua.EvalFile("testdata/test.lua", make([]string, 0))
-		// }()
 	}
 }
