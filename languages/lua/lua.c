@@ -93,12 +93,9 @@ static void print_version(void) {
   l_message(NULL, LUA_RELEASE "  " LUA_COPYRIGHT);
 }
 
-static int getargs(lua_State *L, char **argv, int n) {
+static int getargs(lua_State *L, char **argv, int n, int argc) {
   int narg;
   int i;
-  int argc = 0;
-  while (argv[argc])
-    argc++;              /* count total number of arguments */
   narg = argc - (n + 1); /* number of arguments to the script */
   luaL_checkstack(L, narg + 3, "too many arguments to script");
   for (i = n + 1; i < argc; i++)
@@ -230,7 +227,7 @@ void dotty(lua_State *L) {
 int handle_script(lua_State *L, char **argv, int n) {
   int status;
   const char *fname;
-  int narg = getargs(L, argv, n); /* collect arguments */
+  int narg = getargs(L, argv, n, 1); /* collect arguments */
   lua_setglobal(L, "arg");
   fname = argv[n];
   if (strcmp(fname, "-") == 0 && strcmp(argv[n - 1], "--") != 0)
