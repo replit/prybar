@@ -35,7 +35,10 @@
 
           prybar-nodejs = buildPrybar {
             language = "nodejs";
-            binaries = [ pkgs.nodejs-12_x ];
+            binaries = [
+              pkgs.nodejs-12_x
+              pkgs.yarn
+            ];
           };
 
           prybar-python2 = buildPrybar {
