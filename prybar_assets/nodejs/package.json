@@ -1,7 +1,7 @@
 {
   "name": "@replit/prybar-assets",
   "dependencies": {
-    "@swc/core": "^1.2.182",
+    "@swc/core": "1.2.182",
     "source-map-support": "0.5.21"
   }
 }
