@@ -23,4 +23,4 @@ run_log touch /gocode/src/github.com/replit/prybar/prybar_assets/nodejs/node_mod
 
 # Yarn tries to write to "${HOME}/.yarnrc" if HOME is set; regardless of command arguments.
 # Since $HOME isn't a real directory, this inevitably fails causing yarn to not install packages...
-cd "${PRYBAR_ROOT_DIR}/prybar_assets/nodejs" && HOME="" yarn install --production --cwd 
+cd "${PRYBAR_ROOT_DIR}/prybar_assets/nodejs" && HOME="" yarn install --production 
