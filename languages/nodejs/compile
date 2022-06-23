@@ -15,6 +15,8 @@ run_log ls -lh "${PRYBAR_ROOT_DIR}/prybar_assets/nodejs"
 run_log echo $USER
 run_log mkdir "${PRYBAR_ROOT_DIR}/prybar_assets/nodejs/node_modules"
 run_log ls -lh "${PRYBAR_ROOT_DIR}/prybar_assets/nodejs"
+run_log pwd
+run_log echo $PRYBAR_ROOT_DIR
 
 # Yarn tries to write to "${HOME}/.yarnrc" if HOME is set; regardless of command arguments.
 # Since $HOME isn't a real directory, this inevitably fails causing yarn to not install packages...
