@@ -11,7 +11,5 @@ ENV GOPATH=/gocode LC_ALL=C.UTF-8 PATH="/gocode/src/github.com/replit/prybar:$PA
 ENV GOROOT=/usr/local/go
 ENV PATH=$PATH:$GOROOT/bin
 
-RUN npm install --global yarn
-
 RUN cp languages/tcl/tcl.pc /usr/lib/pkgconfig/
 RUN make
