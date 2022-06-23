@@ -5,22 +5,6 @@ set -e
 NODEJS_LANGUAGE_DIR="$(realpath $(dirname $0))"
 PRYBAR_ROOT_DIR="$(dirname $(dirname "${NODEJS_LANGUAGE_DIR}"))"
 
-run_log() {
-	set -e
-	echo $*
-	$*
-}
-
-run_log ls -lh "${PRYBAR_ROOT_DIR}/prybar_assets/nodejs"
-
-run_log echo $USER
-run_log mkdir "${PRYBAR_ROOT_DIR}/prybar_assets/nodejs/node_modules"
-run_log ls -lh "${PRYBAR_ROOT_DIR}/prybar_assets/nodejs"
-run_log pwd
-run_log echo $PRYBAR_ROOT_DIR
-run_log mkdir -p /gocode/src/github.com/replit/prybar/prybar_assets/nodejs/node_modules/buffer-from/
-run_log touch /gocode/src/github.com/replit/prybar/prybar_assets/nodejs/node_modules/buffer-from/index.js
-
 # Yarn tries to write to "${HOME}/.yarnrc" if HOME is set; regardless of command arguments.
 # Since $HOME isn't a real directory, this inevitably fails causing yarn to not install packages...
 cd "${PRYBAR_ROOT_DIR}/prybar_assets/nodejs" && HOME="" yarn install --production 
