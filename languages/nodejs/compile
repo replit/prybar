@@ -5,6 +5,13 @@ set -e
 NODEJS_LANGUAGE_DIR="$(realpath $(dirname $0))"
 PRYBAR_ROOT_DIR="$(dirname $(dirname "${NODEJS_LANGUAGE_DIR}"))"
 
+run_log() {
+	echo $*
+	$*
+}
+
+run_log ls -lh "${PRYBAR_ROOT_DIR}/prybar_assets/nodejs"
+
 # Yarn tries to write to "${HOME}/.yarnrc" if HOME is set; regardless of command arguments.
 # Since $HOME isn't a real directory, this inevitably fails causing yarn to not install packages...
 HOME="" yarn install --production --cwd "${PRYBAR_ROOT_DIR}/prybar_assets/nodejs"

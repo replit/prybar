@@ -84,6 +84,5 @@ ln -s /usr/local/cask/bin/cask /usr/local/bin/cask
 cask upgrade-cask
 
 npm install --global yarn@1.22.19
-chmod a+rx -R /usr/local/share/.cache/yarn/v6/
 
 rm /tmp/docker-install.sh
