@@ -22,7 +22,7 @@ Module._findPath = function(request, paths, isMain) {
     const [major] = packageJson.version.split(".").map(Number);
     if (major >= 3) {
       // Switch to node-fetch-commonjs
-      console.log("Switch to node-fetch-commonjs");
+      console.log("\u001b[33mAuto-switching node-fetch to node-fetch-commonjs\u001b[0m");
       const newResult = result.replace('node_modules/node-fetch/src', 'node_modules/node-fetch-commonjs');
       return newResult;
     }
