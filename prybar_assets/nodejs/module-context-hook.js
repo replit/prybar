@@ -10,6 +10,8 @@ const kReplitPrybarInit = Symbol.for('replit.prybar.init');
 const kReplitPrybarEvalCode = Symbol.for('replit.prybar.eval.code');
 const kReplitPrybarEvalFile = Symbol.for('replit.prybar.eval.file');
 let moduleMode = null;
+const assets_dir = 
+   process.env.PRYBAR_ASSETS_DIR || path.join(process.cwd(), 'prybar_assets');
 
 const originalFindPath = Module._findPath;
 Module._findPath = function(request, paths, isMain) {
@@ -24,7 +26,7 @@ Module._findPath = function(request, paths, isMain) {
       // Switch to @replit/node-fetch
       console.log("\u001b[33mAuto-switching node-fetch to @replit/node-fetch for cjs support\u001b[0m");
 
-      return path.join(__dirname, "node_modules/@replit/node-fetch/index.js");
+      return path.join(assets_dir, "node_modules/@replit/node-fetch/index.js");
     }
 
     return result;
