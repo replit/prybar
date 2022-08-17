@@ -11,6 +11,10 @@ for t in ${tests}; do
 
     if [[ $t == 'nodejs' ]]; then 
       go test ./tests/nodejs
+
+      cd test_files
+      npm install
+      cd ..
     fi
 
     continue

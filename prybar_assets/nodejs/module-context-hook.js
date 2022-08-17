@@ -26,7 +26,7 @@ Module._findPath = function(request, paths, isMain) {
       // Switch to @replit/node-fetch
       console.log("\u001b[33mAuto-switching node-fetch to @replit/node-fetch for cjs support\u001b[0m");
 
-      return path.join(assets_dir, "node_modules/@replit/node-fetch/index.js");
+      return path.join(assets_dir, "nodejs/node_modules/@replit/node-fetch/index.js");
     }
 
     return result;
