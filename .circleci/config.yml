@@ -41,7 +41,7 @@ jobs:
           command: ssh-keyscan -H github.com >> ~/.ssh/known_hosts
       - checkout
       - setup_remote_docker:
-        version: 19.03.13
+          version: 19.03.13
       - run: make test-image
       - deploy:
           command: |
