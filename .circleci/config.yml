@@ -2,7 +2,7 @@ version: 2.1
 jobs:
   build_and_test:
     docker:
-      - image: docker:18.09
+      - image: docker:20.10
     steps:
       - add_ssh_keys:
           fingerprints:
@@ -30,7 +30,7 @@ jobs:
             - /nix
   build_test_and_deploy:
     docker:
-      - image: docker:18.09
+      - image: docker:20.10
     steps:
       - add_ssh_keys:
           fingerprints:
@@ -40,8 +40,7 @@ jobs:
           name: Keyscan Github (HACK) #https://discuss.circleci.com/t/known-hosts-in-circle-2-0/18544
           command: ssh-keyscan -H github.com >> ~/.ssh/known_hosts
       - checkout
-      - setup_remote_docker:
-          version: 20.10.14
+      - setup_remote_docker
       - run: make test-image
       - deploy:
           command: |
