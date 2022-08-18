@@ -1,0 +1,14 @@
+{
+  "name": "test_files",
+  "version": "1.0.0",
+  "description": "",
+  "main": "global_bug.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "dependencies": {
+    "node-fetch": "^3.2.10"
+  }
+}

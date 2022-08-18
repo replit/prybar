@@ -9,6 +9,32 @@ const nodeRepl = require('repl');
 const kReplitPrybarInit = Symbol.for('replit.prybar.init');
 const kReplitPrybarEvalCode = Symbol.for('replit.prybar.eval.code');
 const kReplitPrybarEvalFile = Symbol.for('replit.prybar.eval.file');
+let moduleMode = null;
+const assets_dir = 
+   process.env.PRYBAR_ASSETS_DIR || path.join(process.cwd(), 'prybar_assets');
+
+const originalFindPath = Module._findPath;
+Module._findPath = function(request, paths, isMain) {
+  if (moduleMode === "cjs" && request === 'node-fetch') {
+    // Because node-fetch version >= 3 doesn't support commonjs, we'll switch to
+    // @replit/node-fetch if it comes to that
+    const result = originalFindPath(request, paths, isMain);
+    const dir = path.dirname(result);
+    const packageJson = require(path.join(dir, "..", "package.json"));
+    const [major] = packageJson.version.split(".").map(Number);
+    if (major >= 3) {
+      // Switch to @replit/node-fetch
+      console.log("\u001b[33mAuto-switching node-fetch to @replit/node-fetch for cjs support\u001b[0m");
+
+      return path.join(assets_dir, "nodejs/node_modules/@replit/node-fetch/index.js");
+    }
+
+    return result;
+  } else {
+    
+    return originalFindPath(request, paths, isMain);
+  }
+}
 
 /**
  * The footer we append at the end of files to run the code we want in the scope of the module its appended to.
@@ -194,9 +220,11 @@ function runModule(moduleName, isInteractive) {
   }
 
   try {
+    moduleMode = "cjs";
     require(absPath);
   } catch (e) {
     if (e.code === 'ERR_REQUIRE_ESM') {
+      moduleMode = "esm";
       import(absPath);
     } else {
       throw e;
