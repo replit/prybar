@@ -2,7 +2,7 @@ version: 2.1
 jobs:
   build_and_test:
     docker:
-      - image: docker:20.10
+      - image: docker:18.09
     steps:
       - add_ssh_keys:
           fingerprints:
@@ -30,7 +30,7 @@ jobs:
             - /nix
   build_test_and_deploy:
     docker:
-      - image: docker:20.10
+      - image: docker:18.09
     steps:
       - add_ssh_keys:
           fingerprints:
