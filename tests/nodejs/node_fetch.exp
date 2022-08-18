@@ -11,4 +11,4 @@ expect -re {Node v\d+\.\d+.\d+ on (linux|darwin)}
 expect -re {Auto\-switching}
 expect -re {ok}
 expect -exact "\[0m\[90mHint: hit control+c anytime to enter REPL.\[0m\r
-�\[1G�\[0J--> �\[5G"
+\[1G\[0J--> \[5G"
