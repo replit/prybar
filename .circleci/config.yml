@@ -20,6 +20,15 @@ jobs:
     steps:
       - checkout
       - run: git checkout .
+      - restore_cache:
+          key: nix-store
+      - run: apk add coreutils git
+      - run: nix-build
+      - save_cache:
+          key: nix-store
+          when: always
+          paths:
+            - /nix
   build_test_and_deploy:
     docker:
       - image: docker:18.09
