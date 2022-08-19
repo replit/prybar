@@ -19,7 +19,8 @@ jobs:
       - image: nixos/nix:2.3.16
     steps:
       - checkout
-      - run: git checkout .
+      - run: git checkout . # circle CI checkout deleted the vendored node_modules
+                            # folders, this adds them back
       - restore_cache:
           key: nix-store
       - run: apk add coreutils git
