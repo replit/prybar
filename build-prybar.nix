@@ -1,5 +1,5 @@
 { language, buildInputs ? [ ], binaries ? [ ], setFlags ? false
-, pkgName ? language, nativeBuildInputs ? [ ] }:
+, pkgName ? language }:
 
 { lib, buildGo117Module, fetchFromGitHub, bash, expect, pkg-config, runCommand, git
 , python3, copyPathToStore, rev, makeWrapper }:
@@ -11,7 +11,7 @@ buildGo117Module {
   src = ./.;
 
   inherit buildInputs;
-  nativeBuildInputs = [ pkg-config makeWrapper ] ++ nativeBuildInputs;
+  nativeBuildInputs = [ pkg-config makeWrapper ];
 
   subPackages = [ "languages/${language}" ];
 

@@ -1,8 +1,0 @@
-#!/bin/sh
-
-set -e
-
-NODEJS_LANGUAGE_DIR="$(realpath $(dirname $0))"
-PRYBAR_ROOT_DIR="$(dirname $(dirname "${NODEJS_LANGUAGE_DIR}"))"
-
-cd "${PRYBAR_ROOT_DIR}/prybar_assets/nodejs" && HOME="" npm install

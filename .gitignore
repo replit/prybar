@@ -5,5 +5,3 @@ deps.lst
 prybar.tar.gz
 generated_*.go
 result*
-prybar_assets/nodejs/node_modules
-test_files/node_modules
