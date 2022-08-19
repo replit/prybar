@@ -18,7 +18,8 @@ jobs:
     docker:
       - image: nixos/nix:2.3.16
     steps:
-      - run: git clone -b "$CIRCLE_BRANCH" "$CIRCLE_REPOSITORY_URL"
+      - checkout
+      - run: git checkout
   build_test_and_deploy:
     docker:
       - image: docker:18.09
