@@ -19,7 +19,7 @@ jobs:
       - image: nixos/nix:2.3.16
     steps:
       - checkout
-      - run: git checkout
+      - run: git checkout .
   build_test_and_deploy:
     docker:
       - image: docker:18.09
