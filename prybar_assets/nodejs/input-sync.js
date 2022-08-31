@@ -130,19 +130,13 @@ function checkForSigs(char) {
  * @return {string} The input read (excluding newlines)
  */
 function question(prompt) {
-  let result = null,
-    error = null;
+  let result = null;
 
-  rl.question(prompt, (d, err) => {
+  rl.question(prompt, (d) => {
     result = d;
-    error = err;
   });
 
-  while (result == null && error == null) rd.readNext();
-
-  if (error != null) {
-    throw error;
-  }
+  while (result == null) rd.readNext();
 
   return result;
 }
