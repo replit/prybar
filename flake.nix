@@ -23,6 +23,13 @@
 
         clojureWithCP =
           import ./languages/clojure/wrappedClojure.nix { inherit pkgs; };
+        
+        python310Full = pkgs.python310.override {
+          self = python310Full;
+          pythonAttr = "python310Full";
+          bluezSupport = true;
+          x11Support = true;
+        };
 
       in {
         packages = {
@@ -46,6 +53,11 @@
           prybar-python3 = buildPrybar {
             language = "python3";
             buildInputs = [ pkgs.python38Full ];
+          };
+
+          prybar-python310 = buildPrybar {
+            language = "python3";
+            buildInputs = [ python310Full ];
           };
 
           prybar-lua = buildPrybar {
