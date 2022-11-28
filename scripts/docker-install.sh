@@ -41,12 +41,18 @@ rlwrap
 
 "
 
+
 export DEBIAN_FRONTEND=noninteractive
 apt-get update
+apt install software-properties-common -y
 apt-get install -y curl
 curl -sL https://deb.nodesource.com/setup_14.x | bash -
 apt-get install -y $(grep -v "^#" <<< "$packages")
 rm -rf /var/lib/apt/lists/*
+
+printf "\n" | add-apt-repository ppa:deadsnakes/ppa
+apt install python3.10 -y
+apt install python3.10-dev -y
 
 go_version=1.16.5
 wget "https://dl.google.com/go/go${go_version}.linux-amd64.tar.gz"
