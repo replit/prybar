@@ -56,7 +56,7 @@
           };
 
           prybar-python310 = buildPrybar {
-            language = "python3";
+            language = "python310";
             buildInputs = [ python310Full ];
           };
 
