@@ -1,10 +1,10 @@
-#!/usr/bin/expect -f
+#!/usr/bin/env -S expect -f
 
 set timeout -1
 spawn ./prybar-nodejs -i -q
 match_max 100000
 expect -exact "\[1G\[0J--> \[5G"
 send -- "x\r"
-expect -e "\[31mReferenceError: x is not defined\[0m\r"
+expect -e "ReferenceError: x is not defined"
 send -- ""
 expect eof
