@@ -1,10 +1,10 @@
 { language, buildInputs ? [ ], binaries ? [ ], setFlags ? false
 , pkgName ? language }:
 
-{ lib, buildGo117Module, fetchFromGitHub, bash, expect, pkg-config, runCommand, git
+{ lib, buildGo119Module, fetchFromGitHub, bash, expect, pkg-config, runCommand, git
 , python3, copyPathToStore, rev, makeWrapper }:
 
-buildGo117Module {
+buildGo119Module {
   pname = "prybar-${language}";
   version = rev;
 
