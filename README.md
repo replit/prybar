@@ -50,18 +50,34 @@ written in the host language which starts a Prybar-compatible REPL.
 | SQLite                    | ✔    | ✔               | ✔         | ✔    | ✗              | ✔          |
 | Tcl                       | ✔    | ✔               | ✔         | ✗    | ✗              | -          |
 
+## Start to Develop with Nix
+
+To get started developing Prybar, you can use the nix shell. Enter
+
+```
+nix develop
+```
+
+to drop into a shell that has all dependencies installed an ready to go.
+
+If you don't have nix yet, install that: https://nixos.org/
+
 ## Build and run
 
     % make help
     usage:
       make all          Build all Prybar binaries
       make prybar-LANG  Build the Prybar binary for LANG
-      make docker       Run a shell with Prybar inside Docker
+      make docker       Run a shell with Prybar inside Docker 
+                        (don't do this in the nix shell, although this is
+                                                not needed if you use nix)
       make image        Build a Docker image with Prybar for distribution
       make test         Run integration tests
       make test-image   Test Docker image for distribution
       make clean        Remove build artifacts
       make help         Show this message
+
+## You can also use Docker
 
 Prybar uses Docker to make it easy to get started with development.
 First, you must [install Docker](https://docs.docker.com/install/).

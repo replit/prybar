@@ -2,7 +2,7 @@
   description = "A universal interpreter front-end";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-22.11";
     flake-utils.url = "github:numtide/flake-utils";
   };
 
@@ -31,6 +31,12 @@
           x11Support = true;
         };
 
+        ocaml = pkgs.ocaml-ng.ocamlPackages_4_12.ocaml;
+        opam = pkgs.opam;
+        findlib = pkgs.ocaml-ng.ocamlPackages_4_12.findlib;
+        topkg = pkgs.ocaml-ng.ocamlPackages_4_12.topkg;
+        reason = pkgs.ocaml-ng.ocamlPackages_4_12.reason;
+
       in {
         packages = {
           prybar-R = buildPrybar {
@@ -42,7 +48,7 @@
 
           prybar-nodejs = buildPrybar {
             language = "nodejs";
-            binaries = [ pkgs.nodejs-12_x ];
+            binaries = [ pkgs.nodejs-16_x ];
           };
 
           prybar-python2 = buildPrybar {
@@ -52,12 +58,12 @@
 
           prybar-python3 = buildPrybar {
             language = "python3";
-            buildInputs = [ pkgs.python38Full ];
+            buildInputs = [ pkgs.libxcrypt pkgs.python38Full ];
           };
 
           prybar-python310 = buildPrybar {
             language = "python310";
-            buildInputs = [ python310Full ];
+            buildInputs = [ pkgs.libxcrypt python310Full ];
           };
 
           prybar-lua = buildPrybar {
@@ -78,11 +84,11 @@
             # This has to be in the build inputs so it set-ups the library paths before the check phase
             # It will not be copied over to the final package.
             buildInputs = [
-              pkgs.opam
-              pkgs.ocaml
-              pkgs.ocamlPackages.findlib
-              pkgs.ocamlPackages.topkg
-              pkgs.ocamlPackages.reason
+              opam
+              ocaml
+              findlib
+              topkg
+              reason
             ];
           };
 
@@ -116,6 +122,41 @@
             };
 
           };
+
+
+        devShells.default = pkgs.mkShell {
+          nativeBuildInputs = [
+            pkgs.pkg-config
+          ];
+          buildInputs = [
+            pkgs.libxcrypt
+            pkgs.R
+            pkgs.nodejs-16_x
+            pkgs.python2
+            pkgs.python38Full
+            pkgs.python310Full
+            pkgs.lua5_1
+            pkgs.readline
+            clojureWithCP
+            pkgs.jdk11_headless
+            opam
+            ocaml
+            findlib
+            topkg
+            reason
+            julia
+            pkgs.zlib
+            pkgs.ruby
+            pkgs.sqlite
+            pkgs.tcl
+            pkgs.expect
+          ];
+          shellHook = ''
+            export CGO_LDFLAGS_ALLOW="-Wl,--compress-debug-sections=zlib"
+            export DISABLE_GO_TESTS=1
+          '';
+        };
+      
 
       });
 }

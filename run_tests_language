@@ -4,7 +4,6 @@ stty cols 80
 stty rows 20
 
 language=$1
-expect_path=$2
 tests=$(find "./tests/${language}" ! -name '*.go' -printf '%P\n')
 
 for t in ${tests}; do
@@ -16,9 +15,9 @@ for t in ${tests}; do
   name=$(echo -n $t | sed -s 's/.*\/\(.*\).exp/\1/' | sed -s 's/_/ /g')
 
   echo -n "...    ${language} $name"
+  
 
-  sed -i "s;#!/usr/bin/expect;#!${expect_path}/expect;" "./tests/${language}/$t"
-  test_out=$(timeout 15 "./tests/${language}/$t" 2>&1)
+  test_out=$(timeout 15 expect -f "./tests/${language}/$t" 2>&1)
   if [[ $? != 0 ]]; then
     echo -e "\n========== \"$t\" failed =========="
     echo "$test_out"

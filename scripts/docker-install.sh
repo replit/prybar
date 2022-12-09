@@ -76,6 +76,14 @@ cp -R   julia-*/lib/*     /usr/lib/
 cp -R   julia-*/share/*   /usr/share/
 rm -rf  julia-*
 
+cat > /usr/lib/x86_64-linux-gnu/pkgconfig/julia.pc <<- EOM
+    Name: julia
+    Cflags: -I/usr/include/julia
+    Version: 1.5.4
+    Description: it's julia
+    Libs: -L/usr/lib -ljulia
+EOM
+
 wget -nv https://downloads.lightbend.com/scala/2.13.1/scala-2.13.1.tgz
 tar -xf *.tgz
 cp -R   scala-*/bin/*     /usr/local/bin/

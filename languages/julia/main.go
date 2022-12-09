@@ -3,7 +3,7 @@ package main
 // USING_CGO
 
 /*
-#cgo CFLAGS: -I/usr/include/julia
+#cgo pkg-config: julia
 #cgo LDFLAGS: -ljulia
 #include "pry.h"
 */
