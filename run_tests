@@ -9,7 +9,8 @@ for t in ${tests}; do
   if [[ $t != *.exp ]]; then
     echo "$t:"
 
-    if [[ $t == 'nodejs' ]]; then 
+    if [[ $t == 'nodejs' && $DISABLE_GO_TESTS != 1 ]]; then
+
       go test ./tests/nodejs
     fi
 
