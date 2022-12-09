@@ -58,12 +58,12 @@
 
           prybar-python3 = buildPrybar {
             language = "python3";
-            buildInputs = [ pkgs.python38Full ];
+            buildInputs = [ pkgs.libxcrypt pkgs.python38Full ];
           };
 
           prybar-python310 = buildPrybar {
             language = "python310";
-            buildInputs = [ python310Full ];
+            buildInputs = [ pkgs.libxcrypt python310Full ];
           };
 
           prybar-lua = buildPrybar {
