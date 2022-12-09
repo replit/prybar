@@ -2,7 +2,7 @@
   description = "A universal interpreter front-end";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
+    nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-22.11";
     flake-utils.url = "github:numtide/flake-utils";
   };
 
@@ -134,7 +134,7 @@
             clojureWithCP
             pkgs.jdk11_headless
             pkgs.opam
-            pkgs.ocaml
+            pkgs.ocaml-ng.ocamlPackages_4_08
             pkgs.ocamlPackages.findlib
             pkgs.ocamlPackages.topkg
             pkgs.ocamlPackages.reason
