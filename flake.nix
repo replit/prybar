@@ -117,6 +117,43 @@
 
           };
 
+
+        devShells.default = pkgs.mkShell {
+          nativeBuildInputs = [
+            pkgs.pkg-config
+          ];
+          buildInputs = [
+            pkgs.libxcrypt
+            pkgs.R
+            pkgs.nodejs-16_x
+            pkgs.python2
+            pkgs.python38Full
+            pkgs.python310Full
+            kgs.lua5_1
+            pkgs.readline
+            clojureWithCP
+            pkgs.jdk11_headless
+            pkgs.opam
+            pkgs.ocaml
+            pkgs.ocamlPackages.findlib
+            pkgs.ocamlPackages.topkg
+            pkgs.ocamlPackages.reason
+            julia
+            pkgs.zlib
+            pkgs.ruby
+            pkgs.lua5_1
+            pkgs.readline
+            pkgs.sqlite
+            pkgs.tcl
+            pkgs.expect
+          ];
+          shellHook = ''
+            export CGO_LDFLAGS_ALLOW="-Wl,--compress-debug-sections=zlib"
+            export DISABLE_GO_TESTS=1
+          '';
+        };
+      
+
       });
 }
 
