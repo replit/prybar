@@ -129,7 +129,7 @@
             pkgs.python2
             pkgs.python38Full
             pkgs.python310Full
-            kgs.lua5_1
+            pkgs.lua5_1
             pkgs.readline
             clojureWithCP
             pkgs.jdk11_headless
@@ -141,8 +141,6 @@
             julia
             pkgs.zlib
             pkgs.ruby
-            pkgs.lua5_1
-            pkgs.readline
             pkgs.sqlite
             pkgs.tcl
             pkgs.expect
