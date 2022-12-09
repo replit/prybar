@@ -1,4 +1,4 @@
-#!/usr/bin/expect -f
+#!/usr/bin/env -S expect -f
 
 spawn ./prybar-ocaml -e 1+1
 match_max 100000

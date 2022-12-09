@@ -1,4 +1,4 @@
-#!/usr/bin/expect -f
+#!/usr/bin/env -S expect -f
 set timeout -1
 set stty_init raw
 spawn ./run_no_pty ./prybar-nodejs -q -i

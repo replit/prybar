@@ -54,7 +54,6 @@ buildGoModule {
     # is running in.
     export HOME=$(echo pwd)
 
-    patchShebangs run_no_pty ./tests/${language}/*.exp
 
     # Currently the go tests won't work in nix because of something w/ nix's sandboxing.
     DISABLE_GO_TESTS=1 "${bash}/bin/bash" "./run_tests_language" "${language}" "${expect}/bin"

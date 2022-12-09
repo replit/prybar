@@ -1,4 +1,4 @@
-#!/usr/bin/expect -f
+#!/usr/bin/env -S expect -f
 
 set timeout -1
 spawn ./prybar-nodejs -i ./test_files/main_module_scoped_to_global.js
