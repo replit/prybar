@@ -31,6 +31,12 @@
           x11Support = true;
         };
 
+        ocaml = pkgs.ocaml-ng.ocamlPackages_4_12.ocaml;
+        opam = pkgs.opam;
+        findlib = pkgs.ocaml-ng.ocamlPackages_4_12.findlib;
+        topkg = pkgs.ocaml-ng.ocamlPackages_4_12.topkg;
+        reason = pkgs.ocaml-ng.ocamlPackages_4_12.reason;
+
       in {
         packages = {
           prybar-R = buildPrybar {
@@ -78,11 +84,11 @@
             # This has to be in the build inputs so it set-ups the library paths before the check phase
             # It will not be copied over to the final package.
             buildInputs = [
-              pkgs.opam
-              pkgs.ocaml
-              pkgs.ocamlPackages.findlib
-              pkgs.ocamlPackages.topkg
-              pkgs.ocamlPackages.reason
+              opam
+              ocaml
+              findlib
+              topkg
+              reason
             ];
           };
 
@@ -133,11 +139,11 @@
             pkgs.readline
             clojureWithCP
             pkgs.jdk11_headless
-            pkgs.opam
-            pkgs.ocaml
-            pkgs.ocamlPackages.findlib
-            pkgs.ocamlPackages.topkg
-            pkgs.ocamlPackages.reason
+            opam
+            ocaml
+            findlib
+            topkg
+            reason
             julia
             pkgs.zlib
             pkgs.ruby
