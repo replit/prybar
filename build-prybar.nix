@@ -54,9 +54,9 @@ buildGoModule {
     # is running in.
     export HOME=$(echo pwd)
 
-
     # Currently the go tests won't work in nix because of something w/ nix's sandboxing.
-    DISABLE_GO_TESTS=1 "${bash}/bin/bash" "./run_tests_language" "${language}" "${expect}/bin"
+
+    DISABLE_GO_TESTS=1 "${bash}/bin/bash" "./run_tests_language" "${language}"
 
     runHook postCheck
   '';

@@ -1,7 +1,7 @@
 #!/usr/bin/env -S expect -f
 set timeout -1
 set stty_init raw
-spawn ./run_no_pty ./prybar-nodejs -q -i
+spawn bash ./run_no_pty ./prybar-nodejs -q -i
 match_max 100000
 expect -exact "--> "
 
