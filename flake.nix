@@ -7,6 +7,16 @@
   };
 
   outputs = { self, nixpkgs, flake-utils }:
+    {
+      overlays.default = final: prev: {
+        prybar = {
+          inherit (self.packages.${prev.system})
+            prybar-R prybar-clojure prybar-elisp prybar-julia prybar-lua prybar-nodejs
+            prybar-ocaml prybar-python2 prybar-python3 prybar-python310 prybar-ruby
+            prybar-scala prybar-sqlite prybar-tcl;
+        };
+      };
+    } //
     flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = nixpkgs.legacyPackages.${system};
