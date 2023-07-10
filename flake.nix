@@ -2,7 +2,7 @@
   description = "A universal interpreter front-end";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-22.11";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-23.05";
     flake-utils.url = "github:numtide/flake-utils";
   };
 
@@ -58,12 +58,7 @@
 
           prybar-nodejs = buildPrybar {
             language = "nodejs";
-            binaries = [ pkgs.nodejs-16_x ];
-          };
-
-          prybar-python2 = buildPrybar {
-            language = "python2";
-            buildInputs = [ pkgs.python2 ];
+            binaries = [ pkgs.nodejs ];
           };
 
           prybar-python3 = buildPrybar {
@@ -141,8 +136,7 @@
           buildInputs = [
             pkgs.libxcrypt
             pkgs.R
-            pkgs.nodejs-16_x
-            pkgs.python2
+            pkgs.nodejs
             pkgs.python38Full
             pkgs.python310Full
             pkgs.lua5_1
