@@ -53,6 +53,7 @@ buildGoModule {
     # Nix unsets HOME but some tests rely on it, let's set it to whatever tmp dir the check
     # is running in.
     export HOME=$(echo pwd)
+    export PATH=$PATH:${lib.makeBinPath ([expect] ++ binaries)}
 
     # Currently the go tests won't work in nix because of something w/ nix's sandboxing.
 
