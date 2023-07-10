@@ -11,7 +11,7 @@
       overlays.default = final: prev: {
         prybar = prev.lib.recurseIntoAttrs {
           inherit (self.packages.${prev.system})
-            prybar-R prybar-clojure prybar-elisp prybar-julia prybar-lua prybar-nodejs
+            prybar-clojure prybar-elisp prybar-julia prybar-lua prybar-nodejs
             prybar-ocaml prybar-python2 prybar-python3 prybar-python310 prybar-ruby
             prybar-scala prybar-sqlite prybar-tcl;
         };
@@ -49,12 +49,6 @@
 
       in {
         packages = {
-          prybar-R = buildPrybar {
-            language = "R";
-            buildInputs = [ pkgs.R ];
-            pkgName = "libR";
-            setFlags = true;
-          };
 
           prybar-nodejs = buildPrybar {
             language = "nodejs";
