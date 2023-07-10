@@ -12,7 +12,7 @@
         prybar = prev.lib.recurseIntoAttrs {
           inherit (self.packages.${prev.system})
             prybar-clojure prybar-elisp prybar-julia prybar-nodejs
-            prybar-ocaml prybar-python2 prybar-python3 prybar-python310 prybar-ruby
+            prybar-ocaml prybar-python2 prybar-python3 prybar-python310
             prybar-scala prybar-sqlite prybar-tcl;
         };
       };
@@ -105,14 +105,6 @@
               buildInputs = [ julia ];
               setFlags = true;
               binaries = [ pkgs.zlib ];
-            };
-
-            # The official Ruby packages is running ruby 2.7
-            prybar-ruby = buildPrybar {
-              language = "ruby";
-              buildInputs = [ pkgs.ruby ];
-              pkgName = "ruby-2.7";
-              setFlags = true;
             };
 
           };
