@@ -12,7 +12,7 @@
         prybar = prev.lib.recurseIntoAttrs {
           inherit (self.packages.${prev.system})
             prybar-elisp prybar-julia prybar-nodejs
-            prybar-ocaml prybar-python2 prybar-python3 prybar-python310
+            prybar-python2 prybar-python3 prybar-python310
             prybar-scala prybar-sqlite prybar-tcl;
         };
       };
@@ -41,12 +41,6 @@
           x11Support = true;
         };
 
-        ocaml = pkgs.ocaml-ng.ocamlPackages_4_12.ocaml;
-        opam = pkgs.opam;
-        findlib = pkgs.ocaml-ng.ocamlPackages_4_12.findlib;
-        topkg = pkgs.ocaml-ng.ocamlPackages_4_12.topkg;
-        reason = pkgs.ocaml-ng.ocamlPackages_4_12.reason;
-
       in {
         packages = {
 
@@ -66,19 +60,6 @@
           };
 
           prybar-elisp = buildPrybar { language = "elisp"; };
-
-          prybar-ocaml = buildPrybar {
-            language = "ocaml";
-            # This has to be in the build inputs so it set-ups the library paths before the check phase
-            # It will not be copied over to the final package.
-            buildInputs = [
-              opam
-              ocaml
-              findlib
-              topkg
-              reason
-            ];
-          };
 
           prybar-scala = buildPrybar { language = "scala"; };
 
@@ -118,11 +99,6 @@
             pkgs.readline
             clojureWithCP
             pkgs.jdk11_headless
-            opam
-            ocaml
-            findlib
-            topkg
-            reason
             julia
             pkgs.zlib
             pkgs.ruby
