@@ -11,7 +11,7 @@
       overlays.default = final: prev: {
         prybar = prev.lib.recurseIntoAttrs {
           inherit (self.packages.${prev.system})
-            prybar-clojure prybar-elisp prybar-julia prybar-nodejs
+            prybar-elisp prybar-julia prybar-nodejs
             prybar-ocaml prybar-python2 prybar-python3 prybar-python310
             prybar-scala prybar-sqlite prybar-tcl;
         };
@@ -63,12 +63,6 @@
           prybar-python310 = buildPrybar {
             language = "python310";
             buildInputs = [ pkgs.libxcrypt python310Full ];
-          };
-
-          prybar-clojure = buildPrybar {
-            language = "clojure";
-            buildInputs = [ clojureWithCP ];
-            binaries = [ pkgs.jdk11_headless ];
           };
 
           prybar-elisp = buildPrybar { language = "elisp"; };
