@@ -2,7 +2,7 @@
   description = "A universal interpreter front-end";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-22.11";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-23.05";
     flake-utils.url = "github:numtide/flake-utils";
   };
 
@@ -11,8 +11,8 @@
       overlays.default = final: prev: {
         prybar = prev.lib.recurseIntoAttrs {
           inherit (self.packages.${prev.system})
-            prybar-R prybar-clojure prybar-elisp prybar-julia prybar-lua prybar-nodejs
-            prybar-ocaml prybar-python2 prybar-python3 prybar-python310 prybar-ruby
+            prybar-elisp prybar-julia prybar-nodejs
+            prybar-python2 prybar-python3 prybar-python310
             prybar-scala prybar-sqlite prybar-tcl;
         };
       };
@@ -41,29 +41,12 @@
           x11Support = true;
         };
 
-        ocaml = pkgs.ocaml-ng.ocamlPackages_4_12.ocaml;
-        opam = pkgs.opam;
-        findlib = pkgs.ocaml-ng.ocamlPackages_4_12.findlib;
-        topkg = pkgs.ocaml-ng.ocamlPackages_4_12.topkg;
-        reason = pkgs.ocaml-ng.ocamlPackages_4_12.reason;
-
       in {
         packages = {
-          prybar-R = buildPrybar {
-            language = "R";
-            buildInputs = [ pkgs.R ];
-            pkgName = "libR";
-            setFlags = true;
-          };
 
           prybar-nodejs = buildPrybar {
             language = "nodejs";
-            binaries = [ pkgs.nodejs-16_x ];
-          };
-
-          prybar-python2 = buildPrybar {
-            language = "python2";
-            buildInputs = [ pkgs.python2 ];
+            binaries = [ pkgs.nodejs ];
           };
 
           prybar-python3 = buildPrybar {
@@ -76,31 +59,7 @@
             buildInputs = [ pkgs.libxcrypt python310Full ];
           };
 
-          prybar-lua = buildPrybar {
-            language = "lua";
-            buildInputs = [ pkgs.lua5_1 pkgs.readline ];
-          };
-
-          prybar-clojure = buildPrybar {
-            language = "clojure";
-            buildInputs = [ clojureWithCP ];
-            binaries = [ pkgs.jdk11_headless ];
-          };
-
           prybar-elisp = buildPrybar { language = "elisp"; };
-
-          prybar-ocaml = buildPrybar {
-            language = "ocaml";
-            # This has to be in the build inputs so it set-ups the library paths before the check phase
-            # It will not be copied over to the final package.
-            buildInputs = [
-              opam
-              ocaml
-              findlib
-              topkg
-              reason
-            ];
-          };
 
           prybar-scala = buildPrybar { language = "scala"; };
 
@@ -123,14 +82,6 @@
               binaries = [ pkgs.zlib ];
             };
 
-            # The official Ruby packages is running ruby 2.7
-            prybar-ruby = buildPrybar {
-              language = "ruby";
-              buildInputs = [ pkgs.ruby ];
-              pkgName = "ruby-2.7";
-              setFlags = true;
-            };
-
           };
 
 
@@ -141,19 +92,13 @@
           buildInputs = [
             pkgs.libxcrypt
             pkgs.R
-            pkgs.nodejs-16_x
-            pkgs.python2
+            pkgs.nodejs
             pkgs.python38Full
             pkgs.python310Full
             pkgs.lua5_1
             pkgs.readline
             clojureWithCP
             pkgs.jdk11_headless
-            opam
-            ocaml
-            findlib
-            topkg
-            reason
             julia
             pkgs.zlib
             pkgs.ruby
