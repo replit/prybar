@@ -49,6 +49,7 @@ written in the host language which starts a Prybar-compatible REPL.
 | Ruby 2.5                  | ✔    | ✔               | ✔         | ✔    | ✗              | ✗          |
 | SQLite                    | ✔    | ✔               | ✔         | ✔    | ✗              | ✔          |
 | Tcl                       | ✔    | ✔               | ✔         | ✗    | ✗              | -          |
+| Hoon                      | ✗    | ✔               | ✔         | ✔    | ✗              | ✗          |
 
 ## Start to Develop with Nix
 
