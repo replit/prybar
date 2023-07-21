@@ -13,7 +13,7 @@
           inherit (self.packages.${prev.system})
             prybar-R prybar-clojure prybar-elisp prybar-julia prybar-lua prybar-nodejs
             prybar-ocaml prybar-python2 prybar-python3 prybar-python310 prybar-ruby
-            prybar-scala prybar-sqlite prybar-tcl;
+            prybar-scala prybar-sqlite prybar-tcl prybar-hoon;
         };
       };
     } //
