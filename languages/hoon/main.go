@@ -14,7 +14,10 @@ import (
 	"strings"
 )
 
-type Hoon struct{}
+type Hoon struct {
+	ps1 string
+	ps2 string
+}
 
 func (p Hoon) Open() {
 }
@@ -47,10 +50,12 @@ func (p Hoon) EvalFile(file string, args []string) int {
 	if err != nil {
 		panic(err)
 	}
-	_, _, err = RunCommand(string(fileContents))
+	out, _, err := RunCommand(string(fileContents))
 	if err != nil {
 		panic(err)
 	}
+
+	fmt.Println(string(out))
 
 	return 0
 }
