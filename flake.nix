@@ -104,6 +104,8 @@
 
           prybar-scala = buildPrybar { language = "scala"; };
 
+          prybar-hoon = buildPrybar { language = "hoon"; };
+
           prybar-sqlite = buildPrybar {
             language = "sqlite";
             binaries = [ pkgs.sqlite ];
@@ -160,6 +162,7 @@
             pkgs.sqlite
             pkgs.tcl
             pkgs.expect
+            pkgs.urbit
           ];
           shellHook = ''
             export CGO_LDFLAGS_ALLOW="-Wl,--compress-debug-sections=zlib"
