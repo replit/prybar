@@ -42,17 +42,19 @@
         };
 
       in {
-        packages = {
+        packages = rec {
 
           prybar-nodejs = buildPrybar {
             language = "nodejs";
             binaries = [ pkgs.nodejs ];
           };
 
-          prybar-python3 = buildPrybar {
+          prybar-python38 = buildPrybar {
             language = "python3";
             buildInputs = [ pkgs.libxcrypt pkgs.python38Full ];
           };
+
+          prybar-python3 = prybar-python38;
 
           prybar-python310 = buildPrybar {
             language = "python310";
