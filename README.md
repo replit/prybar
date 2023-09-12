@@ -52,7 +52,23 @@ written in the host language which starts a Prybar-compatible REPL.
 
 ## Start to Develop with Nix
 
-To get started developing Prybar, you can use the nix shell. Enter
+Look in `packages` in `flake.nix`. For each package present, you can do
+
+```
+nix build .#<package name>
+```
+
+to build it. The result will be a directory named `result`.
+
+Example:
+
+```
+$ nix build .#prybar-python311
+$ ls result/bin
+prybar-python311
+```
+
+Alternately, you can use the nix shell. Enter
 
 ```
 nix develop
@@ -76,29 +92,6 @@ If you don't have nix yet, install that: https://nixos.org/
       make test-image   Test Docker image for distribution
       make clean        Remove build artifacts
       make help         Show this message
-
-## You can also use Docker
-
-Prybar uses Docker to make it easy to get started with development.
-First, you must [install Docker](https://docs.docker.com/install/).
-Then, run:
-
-    $ make docker
-
-to create a Docker image containing the Prybar code and all of its
-dependencies, and launch a shell inside of it. The Prybar source
-repository will be synchronized with the working directory of the
-container's filesystem, so you only need to re-run `make docker` if
-you change the Dockerfile or any of its scripts.
-
-To build Prybar (this should be done inside `make docker` unless you
-have installed all of Prybar's dependencies on your system), run
-`make` or `make all`. Then the `prybar-LANG` binaries will be
-available in the working directory and on `$PATH`, one for each
-supported language `LANG` ([see the `languages` subdirectory of this
-repository](languages)):
-
-    $ prybar-python3 -h
 
 ### Distribution
 
