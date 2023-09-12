@@ -1,19 +1,5 @@
 version: 2.1
 jobs:
-  build_and_test:
-    docker:
-      - image: docker:18.09
-    steps:
-      - add_ssh_keys:
-          fingerprints:
-            - "93:22:9e:64:86:b2:d7:23:41:ab:6f:e7:1a:02:35:a8"
-      - run: apk add --no-cache --no-progress make git openssh
-      - run:
-          name: Keyscan Github (HACK) #https://discuss.circleci.com/t/known-hosts-in-circle-2-0/18544
-          command: ssh-keyscan -H github.com >> ~/.ssh/known_hosts
-      - checkout
-      - setup_remote_docker
-      - run: make test-image
   nix_build:
     docker:
       - image: nixos/nix:2.3.16
@@ -30,42 +16,10 @@ jobs:
           when: always
           paths:
             - /nix
-  build_test_and_deploy:
-    docker:
-      - image: docker:18.09
-    steps:
-      - add_ssh_keys:
-          fingerprints:
-            - "93:22:9e:64:86:b2:d7:23:41:ab:6f:e7:1a:02:35:a8"
-      - run: apk add --no-cache --no-progress make git openssh
-      - run:
-          name: Keyscan Github (HACK) #https://discuss.circleci.com/t/known-hosts-in-circle-2-0/18544
-          command: ssh-keyscan -H github.com >> ~/.ssh/known_hosts
-      - checkout
-      - setup_remote_docker
-      - run: make test-image
-      - deploy:
-          command: |
-            echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_USERNAME" --password-stdin
-            docker tag prybar:latest replco/prybar:latest
-            docker push replco/prybar:latest
-            git tag "circleci_pipeline_<< pipeline.number >>_build_${CIRCLE_BUILD_NUM}"
-            git push origin "circleci_pipeline_<< pipeline.number >>_build_${CIRCLE_BUILD_NUM}"
-
 workflows:
   ci:
     jobs:
-      - build_and_test:
-          filters:
-            branches:
-              ignore: master
       - nix_build:
           filters:
             branches:
               ignore: master
-      - build_test_and_deploy:
-          context: Docker Hub
-          filters:
-            branches:
-              only:
-                - master
