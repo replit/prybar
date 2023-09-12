@@ -12,7 +12,7 @@
         prybar = prev.lib.recurseIntoAttrs {
           inherit (self.packages.${prev.system})
             prybar-elisp prybar-julia prybar-nodejs
-            prybar-python2 prybar-python3 prybar-python310
+            prybar-python2 prybar-python3 prybar-python38 prybar-python310
             prybar-scala prybar-sqlite prybar-tcl;
         };
       };
@@ -33,6 +33,13 @@
 
         clojureWithCP =
           import ./languages/clojure/wrappedClojure.nix { inherit pkgs; };
+
+        python38Full = pkgs.python38Full.override {
+          self = python38Full;
+          pythonAttr = "python38Full";
+          bluezSupport = true;
+          x11Support = true;
+        };
         
         python310Full = pkgs.python310.override {
           self = python310Full;
@@ -56,12 +63,12 @@
             binaries = [ pkgs.nodejs ];
           };
 
-          prybar-python3 = buildPrybar {
+          prybar-python38 = buildPrybar {
             language = "python3";
-            buildInputs = [ pkgs.libxcrypt pkgs.python38Full ];
+            buildInputs = [ pkgs.libxcrypt python38Full ];
           };
 
-          prybar-python38 = prybar-python3;
+          prybar-python3 = prybar-python38;
 
           prybar-python310 = buildPrybar {
             language = "python310";
@@ -126,8 +133,6 @@
             export DISABLE_GO_TESTS=1
           '';
         };
-      
-
       });
 }
 
