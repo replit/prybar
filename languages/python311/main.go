@@ -13,32 +13,32 @@ import (
 	"os"
 	"path"
 	"strings"
-	"unicode/utf16"
 	"unsafe"
 )
 
-var programName *C.wchar_t
+func Py_SetProgramName(name string) error {
+	cname := C.CString(name)
+	defer C.free(unsafe.Pointer(cname))
+	C.pry_set_program_name(cname)
+	return nil
+}
 
-type Python struct{}
-
-func (p Python) Open() {
+func init() {
 	name := "python"
 	virtualEnv, virtualEnvSet := os.LookupEnv("VIRTUAL_ENV")
 	if virtualEnvSet {
 		name = path.Join(virtualEnv, "bin", "python")
 	}
-
-	wname := utf16.Encode([]rune(name))
-
-	var pyConfig C.PyConfig
-	C.PyConfig_InitPythonConfig(&pyConfig)
-	res := C.PyConfig_SetString(&pyConfig, &pyConfig.program_name, (*C.Wchar_t)(wname))
-	if C.PyStatus_Exception(res) != 0 {
-		C.PyConfig_Clear(&pyConfig)
-		panic(fmt.Sprintf("cannot set prybar-python311 program name to '%s'", name))
+	err := Py_SetProgramName(name)
+	if err != nil {
+		panic(fmt.Sprintf("cannot set prybar-python3 program name to '%s': %s", name, err))
 	}
+}
 
-	C.Py_InitializeFromConfig(&pyConfig)
+type Python struct{}
+
+func (p Python) Open() {
+	C.Py_Initialize()
 	p.loadModule("readline")
 	p.Eval("import signal")
 	p.Eval("signal.signal(signal.SIGINT, signal.default_int_handler)")

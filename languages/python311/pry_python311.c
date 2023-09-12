@@ -2,6 +2,11 @@
 
 int pry_eval_file(FILE *f, const char *file, int argn, const char *argv)
 {
+    PyStatus status;
+
+    PyConfig config;
+    PyConfig_InitPythonConfig(&config);
+
     wchar_t *xargv[argn + 1];
     const char *ptr = argv;
     for (int i = 0; i < argn; ++i)
@@ -10,7 +15,12 @@ int pry_eval_file(FILE *f, const char *file, int argn, const char *argv)
         ptr += strlen(ptr) + 1;
     }
     xargv[argn] = NULL;
-    PySys_SetArgvEx(argn, xargv, 1);
+    PyConfig_SetArgv(&config, argn, xargv);
+    status = Py_InitializeFromConfig(&config);
+
+    if (PyStatus_Exception(status)) {
+        return status.exitcode;
+    }
 
     return PyRun_AnyFile(f, file);
 }
@@ -91,7 +101,7 @@ pymain_run_interactive_hook(int *exitcode)
         goto error;
     }
 
-    result = _PyObject_CallNoArg(hook);
+    result = PyObject_CallNoArgs(hook);
     Py_DECREF(hook);
     if (result == NULL) {
         goto error;
@@ -103,6 +113,19 @@ pymain_run_interactive_hook(int *exitcode)
 error:
     PySys_WriteStderr("Failed calling sys.__interactivehook__\n");
     return pymain_err_print(exitcode);
+}
+
+int pry_set_program_name(const char *name) {
+    wchar_t *wideName = Py_DecodeLocale(name, NULL);
+    PyStatus status;
+
+    PyConfig config;
+    PyConfig_InitPythonConfig(&config);
+
+    /* Set the program name. Implicitly preinitialize Python. */
+    status = PyConfig_SetString(&config, &config.program_name,
+                                wideName);
+    return status._type;
 }
 
 int
