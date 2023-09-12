@@ -7,6 +7,7 @@ int pry_eval_file(FILE *f, const char *file, int argn, const char *argv)
     for (int i = 0; i < argn; ++i)
     {
         xargv[i] = Py_DecodeLocale(ptr, NULL);
+        ptr += strlen(ptr) + 1;
     }
     xargv[argn] = NULL;
     PySys_SetArgvEx(argn, xargv, 1);
