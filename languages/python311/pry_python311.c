@@ -1,38 +1,26 @@
 #include "pry_python311.h"
+#include <libgen.h>
 
-int pry_eval_file(FILE *f, const char *file, int argn, const char *argv)
+int pry_eval_file(const char *program_name, int argn, const char *argv)
 {
-    PyStatus status;
-
-    PyConfig config;
-    PyConfig_InitPythonConfig(&config);
-
-    wchar_t *xargv[argn + 1];
+    wchar_t *xargv[argn + 2];
     const char *ptr = argv;
+    xargv[0] = L"python";
     for (int i = 0; i < argn; ++i)
     {
-        xargv[i] = Py_DecodeLocale(ptr, NULL);
+        printf("arg %d: %s\n", i, ptr);
+        xargv[i + 1] = Py_DecodeLocale(ptr, NULL);
         ptr += strlen(ptr) + 1;
     }
-    xargv[argn] = NULL;
-    PyConfig_SetArgv(&config, argn, xargv);
+    xargv[argn + 1] = NULL;
 
-    printf("filename: %s\n", file);
-
-    config.module_search_paths_set = 1;
-    status = PyConfig_SetBytesString(&config, &config.program_name,
-                                "/home/toby/replit/prybar/main.py");
-    status = PyConfig_SetBytesString(&config, &config.run_filename,
-                                "/home/toby/replit/prybar/main.py");
-    status = PyWideStringList_Append(&config.module_search_paths,
-        L"/home/toby/replit/prybar/");
-    status = Py_InitializeFromConfig(&config);
-    PyConfig_Clear(&config);
-    if (PyStatus_Exception(status)) {
-        return status.exitcode;
-    }
-
-    return PyRun_AnyFile(f, file);
+    PyConfig config;
+    // set the program name with a config
+    PyConfig_InitPythonConfig(&config);
+    PyConfig_SetBytesString(&config, &config.program_name, program_name);
+    Py_InitializeFromConfig(&config);
+    
+    return Py_Main(argn, xargv);
 }
 
 const char *pry_eval(const char *code, int start)
@@ -123,22 +111,6 @@ pymain_run_interactive_hook(int *exitcode)
 error:
     PySys_WriteStderr("Failed calling sys.__interactivehook__\n");
     return pymain_err_print(exitcode);
-}
-
-PyStatus pry_set_program_name(const char *name) {
-    PyStatus status;
-    PyConfig config;
-    PyConfig_InitPythonConfig(&config);
-
-    wchar_t *wideName = Py_DecodeLocale(name, NULL);    
-    status = PyConfig_SetString(&config, &config.program_name,
-                                wideName);
-    if (status._type != _PyStatus_TYPE_OK) {
-        return status;
-    }
-    status = Py_InitializeFromConfig(&config);
-    PyConfig_Clear(&config);
-    return status;
 }
 
 int

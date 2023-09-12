@@ -5,3 +5,4 @@ deps.lst
 prybar.tar.gz
 generated_*.go
 result*
+__pycache__
