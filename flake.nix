@@ -65,18 +65,27 @@
 
           prybar-python38 = buildPrybar {
             language = "python3";
+            target = "python38";
+            cgoPkgs = "python-3.8-embed";
+            cgoExtraCflags = "-DPYTHON_3_8";
             buildInputs = [ pkgs.libxcrypt python38Full ];
           };
 
           prybar-python3 = prybar-python38;
 
           prybar-python310 = buildPrybar {
-            language = "python310";
+            language = "python3";
+            target = "python310";
+            cgoPkgs = "python-3.10-embed";
+            cgoExtraCflags = "-DPYTHON_3_10";
             buildInputs = [ pkgs.libxcrypt python310Full ];
           };
 
           prybar-python311 = buildPrybar {
-            language = "python311";
+            language = "python3";
+            target = "python311";
+            cgoPkgs = "python-3.11-embed";
+            cgoExtraCflags = "-DPYTHON_3_11";
             buildInputs = [ pkgs.libxcrypt python311Full ];
           };
 

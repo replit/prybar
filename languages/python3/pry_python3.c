@@ -12,6 +12,11 @@ int pry_eval_file(FILE *f, const char *file, int argn, const char *argv)
     xargv[argn] = NULL;
     PySys_SetArgvEx(argn, xargv, 1);
 
+    #if defined(PYTHON_3_10) || defined(PYTHON_3_11)
+        char absolutePathBuffer [PATH_MAX+1];
+        file = realpath(file, absolutePathBuffer);
+    #endif
+
     return PyRun_AnyFile(f, file);
 }
 
@@ -91,7 +96,13 @@ pymain_run_interactive_hook(int *exitcode)
         goto error;
     }
 
-    result = _PyObject_CallNoArg(hook);
+    #ifdef PYTHON_3_11
+        result = PyObject_CallNoArgs(hook);
+    #else
+        result = _PyObject_CallNoArg(hook); 
+    #endif
+
+
     Py_DECREF(hook);
     if (result == NULL) {
         goto error;

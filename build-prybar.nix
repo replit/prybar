@@ -1,5 +1,5 @@
-{ language, buildInputs ? [ ], binaries ? [ ], setFlags ? false
-, pkgName ? language }:
+{ language, target ? language, buildInputs ? [ ], binaries ? [ ], setFlags ? false
+, pkgName ? language, cgoPkgs ? null, cgoExtraCflags ? "" }:
 
 { lib, buildGoModule, fetchFromGitHub, bash, expect, pkg-config, runCommand, git
 , python3, copyPathToStore, rev, makeWrapper }:
@@ -27,7 +27,12 @@ buildGoModule {
       export NIX_LDFLAGS="$(pkg-config --libs-only-L  ${pkgName}) $(pkg-config --libs-only-l  ${pkgName}) $NIX_LDFLAGS"
     '' else
       ""}
-
+    
+    ${if cgoPkgs != null then ''
+    export CGO_CFLAGS="$(pkg-config --cflags ${cgoPkgs}) ${cgoExtraCflags}"
+    export CGO_LDFLAGS="$(pkg-config --libs ${cgoPkgs})"
+    '' else ""}
+    
     ${bash}/bin/bash ./scripts/inject.sh ${language}
     go generate ./languages/${language}/main.go
 
@@ -68,7 +73,7 @@ buildGoModule {
   '';
 
   postInstall = ''
-    mv $out/bin/${language} $out/bin/prybar-${language}
+    mv $out/bin/${language} $out/bin/prybar-${target}
 
     if [ -d "./prybar_assets/${language}" ] 
     then
