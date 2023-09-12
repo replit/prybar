@@ -1,5 +1,10 @@
 version: 2.1
 jobs:
+  build_and_test:
+    docker:
+      - image: docker:18.09
+    steps:
+      - run: echo skip
   nix_build:
     docker:
       - image: nixos/nix:2.3.16
@@ -19,6 +24,10 @@ jobs:
 workflows:
   ci:
     jobs:
+      - build_and_test:
+        filters:
+          branches:
+            ignore: master
       - nix_build:
           filters:
             branches:
