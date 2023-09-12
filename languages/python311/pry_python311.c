@@ -1,26 +1,18 @@
 #include "pry_python311.h"
-#include <libgen.h>
 
-int pry_eval_file(const char *program_name, int argn, const char *argv)
+int pry_eval_file(FILE *f, const char *file, int argn, const char *argv)
 {
-    wchar_t *xargv[argn + 2];
+    wchar_t *xargv[argn + 1];
     const char *ptr = argv;
-    xargv[0] = L"python";
     for (int i = 0; i < argn; ++i)
     {
-        printf("arg %d: %s\n", i, ptr);
-        xargv[i + 1] = Py_DecodeLocale(ptr, NULL);
+        xargv[i] = Py_DecodeLocale(ptr, NULL);
         ptr += strlen(ptr) + 1;
     }
-    xargv[argn + 1] = NULL;
+    xargv[argn] = NULL;
+    PySys_SetArgvEx(argn, xargv, 1);
 
-    PyConfig config;
-    // set the program name with a config
-    PyConfig_InitPythonConfig(&config);
-    PyConfig_SetBytesString(&config, &config.program_name, program_name);
-    Py_InitializeFromConfig(&config);
-    
-    return Py_Main(argn, xargv);
+    return PyRun_AnyFile(f, file);
 }
 
 const char *pry_eval(const char *code, int start)

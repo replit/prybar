@@ -9,19 +9,42 @@ package main
 import "C"
 
 import (
+	"fmt"
 	"os"
 	"path"
 	"strings"
 	"unsafe"
 )
 
-func GetProgramName() string {
+var programName *C.wchar_t
+
+func Py_SetProgramName(name string) error {
+	cname := C.CString(name)
+	defer C.free(unsafe.Pointer(cname))
+
+	newProgramName := C.Py_DecodeLocale(cname, nil)
+	if newProgramName == nil {
+		return fmt.Errorf("fail to call Py_DecodeLocale on '%s'", name)
+	}
+	C.Py_SetProgramName(newProgramName)
+
+	//no operation is performed if nil
+	C.PyMem_RawFree(unsafe.Pointer(programName))
+	programName = newProgramName
+
+	return nil
+}
+
+func init() {
 	name := "python"
 	virtualEnv, virtualEnvSet := os.LookupEnv("VIRTUAL_ENV")
 	if virtualEnvSet {
 		name = path.Join(virtualEnv, "bin", "python")
 	}
-	return name
+	err := Py_SetProgramName(name)
+	if err != nil {
+		panic(fmt.Sprintf("cannot set prybar-python3 program name to '%s': %s", name, err))
+	}
 }
 
 type Python struct{}
@@ -51,14 +74,22 @@ func (p Python) EvalExpression(code string) string {
 }
 
 func (p Python) EvalFile(file string, args []string) int {
+	handle := C.stdin
+	cfile := C.CString(file)
+	defer C.free(unsafe.Pointer(cfile))
+
+	if file != "-" {
+		cmode := C.CString("r")
+
+		defer C.free(unsafe.Pointer(cmode))
+		handle = C.fopen(cfile, cmode)
+		defer C.fclose(handle)
+	}
+
 	argv := C.CString(file + "\x00" + strings.Join(args, "\x00"))
 	defer C.free(unsafe.Pointer(argv))
 
-	programName := GetProgramName()
-	cprogramName := C.CString(programName)
-	defer C.free(unsafe.Pointer(cprogramName))
-
-	status := (C.pry_eval_file(cprogramName, C.int(len(args)+1), argv))
+	status := (C.pry_eval_file(handle, cfile, C.int(len(args)+1), argv))
 
 	// if status is non-zero an error occured.
 	if status != 0 {
