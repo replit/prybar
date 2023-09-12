@@ -14,19 +14,25 @@ prybar-%: utils/*.go languages/%/* ## Build the Prybar binary for LANG
 prybar-python38: utils/*.go languages/python3/*
 	@echo "build prybar-python38..."
 	@scripts/inject.sh python3
-	CGO_CFLAGS="$(shell pkg-config --cflags python-3.8-embed) -DPYTHON_3_8" CGO_LDFLAGS="$(shell pkg-config --libs python-3.8-embed)" go build -o prybar-python38 ./languages/python3/
+	CGO_CFLAGS="$(shell pkg-config --cflags python-3.8-embed) -DPYTHON_3_8" \
+	CGO_LDFLAGS="$(shell pkg-config --libs python-3.8-embed)" \
+	go build -o prybar-python38 ./languages/python3/
 	@rm -f languages/python3/generated_*.go
 
 prybar-python310: utils/*.go languages/python3/*
 	@echo "build prybar-python310..."
 	@scripts/inject.sh python3
-	CGO_CFLAGS="$(shell pkg-config --cflags python-3.10-embed) -DPYTHON_3_10" CGO_LDFLAGS="$(shell pkg-config --libs python-3.10-embed)" go build -o prybar-python310 ./languages/python3/
+	CGO_CFLAGS="$(shell pkg-config --cflags python-3.10-embed) -DPYTHON_3_10" \
+	CGO_LDFLAGS="$(shell pkg-config --libs python-3.10-embed)" \
+	go build -o prybar-python310 ./languages/python3/
 	@rm -f languages/python3/generated_*.go
 
 prybar-python311: utils/*.go languages/python3/*
 	@echo "build prybar-python311..."
 	@scripts/inject.sh python3
-	CGO_CFLAGS="$(shell pkg-config --cflags python-3.11-embed) -DPYTHON_3_11" CGO_LDFLAGS="$(shell pkg-config --libs python-3.11-embed)" go build -o prybar-python311 ./languages/python3/
+	CGO_CFLAGS="$(shell pkg-config --cflags python-3.11-embed) -DPYTHON_3_11" \
+	CGO_LDFLAGS="$(shell pkg-config --libs python-3.11-embed)" \
+	go build -o prybar-python311 ./languages/python3/
 	@rm -f languages/python3/generated_*.go
 
 .PHONY: docker
