@@ -115,17 +115,19 @@ error:
     return pymain_err_print(exitcode);
 }
 
-int pry_set_program_name(const char *name) {
-    wchar_t *wideName = Py_DecodeLocale(name, NULL);
+PyStatus pry_set_program_name(const char *name) {
     PyStatus status;
-
     PyConfig config;
     PyConfig_InitPythonConfig(&config);
 
-    /* Set the program name. Implicitly preinitialize Python. */
+    wchar_t *wideName = Py_DecodeLocale(name, NULL);    
     status = PyConfig_SetString(&config, &config.program_name,
                                 wideName);
-    return status._type;
+    if (status._type != _PyStatus_TYPE_OK) {
+        return status;
+    }
+    status = Py_InitializeFromConfig(&config);
+    return status;
 }
 
 int

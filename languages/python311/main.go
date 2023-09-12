@@ -9,6 +9,7 @@ package main
 import "C"
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"path"
@@ -19,7 +20,10 @@ import (
 func Py_SetProgramName(name string) error {
 	cname := C.CString(name)
 	defer C.free(unsafe.Pointer(cname))
-	C.pry_set_program_name(cname)
+	status := C.pry_set_program_name(cname)
+	if status._type != 0 {
+		return errors.New(C.GoString(status.err_msg))
+	}
 	return nil
 }
 
