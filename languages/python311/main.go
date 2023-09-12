@@ -28,6 +28,7 @@ func Py_SetProgramName(name string) error {
 }
 
 func init() {
+	fmt.Println("init")
 	name := "python"
 	virtualEnv, virtualEnvSet := os.LookupEnv("VIRTUAL_ENV")
 	if virtualEnvSet {

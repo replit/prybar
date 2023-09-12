@@ -16,8 +16,18 @@ int pry_eval_file(FILE *f, const char *file, int argn, const char *argv)
     }
     xargv[argn] = NULL;
     PyConfig_SetArgv(&config, argn, xargv);
-    status = Py_InitializeFromConfig(&config);
 
+    printf("filename: %s\n", file);
+
+    config.module_search_paths_set = 1;
+    status = PyConfig_SetBytesString(&config, &config.program_name,
+                                "/home/toby/replit/prybar/main.py");
+    status = PyConfig_SetBytesString(&config, &config.run_filename,
+                                "/home/toby/replit/prybar/main.py");
+    status = PyWideStringList_Append(&config.module_search_paths,
+        L"/home/toby/replit/prybar/");
+    status = Py_InitializeFromConfig(&config);
+    PyConfig_Clear(&config);
     if (PyStatus_Exception(status)) {
         return status.exitcode;
     }
@@ -127,6 +137,7 @@ PyStatus pry_set_program_name(const char *name) {
         return status;
     }
     status = Py_InitializeFromConfig(&config);
+    PyConfig_Clear(&config);
     return status;
 }
 
