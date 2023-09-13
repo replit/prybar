@@ -121,18 +121,12 @@
           ];
           buildInputs = [
             pkgs.libxcrypt
-            # pkgs.R
             pkgs.nodejs
             pkgs.python38Full
             pkgs.python310Full
             pkgs.python311Full
-            # pkgs.lua5_1
             pkgs.readline
-            # clojureWithCP
-            # pkgs.jdk11_headless
-            # julia
             pkgs.zlib
-            # pkgs.ruby
             pkgs.sqlite
             pkgs.tcl
             pkgs.expect
