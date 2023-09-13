@@ -5,7 +5,7 @@
 , python3, copyPathToStore, rev, makeWrapper }:
 
 buildGoModule {
-  pname = "prybar-${language}";
+  pname = "prybar-${target}";
   version = rev;
 
   src = ./.;
@@ -80,7 +80,7 @@ buildGoModule {
       mkdir -p "$out/prybar_assets/${language}"
       cp -R "./prybar_assets/${language}" "$out/prybar_assets/"
 
-      wrapProgram "$out/bin/prybar-${language}" \
+      wrapProgram "$out/bin/prybar-${target}" \
         --set PRYBAR_ASSETS_DIR "$out/prybar_assets"
     fi
   '';
