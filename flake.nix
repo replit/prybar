@@ -47,8 +47,17 @@
           bluezSupport = true;
           x11Support = true;
         };
+
+        python311Full = pkgs.python311.override {
+          self = python311Full;
+          pythonAttr = "python311Full";
+          bluezSupport = true;
+          x11Support = true;
+        };
+
       in {
         packages = rec {
+
           prybar-nodejs = buildPrybar {
             language = "nodejs";
             binaries = [ pkgs.nodejs ];
@@ -64,6 +73,11 @@
           prybar-python310 = buildPrybar {
             language = "python310";
             buildInputs = [ pkgs.libxcrypt python310Full ];
+          };
+
+          prybar-python311 = buildPrybar {
+            language = "python311";
+            buildInputs = [ pkgs.libxcrypt python311Full ];
           };
 
           prybar-elisp = buildPrybar { language = "elisp"; };
@@ -98,17 +112,12 @@
           ];
           buildInputs = [
             pkgs.libxcrypt
-            pkgs.R
             pkgs.nodejs
             pkgs.python38Full
             pkgs.python310Full
-            pkgs.lua5_1
+            pkgs.python311Full
             pkgs.readline
-            clojureWithCP
-            pkgs.jdk11_headless
-            julia
             pkgs.zlib
-            pkgs.ruby
             pkgs.sqlite
             pkgs.tcl
             pkgs.expect
