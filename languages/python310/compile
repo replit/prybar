@@ -1,9 +1,0 @@
-#!/usr/bin/env bash
-
-COMPILE_DIR="$(dirname "$0")"
-
-cp $COMPILE_DIR/../python3/* $COMPILE_DIR/
-
-sed -i "s/python-3.8-embed/python-3.10-embed/g" $COMPILE_DIR/main.go
-
-bash $COMPILE_DIR/../../scripts/inject.sh python310
