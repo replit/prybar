@@ -12,7 +12,7 @@
         prybar = prev.lib.recurseIntoAttrs {
           inherit (self.packages.${prev.system})
             prybar-elisp prybar-julia prybar-nodejs
-            prybar-python2 prybar-python3 prybar-python38 prybar-python310
+            prybar-python2 prybar-python3 prybar-python38 prybar-python310 prybar-python311
             prybar-scala prybar-sqlite prybar-tcl;
         };
       };
