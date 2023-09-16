@@ -49,6 +49,7 @@ written in the host language which starts a Prybar-compatible REPL.
 | Ruby 2.5                  | ✔    | ✔               | ✔         | ✔    | ✗              | ✗          |
 | SQLite                    | ✔    | ✔               | ✔         | ✔    | ✗              | ✔          |
 | Tcl                       | ✔    | ✔               | ✔         | ✗    | ✗              | -          |
+| Brainfuck                 | ✔    | ✗               | ✗         | ✗    | ✔              | ✔          |
 
 ## Start to Develop with Nix
 
@@ -97,8 +98,7 @@ If you don't have nix yet, install that: https://nixos.org/
 
 Run `make image` to create a Docker image containing not only Prybar's
 dependencies and source code but also its compiled binaries, which can
-be embedded inside other Docker images by means of `COPY
---from=basicer/prybar`.
+be embedded inside other Docker images by means of `COPY --from=basicer/prybar`.
 
 This image is automatically built and deployed to [Docker
 Hub](https://hub.docker.com/) every time a commit is merged to
