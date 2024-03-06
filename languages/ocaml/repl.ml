@@ -108,7 +108,7 @@ let _ =
         then Filename.concat Filename.current_dir_name name
         else name
       in
-      use_silently ppf explicit_name
+      use_silently ppf (String explicit_name)
 
     let loop ppf =
       Clflags.debug := true ;
