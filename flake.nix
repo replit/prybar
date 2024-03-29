@@ -65,7 +65,7 @@
 
           prybar-python38 = buildPrybar {
             language = "python3";
-            target = "python38";
+            target = "python3";
             cgoPkgs = "python-3.8-embed";
             cgoExtraCflags = "-DPYTHON_3_8";
             buildInputs = [ pkgs.libxcrypt python38Full ];
