@@ -11,7 +11,7 @@
       overlays.default = final: prev: {
         prybar = prev.lib.recurseIntoAttrs {
           inherit (self.packages.${prev.system})
-            prybar-elisp prybar-julia prybar-nodejs
+            prybar-elisp prybar-julia prybar-lua prybar-nodejs
             prybar-python2 prybar-python3 prybar-python38 prybar-python310 prybar-python311
             prybar-scala prybar-sqlite prybar-tcl;
         };
@@ -40,7 +40,7 @@
           bluezSupport = true;
           x11Support = true;
         };
-        
+
         python310Full = pkgs.python310.override {
           self = python310Full;
           pythonAttr = "python310Full";
@@ -87,6 +87,11 @@
             cgoPkgs = "python-3.11-embed";
             cgoExtraCflags = "-DPYTHON_3_11";
             buildInputs = [ pkgs.libxcrypt python311Full ];
+          };
+
+          prybar-lua = buildPrybar {
+            language = "lua";
+            buildInputs = [ pkgs.lua5_1 pkgs.readline ];
           };
 
           prybar-elisp = buildPrybar { language = "elisp"; };
