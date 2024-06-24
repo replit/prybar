@@ -15,7 +15,7 @@ buildGoModule {
 
   subPackages = [ "languages/${language}" ];
 
-  vendorSha256 = "1nrycpyjmmhs8cl6bmrajfwczxsv8z20y7a9k7js8p7z60fz7pya";
+  vendorHash = "sha256-yt/zHTD/XKTlmUkdD8RHW/fPuJMq12UoQxrWKv1lPts=";
 
   # This prebiuild hook will setup the compiler flags on demand based on the package
   # If a language requires this, it MUST expost a ${pkgName}.pc file in its `lib/pkg-config`
