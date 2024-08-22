@@ -2,7 +2,7 @@
   description = "A universal interpreter front-end";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-23.05";
+    nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
     flake-utils.url = "github:numtide/flake-utils";
   };
 
@@ -12,7 +12,7 @@
         prybar = prev.lib.recurseIntoAttrs {
           inherit (self.packages.${prev.system})
             prybar-elisp prybar-julia prybar-lua prybar-nodejs
-            prybar-python2 prybar-python3 prybar-python38 prybar-python310 prybar-python311
+            prybar-python2 prybar-python3 prybar-python39 prybar-python310 prybar-python311
             prybar-scala prybar-sqlite prybar-tcl;
         };
       };
@@ -34,9 +34,9 @@
         clojureWithCP =
           import ./languages/clojure/wrappedClojure.nix { inherit pkgs; };
 
-        python38Full = pkgs.python38Full.override {
-          self = python38Full;
-          pythonAttr = "python38Full";
+        python39Full = pkgs.python39Full.override {
+          self = python39Full;
+          pythonAttr = "python39Full";
           bluezSupport = true;
           x11Support = true;
         };
@@ -63,15 +63,15 @@
             binaries = [ pkgs.nodejs ];
           };
 
-          prybar-python38 = buildPrybar {
+          prybar-python39 = buildPrybar {
             language = "python3";
             target = "python3";
-            cgoPkgs = "python-3.8-embed";
-            cgoExtraCflags = "-DPYTHON_3_8";
-            buildInputs = [ pkgs.libxcrypt python38Full ];
+            cgoPkgs = "python-3.9-embed";
+            cgoExtraCflags = "-DPYTHON_3_9";
+            buildInputs = [ pkgs.libxcrypt python39Full ];
           };
 
-          prybar-python3 = prybar-python38;
+          prybar-python3 = prybar-python39;
 
           prybar-python310 = buildPrybar {
             language = "python3";
