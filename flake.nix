@@ -12,7 +12,7 @@
         prybar = prev.lib.recurseIntoAttrs {
           inherit (self.packages.${prev.system})
             prybar-elisp prybar-julia prybar-lua prybar-nodejs
-            prybar-python2 prybar-python3 prybar-python39 prybar-python310 prybar-python311
+            prybar-python2 prybar-python3 prybar-python38 prybar-python310 prybar-python311
             prybar-scala prybar-sqlite prybar-tcl;
         };
       };
@@ -31,12 +31,16 @@
 
         julia = import ./languages/julia/julia.nix { inherit pkgs; };
 
-        clojureWithCP =
-          import ./languages/clojure/wrappedClojure.nix { inherit pkgs; };
-
-        python39Full = pkgs.python39Full.override {
-          self = python39Full;
-          pythonAttr = "python39Full";
+        python38Full = pkgs.python3.override {
+          self = python38Full;
+          sourceVersion = {
+            major = "3";
+            minor = "8";
+            patch = "18";
+            suffix = "";
+          };
+          hash = "sha256-P/txzTSaMmunsvrcfn34a6V33ZxJF+UqhAGtvadAXj8=";
+          pythonAttr = "python38Full";
           bluezSupport = true;
           x11Support = true;
         };
@@ -63,15 +67,15 @@
             binaries = [ pkgs.nodejs ];
           };
 
-          prybar-python39 = buildPrybar {
+          prybar-python38 = buildPrybar {
             language = "python3";
             target = "python3";
-            cgoPkgs = "python-3.9-embed";
-            cgoExtraCflags = "-DPYTHON_3_9";
-            buildInputs = [ pkgs.libxcrypt python39Full ];
+            cgoPkgs = "python-3.8-embed";
+            cgoExtraCflags = "-DPYTHON_3_8";
+            buildInputs = [ pkgs.libxcrypt python38Full ];
           };
 
-          prybar-python3 = prybar-python39;
+          prybar-python3 = prybar-python38;
 
           prybar-python310 = buildPrybar {
             language = "python3";
@@ -127,9 +131,9 @@
           buildInputs = [
             pkgs.libxcrypt
             pkgs.nodejs
-            pkgs.python38Full
-            pkgs.python310Full
-            pkgs.python311Full
+            python38Full
+            python310Full
+            python311Full
             pkgs.readline
             pkgs.zlib
             pkgs.sqlite
