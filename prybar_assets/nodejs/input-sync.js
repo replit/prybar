@@ -278,7 +278,7 @@ function keyInYNStrict(prompt) {
       if (char.match(/[yn]/i)) {
         writeTTYOutput(`${char}\r\n`);
 
-        return char === "y" || char === "Y";
+        return char.toUpperCase() === "Y";
       }
     }
   });
