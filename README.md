@@ -74,7 +74,7 @@ Alternately, you can use the nix shell. Enter
 nix develop
 ```
 
-to drop into a shell that has all dependencies installed an ready to go.
+to drop into a shell that has all dependencies installed and ready to go.
 
 If you don't have nix yet, install that: https://nixos.org/
 
